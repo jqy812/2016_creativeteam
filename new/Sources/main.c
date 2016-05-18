@@ -39,6 +39,8 @@ void Mode0_DebugCamera(void)
 	
 	for (;;)
 	{
+		//control_car_action();//rfid_ou
+
 		if(fieldover)
 		{
 			fieldover=0;                                              
@@ -71,6 +73,7 @@ void Mode0_DebugCamera(void)
 			EMIOS_0.CH[3].CSR.B.FLAG = 1;
 			EMIOS_0.CH[3].CCR.B.FEN=1;
 		}
+
 	}
 }
 
