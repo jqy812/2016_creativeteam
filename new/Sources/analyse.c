@@ -309,6 +309,10 @@ void FindBlackLine(void)
 	//DetectSlope();					//检测坡道
 	AnalyzeRoadType();				//分析赛道类型	
 	CenterLineFill();				//中线补线
+#if 0
+	for(i=RoadEnd;i<=RoadStart;++i)
+		CenterLine[i]=(CenterLine[i]+BlackLine[1][i])/2;
+#endif
 	TargetOffset();					//目标控制量
 }
 
@@ -2570,7 +2574,7 @@ void CenterLineFill(void)//从最近处的一点开始进行平滑处理
 	//防止补线失败
 	for(i=ROW;i>=RoadEnd;i--)
 	{
-		if(CenterLine[i]==120)
+		if(CenterLine[i]==120)  
 		{
 			CenterLine[i]=41;
 		}

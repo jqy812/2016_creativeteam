@@ -1,6 +1,6 @@
 ﻿#define __SUPERSONIC_C_
 #include "includes.h"
-
+int sign=0;
 
 //**********************超声0***************************
 void init_supersonic_trigger_0(void)
@@ -243,19 +243,35 @@ void get_supersonic_time_3(void)
 
 void supersonic(void)
 {
- 	trigger_supersonic_0();
-    get_supersonic_time_0();
- 	while((ABS((WORD)(tmp_time.R))/100)<250)
+ 	trigger_supersonic_2();
+    get_supersonic_time_2();
+    if(((WORD)(tmp_time2.R)/100)<270)
+    {
+    	sign++;
+    	trigger_supersonic_2();
+    	get_supersonic_time_2();
+    	LCD_Write_Num(96,6,((WORD)(tmp_time2.R)/100),5);
+    }
+    else if(((WORD)(tmp_time2.R)/100)>270)
+    {
+    	sign=0;
+    	trigger_supersonic_2();
+    	get_supersonic_time_2();
+    	LCD_Write_Num(96,6,((WORD)(tmp_time2.R)/100),5);
+    }
+   if(sign>=12)
+   {
+     	set_speed_pwm(-800);
+     	delay_ms(400);
+     	set_speed_pwm(0);
+    }
+ 	while(sign>=12)
  	{
- 		trigger_supersonic_0();
- 		D6=0;
- 		D7=1;
- 		LCD_Write_Num(96,6,(ABS((WORD)(tmp_time.R))/100),5);
- 		get_supersonic_time_0();
+ 		trigger_supersonic_2();
+ 		get_supersonic_time_2();
+ 		LCD_Write_Num(96,6,((WORD)(tmp_time2.R)/100),5);
  		set_speed_pwm(0);
+ 		if(((WORD)(tmp_time2.R)/100)>270)
+ 			sign=0;
  	}
-
- 	D6=1;
-    D7=0;
-
 }

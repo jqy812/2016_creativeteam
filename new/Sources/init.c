@@ -313,7 +313,7 @@ void init_all_and_POST(void)
 	init_pit();
 	init_led();
 	init_DIP();
-	init_serial_port_1();
+	init_serial_port_0();
 	//init_ADC();
 	//init_serial_port_3();
 	init_supersonic_receive_0();

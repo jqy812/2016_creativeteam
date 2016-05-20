@@ -34,7 +34,7 @@ void SteerControl()
 	if(RoadType==NoLine||RoadType==Wrong) {
 		Steer_PWM[3]=(Steer_PWM[2]+Steer_PWM[1])/2;
 		set_steer_helm_basement(Steer_PWM[3]);
-//		set_steer_helm(Steer_PWM[3]);
+		//set_steer_helm(Steer_PWM[3]);
 		//存舵机值
 		Steer_PWM[0]=Steer_PWM[1];Steer_PWM[1]=Steer_PWM[2];Steer_PWM[2]=Steer_PWM[3];
 		return;
@@ -61,14 +61,14 @@ void SteerControl()
 			else							{Steer_kp=12;Steer_kd=5;}
 #endif
 //	Steer_PWM[3]=Steer_kp*target_offset+Steer_kd*(target_offset-last_offset);
-	Steer_PWM[3]=STEER_HELM_CENTER+Steer_kp*target_offset+Steer_kd*(target_offset-last_offset);//位置式PD
+	Steer_PWM[3]=data_steer_helm_basement.center+Steer_kp*target_offset+Steer_kd*(target_offset-last_offset);//位置式PD
 	//if(ABS(Steer_PWM[3]-Steer_PWM[2])>250) Steer_PWM[3]=(Steer_PWM[2]+Steer_PWM[1])/2;
 	//感觉不太靠谱，调的不好
 	
 	//舵机限值+舵机输出
 //	set_steer_helm(Steer_PWM[3]);
 //	LCD_Write_Num(105,5,(int)Steer_PWM[3],4);
-	set_speed_pwm(210);
+	set_speed_pwm(500);
 	set_steer_helm_basement(Steer_PWM[3]);
 //	EMIOS_0.CH[9].CBDR.R = Steer_PWM[3];
 	LCD_Write_Num(105,5,(int)Steer_PWM[3],4);

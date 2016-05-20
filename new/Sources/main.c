@@ -10,6 +10,7 @@ int jishu=0;
 int jia=0;
 int i;
 int j;
+BYTE video_sender;
 
 void Mode0_DebugCamera(void);
 void Mode1_SendVideo(void);
@@ -42,30 +43,39 @@ void Mode0_DebugCamera(void)
 		if(fieldover)
 		{
 			fieldover=0;                                              
-			set_speed_pwm(240); 
+			set_speed_pwm(800); 
 			FindBlackLine();
 	    //	Display_Video();
 			CenterLineWithVideo();
 	     	Video_Show();
-	    	supersonic();
+	    //	supersonic();
+#if 1
+	     	for(video_sender=0;video_sender<70;video_sender++)
+	     	{
+	     		serial_port_0_TX(CenterLine[video_sender]);
+	     	}
+#endif
+	     	
 			if(target_offset<0)
 				LCD_write_english_string(96,1,"-");
 			else LCD_write_english_string(96,1,"+");
 			LCD_Write_Num(105,1,ABS(target_offset),2);
 			LCD_Write_Num(105,2,RoadType,2);
+#if 0
 			if(flag_Rightangle_l)	
 			{ 
-				set_speed_pwm(210);
+				set_speed_pwm(500);
 				set_steer_helm_basement(data_steer_helm_basement.left_limit);   
 				LCD_Write_Num(105,3,(int)flag_Rightangle_l,4);
 			}
 			else if(flag_Rightangle_r)		
 			{ 
-				set_speed_pwm(210); 
+				set_speed_pwm(500);
 				set_steer_helm_basement(data_steer_helm_basement.right_limit);   
 				LCD_Write_Num(105,4,(int)flag_Rightangle_r,4);
 			}
-			else				
+			else
+#endif
 				SteerControl();
 
 			EMIOS_0.CH[3].CSR.B.FLAG = 1;
