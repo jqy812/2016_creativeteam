@@ -311,7 +311,7 @@ void FindBlackLine(void)
 	CenterLineFill();				//中线补线
 #if 0
 	for(i=RoadEnd;i<=RoadStart;++i)
-		CenterLine[i]=(CenterLine[i]+BlackLine[1][i])/2;
+		CenterLine[i]=(CenterLine[i]+15);
 #endif
 	TargetOffset();					//目标控制量
 }

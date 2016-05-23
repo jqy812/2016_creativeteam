@@ -83,14 +83,11 @@ void RFID_control_car_2_action(DWORD site)
 //	{
 //		set_steer_helm(0);
 //	}
-#if 0
 	if (RFID_CARD_ID_2_4 == site&&RFID_site_data.old_site==RFID_CARD_ID_1_3)
 	{
 		Road_num=WIFI_ADDRESS_Road_Node_1;
 		send_net_cmd(Road_num,WIFI_CMD_ASK_ROAD);//请求节点发送路况信息
 	}
-#endif//ou
-	rfid_ask_road(0x01, 0xFF, 0xCD, site);
 }
 /*-----------------------------------------------------------------------*/
 /* 整车动作控制                                                          */
@@ -203,12 +200,6 @@ void WiFi_control_car_4_action(WORD cmd)
 /*-----------------------------------------------------------------------*/
 void control_car_action(void)
 {
-	if (RFID_site_data.is_new_site)
-			{
-				RFID_site_data.is_new_site = 0;
-				RFID_control_car_2_action(RFID_site_data.site);
-			}
-#if 0
 	if (WIFI_ADDRESS_CAR_2 == g_device_NO)
 	{
 		if (RFID_site_data.is_new_site)
@@ -271,6 +262,5 @@ void control_car_action(void)
 			WiFi_control_car_1_action(g_net_control_data.cmd);
 		}
 	}
-#endif
 
 }

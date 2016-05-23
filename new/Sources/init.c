@@ -313,13 +313,7 @@ void init_all_and_POST(void)
 	init_pit();
 	init_led();
 	init_DIP();
-<<<<<<< HEAD
 	init_serial_port_0();
-=======
-	init_serial_port_1();
-	//init_serial_port_0();//wifi
-	//init_serial_port_2();//rfid_ou
->>>>>>> afda39200f48244d7f6dccff78656ae1d48a340e
 	//init_ADC();
 	//init_serial_port_3();
 	init_supersonic_receive_0();
@@ -395,9 +389,9 @@ void init_all_and_POST(void)
 	{
 		suicide();
 	}
-#if 0
+	
 	/* 开启RFID读卡器主动模式 */
-
+#if 0
 	if (!init_RFID_modul_type())
 	{
 		g_devices_init_status.RFIDCard_energetic_mode_enable_is_OK = 1;
@@ -413,6 +407,8 @@ void init_all_and_POST(void)
 	/* 换屏 */
 	LCD_Fill(0x00);
 #endif
+
+
 	/* 读取舵机参数 */
 	LCD_P8x16Str(0, 0, (BYTE*)"StH.L=");
 	if (read_steer_helm_data_from_TF())

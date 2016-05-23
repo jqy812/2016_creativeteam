@@ -40,8 +40,6 @@ void Mode0_DebugCamera(void)
 	
 	for (;;)
 	{
-		//control_car_action();//rfid_ou
-
 		if(fieldover)
 		{
 			fieldover=0;                                              
@@ -50,8 +48,9 @@ void Mode0_DebugCamera(void)
 	    //	Display_Video();
 			CenterLineWithVideo();
 	     	Video_Show();
-	    //	supersonic();
-#if 1
+	    // 	Send_CCD_Video();
+	    // 	supersonic();
+#if 0
 	     	for(video_sender=0;video_sender<70;video_sender++)
 	     	{
 	     		serial_port_0_TX(CenterLine[video_sender]);
@@ -83,7 +82,6 @@ void Mode0_DebugCamera(void)
 			EMIOS_0.CH[3].CSR.B.FLAG = 1;
 			EMIOS_0.CH[3].CCR.B.FEN=1;
 		}
-
 	}
 }
 

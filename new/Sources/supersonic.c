@@ -245,33 +245,35 @@ void supersonic(void)
 {
  	trigger_supersonic_2();
     get_supersonic_time_2();
-    if(((WORD)(tmp_time2.R)/100)<270)
+    if(((WORD)(tmp_time2.R)/100)<320)
     {
     	sign++;
     	trigger_supersonic_2();
     	get_supersonic_time_2();
     	LCD_Write_Num(96,6,((WORD)(tmp_time2.R)/100),5);
     }
-    else if(((WORD)(tmp_time2.R)/100)>270)
+    else if(((WORD)(tmp_time2.R)/100)>320)
     {
     	sign=0;
     	trigger_supersonic_2();
     	get_supersonic_time_2();
     	LCD_Write_Num(96,6,((WORD)(tmp_time2.R)/100),5);
     }
-   if(sign>=12)
+#if 1
+   if(sign>=20)
    {
-     	set_speed_pwm(-800);
-     	delay_ms(400);
+     	set_speed_pwm(-1300);
+     	delay_ms(200);
      	set_speed_pwm(0);
     }
- 	while(sign>=12)
+#endif
+ 	while(sign>=20)
  	{
  		trigger_supersonic_2();
  		get_supersonic_time_2();
  		LCD_Write_Num(96,6,((WORD)(tmp_time2.R)/100),5);
  		set_speed_pwm(0);
- 		if(((WORD)(tmp_time2.R)/100)>270)
+ 		if(((WORD)(tmp_time2.R)/100)>320)
  			sign=0;
  	}
 }
