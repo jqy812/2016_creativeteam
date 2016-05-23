@@ -134,6 +134,7 @@ extern int rev_remote_frame_2(BYTE rev);
 extern void generate_remote_frame_2(BYTE scr, BYTE des, WORD cmd, BYTE length, const BYTE data[]);
 extern void send_remote_request_data(void);
 void send_net_cmd(BYTE des, WORD net_cmd);
+void rfid_ask_road(BYTE scr, BYTE des, BYTE length, DWORD RFID_Num);
 void report_online(void);
 
 

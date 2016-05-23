@@ -40,6 +40,7 @@ void Mode0_DebugCamera(void)
 	
 	for (;;)
 	{
+		//control_car_action();//ouyang
 		if(fieldover)
 		{
 			fieldover=0;                                              
