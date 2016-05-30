@@ -313,8 +313,8 @@ void init_all_and_POST(void)
 	init_pit();
 	init_led();
 	init_DIP();
-	init_serial_port_1();//Wifi_ouyang
-	init_serial_port_2();//rfid_ouyang
+//	init_serial_port_1();//Wifi_ouyang
+//	init_serial_port_2();//rfid_ouyang
 	init_serial_port_0();
 	//init_ADC();
 	//init_serial_port_3();
@@ -393,7 +393,7 @@ void init_all_and_POST(void)
 	}
 	
 	/* 开启RFID读卡器主动模式 */
-#if 0
+#if 0//ouyang
 	if (!init_RFID_modul_type())
 	{
 		g_devices_init_status.RFIDCard_energetic_mode_enable_is_OK = 1;

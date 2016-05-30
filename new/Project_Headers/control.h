@@ -163,6 +163,7 @@ extern void control_angle_steer_helm(int angle_target);
 extern void control_speed_motor(int speed_target);
 extern int abs(int data);
 extern void set_steer_helm(SWORD helmData);
+extern void Road_Stop(void);
 
 
 

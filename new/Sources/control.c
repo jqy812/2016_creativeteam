@@ -391,3 +391,8 @@ int abs(int data)
 	return data;
 }
 #endif
+
+void Road_Stop(void)
+{
+	set_speed_pwm(0);
+}

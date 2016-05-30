@@ -114,6 +114,7 @@ void explane_RFID_ret_data(const BYTE *data, WORD length)
 			RFID_site_data.site = cardID;
 			RFID_site_data.is_new_site = 1;
 			RFID_site_data.time = g_time_basis_PIT;
+			RFID_site_data.roadnum=RFID_Num_Exp(cardID);
 		}
 	}
 }
@@ -152,4 +153,14 @@ int init_RFID_modul_type(void)
 	{
 		return 0;
 	}
+}
+/*-----------------------------------------------------------------------*/
+/* RFID卡对应路段  by 欧阳                                                          */
+/*-----------------------------------------------------------------------*/
+WORD RFID_Num_Exp(DWORD site)
+{
+	if(site== ROAD_NUM_1001)
+		return 0x1001;
+	if(site== ROAD_NUM_1002)
+		return 0x1002;
 }

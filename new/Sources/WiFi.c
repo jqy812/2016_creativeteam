@@ -274,7 +274,7 @@ void send_remote_request_data(void)
 	}
 	*/
 }
-void rfid_ask_road(BYTE scr, BYTE des, BYTE length, DWORD RFID_Num)
+void rfid_ask_road(BYTE scr, BYTE des, BYTE length,	WORD cmd ,WORD RFID_Num)
 {
 	WORD i = 0, j = 0;
 	byte num_1=0x00,num_2=0x00,num_3=0x00, num_4=0x00;//ou
@@ -285,11 +285,10 @@ void rfid_ask_road(BYTE scr, BYTE des, BYTE length, DWORD RFID_Num)
 	remote_frame_data_send[i++] = scr;
 	remote_frame_data_send[i++] = des;
 	remote_frame_data_send[i++] = length;
-	//ou_取16进制数
 	num_temp=0xFF;
-	num_1=(byte)((RFID_Num>>24)&num_temp);
+	num_1=(byte)((cmd>>8)&num_temp);
 	remote_frame_data_send[i++] = num_1 ;
-	num_2=(byte)((RFID_Num>>16)&num_temp);
+	num_2=(byte)(cmd&num_temp);
 	remote_frame_data_send[i++] = num_2 ;
 	num_3=(byte)((RFID_Num>>8)&num_temp);
 	remote_frame_data_send[i++] = num_3 ;

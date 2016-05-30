@@ -40,17 +40,26 @@ void Mode0_DebugCamera(void)
 	
 	for (;;)
 	{
-		//control_car_action();//ouyang
+#if 0
+		control_car_action();//ouyang
+		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
+		{
+			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
+					
+			execute_remote_cmd(remote_frame_data+5);
+		}
+#endif
+	   
 		if(fieldover)
 		{
 			fieldover=0;                                              
-			set_speed_pwm(800); 
+			set_speed_pwm(500); 
 			FindBlackLine();
 	    //	Display_Video();
 			CenterLineWithVideo();
 	     	Video_Show();
 	    // 	Send_CCD_Video();
-	    // 	supersonic();
+	    //	supersonic();
 #if 0
 	     	for(video_sender=0;video_sender<70;video_sender++)
 	     	{

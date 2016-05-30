@@ -53,6 +53,9 @@
 #define RFID_MODUL_TYPE_OLD (1)
 #define RFID_MODUL_TYPE_NEW (2)
 
+#define ROAD_NUM_1001 (0x3ABE1FBD)//路段名 by 欧阳
+#define ROAD_NUM_1002 (0xCA7C00BD)
+
 extern const BYTE rfid_cmd_get_id[];
 extern const BYTE rfid_cmd_get_data[];
 extern const BYTE rfid_cmd_energetic_mode_enable[];
@@ -77,6 +80,7 @@ extern struct
 	DWORD site;
 	DWORD time;
 	DWORD old_site;
+	WORD roadnum;
 	int is_new_site;
 } RFID_site_data;
 #endif
@@ -85,5 +89,6 @@ extern int rev_RFID_frame(BYTE rev);
 extern void explane_RFID_ret_data(const BYTE *data, WORD length);
 extern void explane_RFID_ret_cardID(DWORD id);
 extern int init_RFID_modul_type(void);
+extern WORD RFID_Num_Exp(DWORD site);
 
 #endif

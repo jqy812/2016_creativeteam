@@ -63,13 +63,20 @@ void set_car_direction(SBYTE act)
 /* RFID                                                                  */
 /* 车1                                                                   */
 /*-----------------------------------------------------------------------*/
-void RFID_control_car_1_action(DWORD site)
+void RFID_control_car_1_action(WORD site)//欧阳修改
 {
+#if 0
 	if (RFID_CARD_ID_2_4 == site&&RFID_site_data.old_site==RFID_CARD_ID_1_3)
 	{
 		Road_num=WIFI_ADDRESS_Road_Node_1;
 		send_net_cmd(Road_num,WIFI_CMD_ASK_ROAD);//请求节点发送路况信息
 	}
+#endif
+	if((site>>12)==0x1)//在红绿灯路口
+	{
+		rfid_ask_road(0x01, 0xFF, 0x04,	0x00CD ,site);
+		Road_Stop();
+	}	
 }
 
 /*-----------------------------------------------------------------------*/
@@ -90,7 +97,8 @@ void RFID_control_car_2_action(DWORD site)
 		send_net_cmd(Road_num,WIFI_CMD_ASK_ROAD);//请求节点发送路况信息
 	}
 #endif
-	rfid_ask_road(0x01, 0xFF, 0xCD, site);
+	//rfid_ask_road(0x01, 0xFF, 0xCD, site);//CD=CARD
+	//road_stop();
 }
 /*-----------------------------------------------------------------------*/
 /* 整车动作控制                                                          */
@@ -203,10 +211,13 @@ void WiFi_control_car_4_action(WORD cmd)
 /*-----------------------------------------------------------------------*/
 void control_car_action(void)
 {
-	if (RFID_site_data.is_new_site)
+	if(WIFI_ADDRESS_CAR_1 == g_device_NO)
 	{
-		RFID_site_data.is_new_site = 0;
-		RFID_control_car_2_action(RFID_site_data.site);
+		if (RFID_site_data.is_new_site)
+		{
+			RFID_site_data.is_new_site = 0;
+			RFID_control_car_1_action(RFID_site_data.roadnum);
+		}
 	}
 #if 0
 	if (WIFI_ADDRESS_CAR_2 == g_device_NO)
@@ -273,3 +284,4 @@ void control_car_action(void)
 	}
 #endif
 }
+
