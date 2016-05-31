@@ -1,6 +1,8 @@
 ﻿#define __INIT_C_
 #include "includes.h"
-
+int Lcounter=0;
+int sending_waiter=0;
+int LightCWifi=0;
 
 FATFS fatfs1;	/* 会被文件系统引用，不得释放 */
 int mode=0;
@@ -313,8 +315,8 @@ void init_all_and_POST(void)
 	init_pit();
 	init_led();
 	init_DIP();
-//	init_serial_port_1();//Wifi_ouyang
-//	init_serial_port_2();//rfid_ouyang
+	init_serial_port_1();//Wifi_ouyang
+	init_serial_port_2();//rfid_ouyang
 	init_serial_port_0();
 	//init_ADC();
 	//init_serial_port_3();
@@ -331,7 +333,7 @@ void init_all_and_POST(void)
 	//init_DSPI_2();
 	//init_I2C();
 	init_choose_mode();
-	
+	init_pit_1s_L();
 	
 	/* 初始化SPI总线 */
 	//init_DSPI_1();
@@ -391,9 +393,9 @@ void init_all_and_POST(void)
 	{
 		suicide();
 	}
-	
+	device_Num_change();
 	/* 开启RFID读卡器主动模式 */
-#if 0//ouyang
+//#if 0//ouyang
 	if (!init_RFID_modul_type())
 	{
 		g_devices_init_status.RFIDCard_energetic_mode_enable_is_OK = 1;
@@ -408,7 +410,7 @@ void init_all_and_POST(void)
 	delay_ms(1000);
 	/* 换屏 */
 	LCD_Fill(0x00);
-#endif
+//#endif
 
 
 	/* 读取舵机参数 */
@@ -460,6 +462,31 @@ void init_all_and_POST(void)
 void suicide(void)
 {
 	while (1) { }
+}
+
+
+void init_pit_1s_L(void)
+{
+	/* NOTE:  DIVIDER FROM SYSCLK TO PIT ASSUMES DEFAULT DIVIDE BY 1 */
+	PIT.PITMCR.R = 0x00000001;	/* Enable PIT and configure timers to stop in debug modem */
+	PIT.CH[1].LDVAL.R = 800000;	/* 800000==10ms */
+	PIT.CH[1].TCTRL.R = 0x00000003;	/* Enable PIT1 interrupt and make PIT active to count */
+	INTC_InstallINTCInterruptHandler(Pit_1s_L,60,1);	/* PIT 1 interrupt vector with priority 1 */
+}
+void Pit_1s_L(void)//10ms
+{
+	Lcounter++;
+	if(Lcounter==80)
+	{
+		Lcounter=0;
+		LightCWifi=1;
+	}
+	if(Lcounter==10)
+	{
+		sending_waiter++;    //用来发送完等待一段时间
+	}
+	
+	PIT.CH[1].TFLG.B.TIF = 1;	// MPC56xxB/P/S: Clear PIT 1 flag by writing 1
 }
 
 

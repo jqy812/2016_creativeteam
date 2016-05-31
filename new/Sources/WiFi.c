@@ -5,9 +5,14 @@
 int g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
 int g_remote_frame_cnt = 0;
 int g_start_all=0;
+int have_responsed;
+int order_received; 
+int Light_Status=0;
 BYTE remote_frame_data[REMOTE_FRAME_LENGTH];
 BYTE remote_frame_data_send[REMOTE_FRAME_LENGTH];
-BYTE g_device_NO = WIFI_ADDRESS_CAR_1;	/* 设备号 即WiFi地址 */
+BYTE g_device_NO = WIFI_ADDRESS_CAR_1;
+BYTE g_device_NO_Hex;/* 设备号 即WiFi地址 */
+int  lost_data=0;
 
 
 /*-----------------------------------------------------------------------*/
@@ -95,7 +100,6 @@ void execute_remote_cmd(const BYTE *data)
 	}
 }
 
-
 /*-----------------------------------------------------------------------*/
 /* 接受远程数据帧                                                        */
 /* 第二版                                                                */
@@ -162,7 +166,18 @@ int rev_remote_frame_2(BYTE rev)
 			g_remote_frame_state = REMOTE_FRAME_STATE_OK;	//CheckSum Success
 		}
 	}
-	
+	if (remote_frame_data[2] == 0x33 && remote_frame_data[3] == g_device_NO_Hex && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)   
+	{	
+		have_responsed=1;	
+	}// 检查是否得到应答 
+	if (remote_frame_data[2] == 0x33 &&remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xCD && remote_frame_data[6]==0x01)   
+	{
+		order_received =1;
+		if(remote_frame_data[8]==0x0A)
+			Light_Status=0;	
+		if(remote_frame_data[8]==0x0B)
+			Light_Status=1;	
+	}// 红绿灯状态
 	return g_remote_frame_state;
 }
 
@@ -276,6 +291,11 @@ void send_remote_request_data(void)
 }
 void rfid_ask_road(BYTE scr, BYTE des, BYTE length,	WORD cmd ,WORD RFID_Num)
 {
+	Temp_Send_Data.scr=scr;
+	Temp_Send_Data.des=des;
+	Temp_Send_Data.length=length;
+	Temp_Send_Data.cmd=cmd;
+	Temp_Send_Data.RFID_Num=RFID_Num;
 	WORD i = 0, j = 0;
 	byte num_1=0x00,num_2=0x00,num_3=0x00, num_4=0x00;//ou
 	byte check;
@@ -302,4 +322,62 @@ void rfid_ask_road(BYTE scr, BYTE des, BYTE length,	WORD cmd ,WORD RFID_Num)
 	remote_frame_data_send[i++] = check;
 	serial_port_0_TX_array(remote_frame_data_send, 10);//ouyang
 }
+//*********************************************************************************
+//  主发送程序                 输入： 发送所需的数据      输出： 1 串口发送      2  waiting位     3 串口发送备份给备发送程序    4 发送丢失数
+//*********************************************************************************
+void main_wifi_sender (WORD data_input)
+{  
+//	***********如果依然在等待回复，放弃上一个发送的等待，并且lostdata数加一***************
+	if (waiting_for_response==1)
+	{
+	   lost_data++;
+	   waiting_for_response=0;
+	}
+//	***********发送函数主体***************	                                    
+	rfid_ask_road(g_device_NO_Hex,0x33,0x04,0x00CD,data_input);
+//  ***********等待回复位置1*************** 
+	waiting_for_response=1;
+	have_responsed=0;  
+	sending_waiter=0;
+}
 
+//*********************************************************************************
+//  应答检查程序               定时检查发送的数据是否得到了应答，若未，则使用辅助发送程序再次发送。 直到收到应答或有新的程序要发数据。
+//*********************************************************************************
+void wifi_sender_checker (void)
+{ 
+	if (sending_waiter<5)
+	{
+		return;
+	}
+	else
+	{
+		if (waiting_for_response==1)
+		{
+			if (have_responsed==1)
+			{
+				waiting_for_response=0;
+			}
+			else if (have_responsed==0)
+			{
+				ancillary_wifi_sender ();
+			}
+		}
+	}
+}
+//*********************************************************************************
+//  辅助发送程序                 输入： 如果未应答，再发送数据      输出：  串口发送    
+//*********************************************************************************
+void ancillary_wifi_sender (void)
+{                                      		    
+	rfid_ask_road(Temp_Send_Data.scr, Temp_Send_Data.des, Temp_Send_Data.length, Temp_Send_Data.cmd ,Temp_Send_Data.RFID_Num);
+}
+
+void wifi_receive_checker (void)
+{
+	if (order_received == 1)
+	{
+		order_received=0;
+		rfid_ask_road(g_device_NO_Hex, 0x33, 0x04, 0x0000, 0x0000);
+	}
+}

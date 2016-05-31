@@ -8,6 +8,7 @@ byte Road_num=0;
 int g_f_red=0;//信号灯标志位
 int car_direction=1;//车身绝对方向：1234北东南西
 int old_car_direction=1;//车身上一次绝对方向：1234北东南西
+BYTE waiting_for_response=0;
 
 /*------------------------------*/
 /* 车灯控制程序    掉头                                         */  
@@ -72,11 +73,10 @@ void RFID_control_car_1_action(WORD site)//欧阳修改
 		send_net_cmd(Road_num,WIFI_CMD_ASK_ROAD);//请求节点发送路况信息
 	}
 #endif
-	if((site>>12)==0x1)//在红绿灯路口
+	if((site>>12)==0x1||(site>>12)==0x3)//在红绿灯路口
 	{
-		rfid_ask_road(0x01, 0xFF, 0x04,	0x00CD ,site);
-		Road_Stop();
-	}	
+		main_wifi_sender (site);
+	}
 }
 
 /*-----------------------------------------------------------------------*/
@@ -213,10 +213,16 @@ void control_car_action(void)
 {
 	if(WIFI_ADDRESS_CAR_1 == g_device_NO)
 	{
-		if (RFID_site_data.is_new_site)
+		if (RFID_site_data.is_new_site && RFID_site_data.old_site!=RFID_site_data.site)
 		{
 			RFID_site_data.is_new_site = 0;
 			RFID_control_car_1_action(RFID_site_data.roadnum);
+		}
+		if(LightCWifi==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
+		{
+			LightCWifi=0;
+			wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
+			wifi_receive_checker();    // 收到数据回复我收到了 by xiong
 		}
 	}
 #if 0
@@ -283,5 +289,12 @@ void control_car_action(void)
 		}
 	}
 #endif
+}
+void device_Num_change(void)
+{
+	if(g_device_NO==1)
+		g_device_NO_Hex=0x01;
+	if(g_device_NO==2)
+		g_device_NO_Hex=0x02;
 }
 

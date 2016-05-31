@@ -33,14 +33,13 @@ void main(void)
 }
 void Mode0_DebugCamera(void)
 {
-//	set_speed_target(20);
+	set_speed_target(20);
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
 	LCD_write_english_string(96,0,"T");
 	LCD_write_english_string(96,2,"R");
 	
 	for (;;)
 	{
-#if 0
 		control_car_action();//ouyang
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
@@ -48,12 +47,11 @@ void Mode0_DebugCamera(void)
 					
 			execute_remote_cmd(remote_frame_data+5);
 		}
-#endif
 	   
 		if(fieldover)
 		{
 			fieldover=0;                                              
-			set_speed_pwm(500); 
+		//	set_speed_pwm(500); oy
 			FindBlackLine();
 	    //	Display_Video();
 			CenterLineWithVideo();

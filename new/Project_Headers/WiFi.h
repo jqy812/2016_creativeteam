@@ -92,7 +92,11 @@
 extern BYTE remote_frame_data[];
 extern int g_remote_frame_state;
 extern BYTE g_device_NO;
+extern BYTE g_device_NO_Hex;
 extern int g_start_all;
+extern int sending_waiter;
+extern int have_responsed;
+extern int Light_Status;
 
 /* 远程控制标志位 */
 #ifdef __WIFI_C_
@@ -136,7 +140,18 @@ extern void send_remote_request_data(void);
 void send_net_cmd(BYTE des, WORD net_cmd);
 extern void rfid_ask_road(BYTE scr, BYTE des, BYTE length,	WORD cmd ,WORD RFID_Num);
 void report_online(void);
+extern void wifi_sender_checker (void);
+extern void main_wifi_sender (WORD data_input);
+void ancillary_wifi_sender (void);
+void wifi_receive_checker (void);
 
-
-
+extern struct
+{
+	BYTE scr;
+	BYTE des;
+	BYTE length;
+	WORD cmd;
+	WORD RFID_Num;
+} Temp_Send_Data;
 #endif
+

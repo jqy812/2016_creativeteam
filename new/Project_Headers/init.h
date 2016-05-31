@@ -7,7 +7,7 @@
 
 extern FATFS fatfs1;
 extern int mode;
-
+extern int LightCWifi;
 
 /* 设备初始化状态 */
 #ifdef __INIT_C_
@@ -53,6 +53,8 @@ extern void delay_us(DWORD us);
 extern void delay_ms(DWORD ms);
 extern void init_all_and_POST(void);
 extern void suicide(void);
+void init_pit_1s_L(void);
+void Pit_1s_L(void);
 
 
 #endif
