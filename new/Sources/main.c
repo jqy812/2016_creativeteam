@@ -337,44 +337,42 @@ void Mode3_Andriod(void)
 {
 	for(;;)
     {
-//		
-//			LCD_PrintoutInt(0, 0, (int)haha);
-//			
-//			high2=((WORD)(remote_frame_data[5])<<8);
-//			low2=(WORD)(remote_frame_data[6]);
-//			device_number2=(high2|low2);
-//			LCD_PrintoutInt(0, 4, (int)device_number2);
-//		
-//			high3=((WORD)(remote_frame_data[7])<<8);
-//			low3=(WORD)(remote_frame_data[8]);
-//			data_number=(high3|low3);
-//			LCD_PrintoutInt(0, 6, (int)data_number);
-//			
-//			
-//			if ( device_number2==1)
-//				{
-//					set_steer_helm_basement(data_number);
-//				}
-//			else if (device_number2==5)
-//				{
-//					set_speed_pwm(data_number);
-//				}
-//	   }
-	g_device_NO_Hex=0x01;
-	des=0x33;
-	cmd_WIFI=0x0001;
-	sending_data=0;
-	if(sending_test==1)          
-	{
-		sending_test=0;
-		main_wifi_sender();
 		
-	}
-    if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
-	{
-		WIFICHEKER=0;
-		wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
-	  }
+#if 0
+			LCD_PrintoutInt(0, 0, (int)haha);
+			
+			high2=((WORD)(remote_frame_data[5])<<8);
+			low2=(WORD)(remote_frame_data[6]);
+			device_number2=(high2|low2);
+			LCD_PrintoutInt(0, 4, (int)device_number2);
+		
+			high3=((WORD)(remote_frame_data[7])<<8);
+			low3=(WORD)(remote_frame_data[8]);
+			data_number=(high3|low3);
+			LCD_PrintoutInt(0, 6, (int)data_number);
+			
+			
+			if ( device_number2==1)
+				{
+					set_steer_helm_basement(data_number);
+				}
+			else if (device_number2==5)
+				{
+					set_speed_pwm(data_number);
+				}
+	   }
+#endif
+		if(sending_test==1)          
+		{
+			sending_test=0;
+			sending_service_package(0x33,0x0001,0x000a);// BYTE 目标地址 WORD 命令字 WORD 数据字
+		}
+		
+		if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
+		{
+			WIFICHEKER=0;
+			wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
+		}
     }
 	
 }

@@ -92,7 +92,6 @@
 extern BYTE remote_frame_data[];
 extern int g_remote_frame_state;
 extern BYTE g_device_NO;
-extern BYTE g_device_NO_Hex;
 extern int g_start_all;
 extern int sending_waiter;
 extern int have_responsed;
@@ -149,7 +148,7 @@ void report_online(void);
 extern void main_wifi_sender (void);
 extern void ancillary_wifi_sender (void);
 extern void wifi_sender_checker (void);
-
+extern void sending_service_package ( BYTE toward, WORD cmd, WORD data);
 
 extern struct
 {
