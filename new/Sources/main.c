@@ -29,24 +29,30 @@ void main(void)
 {
 	init_all_and_POST();
 //	if(mode==0)
-//		Mode0_DebugCamera();//图像显示屏显示，车速20，显示offset RoadType，舵机打角，wifi_car_action不激活
+		Mode0_DebugCamera();//图像显示屏显示，车速20，显示offset RoadType，舵机打角，wifi_car_action不激活
 //	else if(mode==1)
 //		Mode1_SendVideo();//推车录图像，仅摄像头图像发上位机
 //	else if(mode==2)
 //		Mode2_GO();//速度20，WIFI读卡循迹超声全开，图像不显示不发送
 //	else if(mode==3)
-		Mode3_Andriod();//远程模式，上位机遥控车
+//		Mode3_Andriod();//远程模式，上位机遥控车
 }
 void Mode0_DebugCamera(void)
 {
-	set_speed_target(20);
+	set_speed_pwm(200); 
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
-	LCD_write_english_string(96,0,"T");
+//	LCD_write_english_string(96,0,"T");
 	LCD_write_english_string(96,2,"R");
 	
 	for (;;)
 	{
+		LCD_PrintoutInt(96, 0, Light_Status);
 		control_car_action();//ouyang
+		if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
+		{
+			WIFICHEKER=0;
+			wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
+		}
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
 			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
@@ -57,8 +63,9 @@ void Mode0_DebugCamera(void)
 	   
 		if(fieldover)
 		{
-			fieldover=0;                                              
-		//	set_speed_pwm(500); oy
+			fieldover=0; 
+			if(!Car_Stop)
+				set_speed_pwm(500); 
 			FindBlackLine();
 	    	//Display_Video();
 			CenterLineWithVideo();

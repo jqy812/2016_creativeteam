@@ -5,6 +5,7 @@ int flag_c_2_2=0;
 int flag_c_4_1=0;
 int flag_c_4_2=0;
 byte Road_num=0;
+int Car_Stop=0;
 int g_f_red=0;//信号灯标志位
 int car_direction=1;//车身绝对方向：1234北东南西
 int old_car_direction=1;//车身上一次绝对方向：1234北东南西
@@ -75,8 +76,15 @@ void RFID_control_car_1_action(WORD site)//欧阳修改
 #endif
 	if((site>>12)==0x1||(site>>12)==0x3)//在红绿灯路口
 	{
-		main_wifi_sender ();
+		sending_service_package(0x33,0x00CD,site);
+		if(Light_Status==0)
+		{
+			Car_Stop=1;
+			set_speed_pwm(0);
+		}
 	}
+	
+	
 }
 
 /*-----------------------------------------------------------------------*/
@@ -213,12 +221,19 @@ void control_car_action(void)
 {
 	if(WIFI_ADDRESS_CAR_1 == g_device_NO)
 	{
-		if (RFID_site_data.is_new_site && RFID_site_data.old_site!=RFID_site_data.site)
+		if (RFID_site_data.is_new_site )
 		{
 			RFID_site_data.is_new_site = 0;
 			RFID_control_car_1_action(RFID_site_data.roadnum);
 		}
-	
+		if(Car_Stop)
+		{
+			if(Light_Status==1)
+			{
+				Car_Stop=0;
+				set_speed_pwm(200); 
+			}
+		}
 	}
 #if 0
 	if (WIFI_ADDRESS_CAR_2 == g_device_NO)
