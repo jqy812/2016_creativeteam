@@ -4,12 +4,6 @@ WORD helm_use=0;
 int16_t motor_use=0;
 int direction;
 BYTE haha;
-BYTE high2;
-BYTE low2;
-BYTE high3;
-BYTE low3;
-BYTE device_number2;
-BYTE data_number;
 int supersonic_on_off=1;
 int biaoji=0;
 int jishu=0;
@@ -331,34 +325,52 @@ for (;;)
 		}
 }
 }
-
 void Mode3_Andriod(void)
 {
+	 LCD_Fill(0x00);
 	for(;;)
     {
-		
-			LCD_PrintoutInt(0, 0, (int)haha);
+		   // LCD_PrintoutInt(48, 0, (int)haha);
+		  // LCD_PrintoutInt(48, 0, (int)shuzi);
+		   // LCD_PrintoutInt(48, 0, (int)rev_ch);
+		    LCD_PrintoutInt(48, 0, (SWORD)motor_use);
+		  
+		// ---------------------交给控制--------------------	
+		   if(haha==1)
+	        {
+			   if (direction==1)
 			
-			high2=((WORD)(remote_frame_data[5])<<8);
-			low2=(WORD)(remote_frame_data[6]);
-			device_number2=(high2|low2);
-			LCD_PrintoutInt(0, 4, (int)device_number2);
-		
-			high3=((WORD)(remote_frame_data[7])<<8);
-			low3=(WORD)(remote_frame_data[8]);
-			data_number=(high3|low3);
-			LCD_PrintoutInt(0, 6, (int)data_number);
-			
-			
-			if ( device_number2==1)
+		    	{
+		    		set_steer_helm_basement(helm_use); //舵机调参
+		    	}
+		        else if (direction==5)
+		    	{
+		    		set_speed_pwm(motor_use);
+		    	}
+		        else if (direction==11)
 				{
-					set_steer_helm_basement(data_number);
+		        	supersonic_on_off=~supersonic_on_off;
 				}
-			else if (device_number2==5)
-				{
-					set_speed_pwm(data_number);
-				}
-	   }
-	
+		     haha=0;
+	        } 
+		   if (supersonic_on_off)
+		   {
+			   trigger_supersonic_0();
+			   get_supersonic_time_0();
+			   trigger_supersonic_1();
+			   get_supersonic_time_1();
+			   while(((ABS((WORD)(tmp_time.R))/100)<200)  && (motor_use>0))
+			   {
+					trigger_supersonic_0();
+					get_supersonic_time_0();
+					trigger_supersonic_1();
+					get_supersonic_time_1();
+					LCD_Write_Num(96,6,(ABS((WORD)(tmp_time.R))/100),5);
+					set_speed_pwm(0);
+				}	
+				LCD_Fill(0x00);
+				set_speed_pwm(motor_use);
+		   }
+	}
 	
 }

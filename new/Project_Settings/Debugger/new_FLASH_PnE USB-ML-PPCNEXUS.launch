@@ -134,10 +134,10 @@
 <stringAttribute key="com.pemicro.mcu.debug.connections.pne.eppc.names_of_user_added_attributes" value=""/>
 <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_ID" value="com.freescale.cdt.debug.cw.eppc.EPPCDebugger"/>
 <stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="FLASH/new.elf"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="traffic_light_test"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="new"/>
 <stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="com.freescale.ppc.debug.toolchain.configuration.1890084524"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/traffic_light_test"/>
+<listEntry value="/new"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="4"/>
