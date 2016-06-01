@@ -137,7 +137,7 @@ int rev_remote_frame_2(BYTE rev)
 	else if (g_remote_frame_cnt == 3)	//接收目的地址
 	{
 		remote_frame_data[g_remote_frame_cnt++] = rev;
-		if (rev != g_device_NO && rev != 0xFF)
+		if (rev != g_device_NO && rev != 0xFF && rev != 0xEE)
 		{
 			g_remote_frame_cnt = 0;	//不是发给本机的
 		}

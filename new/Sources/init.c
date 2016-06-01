@@ -315,7 +315,7 @@ void init_all_and_POST(void)
 	init_pit();
 	init_led();
 	init_DIP();
-	init_serial_port_1();//Wifi_ouyang
+//	init_serial_port_1();//Wifi_ouyang
 	init_serial_port_2();//rfid_ouyang
 	init_serial_port_0();
 	//init_ADC();
