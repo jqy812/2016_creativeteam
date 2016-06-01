@@ -7,7 +7,8 @@
 
 extern FATFS fatfs1;
 extern int mode;
-extern int LightCWifi;
+extern int WIFICHEKER;
+extern int sending_test;
 
 /* 设备初始化状态 */
 #ifdef __INIT_C_

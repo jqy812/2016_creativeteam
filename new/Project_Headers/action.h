@@ -30,7 +30,6 @@
 #define WEST (4)
 extern int car_direction;//车身绝对方向-余婧添加
 extern int g_f_red;//信号灯标志位
-extern BYTE waiting_for_response;
 
 /* 刺气球数据 */
 #ifdef __ACTION_C_

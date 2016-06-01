@@ -2,8 +2,8 @@
 #include "includes.h"
 int Lcounter=0;
 int sending_waiter=0;
-int LightCWifi=0;
-
+int WIFICHEKER=0;
+int sending_test;
 FATFS fatfs1;	/* 会被文件系统引用，不得释放 */
 int mode=0;
 
@@ -475,15 +475,22 @@ void init_pit_1s_L(void)
 }
 void Pit_1s_L(void)//10ms
 {
+	static int time_counter;
+	time_counter++;
 	Lcounter++;
 	if(Lcounter==80)
 	{
 		Lcounter=0;
-		LightCWifi=1;
+		WIFICHEKER=1;
 	}
 	if(Lcounter==10)
 	{
 		sending_waiter++;    //用来发送完等待一段时间
+	}
+	if(time_counter==1000)
+	{
+		time_counter=0;
+	    sending_test=1;
 	}
 	
 	PIT.CH[1].TFLG.B.TIF = 1;	// MPC56xxB/P/S: Clear PIT 1 flag by writing 1

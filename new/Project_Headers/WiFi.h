@@ -67,7 +67,7 @@
 #define WIFI_NET_CMD_CAR_REPORT_CACHE_SITE (0x0002)	/* 车报告缓存的位置 即最近一次读到的位置 */
 
 
-#define REMOTE_FRAME_LENGTH (32)
+#define REMOTE_FRAME_LENGTH (10)                  /* 改为10*/
 #define REMOTE_FRAME_STATE_OK (1)
 #define REMOTE_FRAME_STATE_NOK (0)
 
@@ -97,6 +97,11 @@ extern int g_start_all;
 extern int sending_waiter;
 extern int have_responsed;
 extern int Light_Status;
+extern BYTE waiting_for_response;
+extern BYTE g_device_NO_Hex;/* 设备号 即WiFi地址 */
+extern BYTE des;
+extern WORD cmd_WIFI;
+extern WORD sending_data;
 
 /* 远程控制标志位 */
 #ifdef __WIFI_C_
@@ -140,10 +145,11 @@ extern void send_remote_request_data(void);
 void send_net_cmd(BYTE des, WORD net_cmd);
 extern void rfid_ask_road(BYTE scr, BYTE des, BYTE length,	WORD cmd ,WORD RFID_Num);
 void report_online(void);
+
+extern void main_wifi_sender (void);
+extern void ancillary_wifi_sender (void);
 extern void wifi_sender_checker (void);
-extern void main_wifi_sender (WORD data_input);
-void ancillary_wifi_sender (void);
-void wifi_receive_checker (void);
+
 
 extern struct
 {

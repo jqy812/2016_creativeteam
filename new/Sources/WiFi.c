@@ -12,6 +12,10 @@ BYTE remote_frame_data[REMOTE_FRAME_LENGTH];
 BYTE remote_frame_data_send[REMOTE_FRAME_LENGTH];
 BYTE g_device_NO = WIFI_ADDRESS_CAR_1;
 BYTE g_device_NO_Hex;/* 设备号 即WiFi地址 */
+BYTE des;
+WORD cmd_WIFI;
+WORD sending_data;
+BYTE waiting_for_response=0;
 int  lost_data=0;
 
 
@@ -289,17 +293,18 @@ void send_remote_request_data(void)
 	}
 	*/
 }
+#if 0
 void rfid_ask_road(BYTE scr, BYTE des, BYTE length,	WORD cmd ,WORD RFID_Num)
-{
+{ 
+	WORD i = 0,j = 0;
+    byte num_1=0x00,num_2=0x00,num_3=0x00, num_4=0x00;//ou
+	byte check;
+	int num_temp=0x00000000;
 	Temp_Send_Data.scr=scr;
 	Temp_Send_Data.des=des;
 	Temp_Send_Data.length=length;
 	Temp_Send_Data.cmd=cmd;
 	Temp_Send_Data.RFID_Num=RFID_Num;
-	WORD i = 0, j = 0;
-	byte num_1=0x00,num_2=0x00,num_3=0x00, num_4=0x00;//ou
-	byte check;
-	int num_temp=0x00000000;
 	remote_frame_data_send[i++] = 0xAA;
 	remote_frame_data_send[i++] = 0xBB;
 	remote_frame_data_send[i++] = scr;
@@ -322,11 +327,14 @@ void rfid_ask_road(BYTE scr, BYTE des, BYTE length,	WORD cmd ,WORD RFID_Num)
 	remote_frame_data_send[i++] = check;
 	serial_port_0_TX_array(remote_frame_data_send, 10);//ouyang
 }
+#endif 
+// 以下部分非必须程序，用于2016赛季应答机制//
 //*********************************************************************************
 //  主发送程序                 输入： 发送所需的数据      输出： 1 串口发送      2  waiting位     3 串口发送备份给备发送程序    4 发送丢失数
 //*********************************************************************************
-void main_wifi_sender (WORD data_input)
+void main_wifi_sender (void)
 {  
+
 //	***********如果依然在等待回复，放弃上一个发送的等待，并且lostdata数加一***************
 	if (waiting_for_response==1)
 	{
@@ -334,7 +342,7 @@ void main_wifi_sender (WORD data_input)
 	   waiting_for_response=0;
 	}
 //	***********发送函数主体***************	                                    
-	rfid_ask_road(g_device_NO_Hex,0x33,0x04,0x00CD,data_input);
+	generate_remote_frame_2(g_device_NO_Hex, des, cmd_WIFI, 2, (const BYTE *)(&sending_data));
 //  ***********等待回复位置1*************** 
 	waiting_for_response=1;
 	have_responsed=0;  
@@ -370,14 +378,8 @@ void wifi_sender_checker (void)
 //*********************************************************************************
 void ancillary_wifi_sender (void)
 {                                      		    
-	rfid_ask_road(Temp_Send_Data.scr, Temp_Send_Data.des, Temp_Send_Data.length, Temp_Send_Data.cmd ,Temp_Send_Data.RFID_Num);
+	generate_remote_frame_2(g_device_NO_Hex, des, cmd_WIFI, 2, (const BYTE *)(&sending_data));
 }
 
-void wifi_receive_checker (void)
-{
-	if (order_received == 1)
-	{
-		order_received=0;
-		rfid_ask_road(g_device_NO_Hex, 0x33, 0x04, 0x0000, 0x0000);
-	}
-}
+
+

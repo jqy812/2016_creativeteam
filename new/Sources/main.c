@@ -4,6 +4,12 @@ WORD helm_use=0;
 int16_t motor_use=0;
 int direction;
 BYTE haha;
+BYTE high2;
+BYTE low2;
+BYTE high3;
+BYTE low3;
+BYTE device_number2;
+BYTE data_number;
 int supersonic_on_off=1;
 int biaoji=0;
 int jishu=0;
@@ -23,13 +29,13 @@ void main(void)
 {
 	init_all_and_POST();
 //	if(mode==0)
-		Mode0_DebugCamera();//图像显示屏显示，车速20，显示offset RoadType，舵机打角，wifi_car_action不激活
+//		Mode0_DebugCamera();//图像显示屏显示，车速20，显示offset RoadType，舵机打角，wifi_car_action不激活
 //	else if(mode==1)
 //		Mode1_SendVideo();//推车录图像，仅摄像头图像发上位机
 //	else if(mode==2)
 //		Mode2_GO();//速度20，WIFI读卡循迹超声全开，图像不显示不发送
 //	else if(mode==3)
-//		Mode3_Andriod();//远程模式，上位机遥控车
+		Mode3_Andriod();//远程模式，上位机遥控车
 }
 void Mode0_DebugCamera(void)
 {
@@ -47,13 +53,14 @@ void Mode0_DebugCamera(void)
 					
 			execute_remote_cmd(remote_frame_data+5);
 		}
+		
 	   
 		if(fieldover)
 		{
 			fieldover=0;                                              
 		//	set_speed_pwm(500); oy
 			FindBlackLine();
-	    //	Display_Video();
+	    	//Display_Video();
 			CenterLineWithVideo();
 	     	Video_Show();
 	    // 	Send_CCD_Video();
@@ -325,52 +332,49 @@ for (;;)
 		}
 }
 }
+
 void Mode3_Andriod(void)
 {
-	 LCD_Fill(0x00);
 	for(;;)
     {
-		   // LCD_PrintoutInt(48, 0, (int)haha);
-		  // LCD_PrintoutInt(48, 0, (int)shuzi);
-		   // LCD_PrintoutInt(48, 0, (int)rev_ch);
-		    LCD_PrintoutInt(48, 0, (SWORD)motor_use);
-		  
-		// ---------------------交给控制--------------------	
-		   if(haha==1)
-	        {
-			   if (direction==1)
-			
-		    	{
-		    		set_steer_helm_basement(helm_use); //舵机调参
-		    	}
-		        else if (direction==5)
-		    	{
-		    		set_speed_pwm(motor_use);
-		    	}
-		        else if (direction==11)
-				{
-		        	supersonic_on_off=~supersonic_on_off;
-				}
-		     haha=0;
-	        } 
-		   if (supersonic_on_off)
-		   {
-			   trigger_supersonic_0();
-			   get_supersonic_time_0();
-			   trigger_supersonic_1();
-			   get_supersonic_time_1();
-			   while(((ABS((WORD)(tmp_time.R))/100)<200)  && (motor_use>0))
-			   {
-					trigger_supersonic_0();
-					get_supersonic_time_0();
-					trigger_supersonic_1();
-					get_supersonic_time_1();
-					LCD_Write_Num(96,6,(ABS((WORD)(tmp_time.R))/100),5);
-					set_speed_pwm(0);
-				}	
-				LCD_Fill(0x00);
-				set_speed_pwm(motor_use);
-		   }
+//		
+//			LCD_PrintoutInt(0, 0, (int)haha);
+//			
+//			high2=((WORD)(remote_frame_data[5])<<8);
+//			low2=(WORD)(remote_frame_data[6]);
+//			device_number2=(high2|low2);
+//			LCD_PrintoutInt(0, 4, (int)device_number2);
+//		
+//			high3=((WORD)(remote_frame_data[7])<<8);
+//			low3=(WORD)(remote_frame_data[8]);
+//			data_number=(high3|low3);
+//			LCD_PrintoutInt(0, 6, (int)data_number);
+//			
+//			
+//			if ( device_number2==1)
+//				{
+//					set_steer_helm_basement(data_number);
+//				}
+//			else if (device_number2==5)
+//				{
+//					set_speed_pwm(data_number);
+//				}
+//	   }
+	g_device_NO_Hex=0x01;
+	des=0x33;
+	cmd_WIFI=0x0001;
+	sending_data=0;
+	if(sending_test==1)          
+	{
+		sending_test=0;
+		main_wifi_sender();
+		
 	}
+    if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
+	{
+		WIFICHEKER=0;
+		wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
+	  }
+    }
 	
 }
