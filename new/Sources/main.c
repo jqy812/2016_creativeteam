@@ -64,12 +64,12 @@ void Mode0_DebugCamera(void)
 			fieldover=0; 
 			if(!Car_Stop)
 				set_speed_pwm(500); 
-			FindBlackLine();
+			FindBlackLine();              //寻迹处理                        jqy     
 	    	//Display_Video();
-			CenterLineWithVideo();
-	     	Video_Show();
-	    // 	Send_CCD_Video();
-	    //	supersonic();
+			CenterLineWithVideo();        //摄像头数据处理              jqy     
+	     	Video_Show();                 //显示屏显示                     jqy
+	    // 	Send_CCD_Video();             //发送图像给wifi        jqy
+	    //	supersonic();                 //超声                                jqy
 #if 0
 	     	for(video_sender=0;video_sender<70;video_sender++)
 	     	{
@@ -77,12 +77,12 @@ void Mode0_DebugCamera(void)
 	     	}
 #endif
 	     	
-			if(target_offset<0)
+			if(target_offset<0)           //显示偏差值及赛道类型      jqy
 				LCD_write_english_string(96,1,"-");
 			else LCD_write_english_string(96,1,"+");
 			LCD_Write_Num(105,1,ABS(target_offset),2);
 			LCD_Write_Num(105,2,RoadType,2);
-#if 0
+#if 0                                     //应用于之后直角转弯程序（初版，未经测试）                  jqy
 			if(flag_Rightangle_l)	
 			{ 
 				set_speed_pwm(500);
@@ -97,7 +97,7 @@ void Mode0_DebugCamera(void)
 			}
 			else
 #endif
-				SteerControl();
+				SteerControl();          //舵机控制              jqy
 
 			EMIOS_0.CH[3].CSR.B.FLAG = 1;
 			EMIOS_0.CH[3].CCR.B.FEN=1;
