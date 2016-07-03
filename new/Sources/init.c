@@ -3,6 +3,7 @@
 int Lcounter=0;
 int sending_waiter=0;
 int WIFICHEKER=0;
+int DoorC=0;
 int sending_test;
 FATFS fatfs1;	/* 会被文件系统引用，不得释放 */
 int mode=0;
@@ -136,6 +137,20 @@ void initEMIOS_0MotorAndSteer(void)
 	EMIOS_0.CH[16].CADR.R = 2000;	/* 设置周期200us 5KHZ */
 	EMIOS_0.CH[16].CCR.B.MODE = 0x50;	/* Modulus Counter Buffered (MCB) */
 	EMIOS_0.CH[16].CCR.B.BSL = 0x3;	/* Use internal counter */
+	 /* 前进输出 OPWMB PE5 输出0-2000 */
+	EMIOS_0.CH[18].CCR.B.BSL = 0x1;	/* Use counter bus D (default) */
+	EMIOS_0.CH[18].CCR.B.MODE = 0x60;	/* Mode is OPWM Buffered */
+	EMIOS_0.CH[18].CCR.B.EDPOL = 1;	/* Polarity-leading edge sets output/trailing clears*/
+	EMIOS_0.CH[18].CADR.R = 0;	/* Leading edge when channel counter bus= */
+	EMIOS_0.CH[18].CBDR.R = 0;	/* Trailing edge when channel counter bus= */
+	SIU.PCR[66].R = 0x0600;	/*[11:10]选择AFx 此处AF1 /* MPC56xxS: Assign EMIOS_0 ch 21 to pad */
+	/* 前进输出 OPWMB PE6 输出0-2000 */
+	EMIOS_0.CH[20].CCR.B.BSL = 0x1;
+	EMIOS_0.CH[20].CCR.B.MODE = 0x60;
+	EMIOS_0.CH[20].CCR.B.EDPOL = 1;
+	EMIOS_0.CH[20].CADR.R = 0;
+	EMIOS_0.CH[20].CBDR.R = 0;
+	SIU.PCR[68].R = 0x0600;
     /* 前进输出 OPWMB PE5 输出0-2000 */
 	EMIOS_0.CH[21].CCR.B.BSL = 0x1;	/* Use counter bus D (default) */
 	EMIOS_0.CH[21].CCR.B.MODE = 0x60;	/* Mode is OPWM Buffered */
@@ -315,7 +330,7 @@ void init_all_and_POST(void)
 	init_pit();
 	init_led();
 	init_DIP();
-//	init_serial_port_1();//Wifi_ouyang
+	init_serial_port_1();//Wifi_ouyang
 	init_serial_port_2();//rfid_ouyang
 	init_serial_port_0();
 	//init_ADC();
@@ -478,7 +493,7 @@ void Pit_1s_L(void)//10ms
 	static int time_counter;
 	time_counter++;
 	Lcounter++;
-	if(Lcounter==80)
+	if(Lcounter==160)
 	{
 		Lcounter=0;
 		WIFICHEKER=1;
@@ -492,7 +507,15 @@ void Pit_1s_L(void)//10ms
 		time_counter=0;
 	    sending_test=1;
 	}
-	
+	if(Door_Status==1)
+	{
+		DoorC++;
+	}
+	if(DoorC==300)
+	{
+		Door_Stop=1;
+		DoorC=0;
+	}
 	PIT.CH[1].TFLG.B.TIF = 1;	// MPC56xxB/P/S: Clear PIT 1 flag by writing 1
 }
 

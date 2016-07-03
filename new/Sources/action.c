@@ -6,6 +6,11 @@ int flag_c_4_1=0;
 int flag_c_4_2=0;
 byte Road_num=0;
 int Car_Stop=0;
+int Door_Status=0;
+int Door_Stop=0;
+int Car_Psg=0;
+int Door_Open=0;
+int Door_Close=0;
 int g_f_red=0;//信号灯标志位
 int car_direction=1;//车身绝对方向：1234北东南西
 int old_car_direction=1;//车身上一次绝对方向：1234北东南西
@@ -80,11 +85,10 @@ void RFID_control_car_1_action(WORD site)//欧阳修改
 		if(Light_Status==0)
 		{
 			Car_Stop=1;
+			LCD_Fill(0x00);
 			set_speed_pwm(0);
 		}
 	}
-	
-	
 }
 
 /*-----------------------------------------------------------------------*/
@@ -115,7 +119,24 @@ void RFID_control_car_2_action(DWORD site)
 /*-----------------------------------------------------------------------*/
 void RFID_control_car_3_action(DWORD site)
 {
-	return;
+	if((site>>12)==0x1||(site>>12)==0x3)//在红绿灯路口
+	{
+		sending_service_package(0x33,0x00CD,site);
+		if(Light_Status==0)
+		{
+			Car_Stop=1;
+			LCD_Fill(0x00);
+			set_speed_pwm(0);
+		}
+	}
+	if((site>>12)==0x04)//在接客区
+	{
+		sending_service_package(0x44,0x0020,site);
+		Car_Stop=1;
+		LCD_Fill(0x00);
+		Car_Psg=1;
+		set_speed_pwm(0);
+	}
 }
 /*-----------------------------------------------------------------------*/
 /* 整车动作控制                                                          */
@@ -221,7 +242,7 @@ void control_car_action(void)
 {
 	if(WIFI_ADDRESS_CAR_1 == g_device_NO)
 	{
-		if (RFID_site_data.is_new_site )
+		if (RFID_site_data.is_new_site && RFID_site_data.old_site!=RFID_site_data.site)
 		{
 			RFID_site_data.is_new_site = 0;
 			RFID_control_car_1_action(RFID_site_data.roadnum);
@@ -231,7 +252,43 @@ void control_car_action(void)
 			if(Light_Status==1)
 			{
 				Car_Stop=0;
-				set_speed_pwm(200); 
+			}
+		}
+	}
+	if(WIFI_ADDRESS_CAR_3 == g_device_NO)
+	{
+		if (RFID_site_data.is_new_site && RFID_site_data.old_site!=RFID_site_data.site)
+		{
+			RFID_site_data.is_new_site = 0;
+			RFID_control_car_3_action(RFID_site_data.roadnum);
+		}
+		if(Car_Stop==1 && Car_Psg == 0 )
+		{
+			if(Light_Status==1)
+			{
+				Car_Stop=0;
+				set_speed_pwm(500); 
+			}
+		}
+		if(Car_Psg)
+		{
+			if(Door_Open)
+			{
+				Door_Status=1;
+				Door_Open=0;
+				set_door_pwm(600);
+			}
+			if(Door_Close)
+			{
+				Door_Status=1;
+				Door_Close=0;
+				set_door_pwm(-600);
+			}
+			if(Door_Stop)
+			{
+				Door_Stop=0;
+				Door_Status=0;
+				set_door_pwm(0);
 			}
 		}
 	}
@@ -306,5 +363,9 @@ void device_Num_change(void)
 		g_device_NO_Hex=0x01;
 	if(g_device_NO==2)
 		g_device_NO_Hex=0x02;
+	if(g_device_NO==3)
+		g_device_NO_Hex=0x03;
+	if(g_device_NO==4)
+		g_device_NO_Hex=0x04;
 }
 

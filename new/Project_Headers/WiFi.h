@@ -75,9 +75,9 @@
 #define ANDROID_ADDRESS (3)
 
 #define WIFI_ADDRESS_WITHOUT_INIT (0)	/* 警车1 漂移 */
-#define WIFI_ADDRESS_CAR_1 (1)	/* 警车1 漂移 */
-#define WIFI_ADDRESS_CAR_2 (2)	/* 警车2 */
-#define WIFI_ADDRESS_CAR_3 (3)	/* 匪车1 */
+#define WIFI_ADDRESS_CAR_1 (1)	/* 路虎*/
+#define WIFI_ADDRESS_CAR_2 (2)	/* 宝马x6*/
+#define WIFI_ADDRESS_CAR_3 (3)	/* 宝马i8 */
 #define WIFI_ADDRESS_CAR_4 (4)	/* 匪车2 */
 #define WIFI_ADDRESS_DRAWBRIDGE (5)	/* 吊桥 */
 #define WIFI_ADDRESS_DRAHTBRIDGE (6)	/* 钢丝桥 */

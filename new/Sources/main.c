@@ -24,22 +24,20 @@ void Mode2_GO(void);
 void Mode3_Andriod(void);
 
 void main(void)
-
-
 {
 	init_all_and_POST();
-//	if(mode==0)
-//		Mode0_DebugCamera();//图像显示屏显示，车速20，显示offset RoadType，舵机打角，wifi_car_action不激活
-//	else if(mode==1)
-//		Mode1_SendVideo();//推车录图像，仅摄像头图像发上位机
-//	else if(mode==2)
-//		Mode2_GO();//速度20，WIFI读卡循迹超声全开，图像不显示不发送
-//	else if(mode==3)
+	if(mode==0)
+		Mode0_DebugCamera();//图像显示屏显示，车速20，显示offset RoadType，舵机打角，wifi_car_action不激活
+	else if(mode==1)
+		Mode1_SendVideo();//推车录图像，仅摄像头图像发上位机
+	else if(mode==2)
+		Mode2_GO();//速度20，WIFI读卡循迹超声全开，图像不显示不发送
+	else if(mode==3)
 		Mode3_Andriod();//远程模式，上位机遥控车
 }
 void Mode0_DebugCamera(void)
 {
-	set_speed_pwm(200); 
+	set_speed_pwm(300); 
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
 //	LCD_write_english_string(96,0,"T");
 //	LCD_write_english_string(96,2,"R");
@@ -57,13 +55,10 @@ void Mode0_DebugCamera(void)
 					
 			execute_remote_cmd(remote_frame_data+5);
 		}
-		
-	   
-		if(fieldover)
+		if(fieldover==1&&Car_Stop==0)
 		{
 			fieldover=0; 
-			if(!Car_Stop)
-				set_speed_pwm(500); 
+			set_speed_pwm(500); 
 			FindBlackLine();              //寻迹处理                        jqy     
 	    	//Display_Video();
 			CenterLineWithVideo();        //摄像头数据处理              jqy     

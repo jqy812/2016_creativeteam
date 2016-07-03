@@ -31,7 +31,11 @@
 extern int car_direction;//车身绝对方向-余婧添加
 extern int g_f_red;//信号灯标志位
 extern int Car_Stop;
-
+extern int Door_Status;
+extern int Door_Stop;
+extern int Car_Psg;
+extern int Door_Open;
+extern int Door_Close;
 /* 刺气球数据 */
 #ifdef __ACTION_C_
 struct

@@ -7,7 +7,7 @@ int g_remote_frame_cnt = 0;
 int g_start_all=0;
 int have_responsed;
 int order_received; 
-int Light_Status=1;
+int Light_Status=0;
 BYTE remote_frame_data[REMOTE_FRAME_LENGTH];
 BYTE remote_frame_data_send[REMOTE_FRAME_LENGTH];
 BYTE g_device_NO = WIFI_ADDRESS_CAR_1;
@@ -173,6 +173,23 @@ int rev_remote_frame_2(BYTE rev)
 	{	
 		have_responsed=1;	
 	}// 检查是否得到应答 
+	if (remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00) 
+	{	
+		have_responsed=1;	
+	}// 检查天少是否回答 
+	if (remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x0B)   
+	{	
+		Door_Open=1;	
+	}//天少远程开门
+	if (remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex && remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCB)   
+	{	
+		Door_Close=1;	
+	}//天少远程关门
+	if (remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex && remote_frame_data[5]==0x00 && remote_frame_data[6]==0xBB)   
+	{	
+		Car_Stop=0;	
+		Car_Psg=0;
+	}//天少开车
 	if (remote_frame_data[2] == 0x33 &&remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01)   
 	{
 		order_received =1;

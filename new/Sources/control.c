@@ -391,7 +391,41 @@ int abs(int data)
 	return data;
 }
 #endif
-
+/*-----------------------------------------------------------------------*/
+/* 设置BMW车门开启关闭                                 */     
+/*-----------------------------------------------------------------------*/
+void set_door_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
+{
+	if (speed_pwm>0)	//forward
+	{
+		if (speed_pwm>SPEED_PWM_MAX)
+		{
+			speed_pwm = SPEED_PWM_MAX;
+		}
+		EMIOS_0.CH[18].CBDR.R = speed_pwm;
+		EMIOS_0.CH[20].CBDR.R = 1;
+		
+	}
+	else if (speed_pwm<0)	//backward
+	{
+		StopL = 1;
+		RunL = 0;
+		speed_pwm = 0-speed_pwm;
+		if (speed_pwm>SPEED_PWM_MAX)
+		{
+			speed_pwm = SPEED_PWM_MAX;
+		}
+		EMIOS_0.CH[18].CBDR.R = 1;
+		EMIOS_0.CH[20].CBDR.R = speed_pwm;	
+	}
+	else
+	{
+		StopL = 1;
+		RunL = 0;
+		EMIOS_0.CH[18].CBDR.R = 1;
+		EMIOS_0.CH[20].CBDR.R = 1;	
+	}
+}
 void Road_Stop(void)
 {
 	set_speed_pwm(0);

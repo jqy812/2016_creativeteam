@@ -146,6 +146,7 @@ WORD helm_data_record = STEER_HELM_CENTER;
 
 extern void PitISR(void);
 extern void set_speed_pwm(int16_t speed_pwm);
+extern void set_door_pwm(int16_t speed_pwm);
 extern void contorl_speed_encoder_bb(void);
 extern void set_speed_target(SWORD speed_target);
 extern void set_speed_KP(WORD kp);

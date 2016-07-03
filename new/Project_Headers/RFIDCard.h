@@ -55,6 +55,8 @@
 
 #define ROAD_NUM_1001 (0x3ABE1FBD)//路段名 by 欧阳
 #define ROAD_NUM_1002 (0xCA7C00BD)
+#define ROAD_NUM_4001 (0x545F2F52)
+#define ROAD_NUM_4002 (0xC4632952)
 
 extern const BYTE rfid_cmd_get_id[];
 extern const BYTE rfid_cmd_get_data[];
