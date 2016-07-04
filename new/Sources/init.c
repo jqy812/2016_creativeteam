@@ -513,6 +513,7 @@ void Pit_1s_L(void)//10ms
 	}
 	if(DoorC==300)
 	{
+		Door_Status=0;
 		Door_Stop=1;
 		DoorC=0;
 	}

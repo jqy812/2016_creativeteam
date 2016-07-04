@@ -261,6 +261,8 @@ void control_car_action(void)
 		{
 			RFID_site_data.is_new_site = 0;
 			RFID_control_car_3_action(RFID_site_data.roadnum);
+			RFID_site_data.old_site=0x0;
+			RFID_site_data.site=0x0;
 		}
 		if(Car_Stop==1 && Car_Psg == 0 )
 		{
@@ -274,21 +276,20 @@ void control_car_action(void)
 		{
 			if(Door_Open)
 			{
-				Door_Status=1;
-				Door_Open=0;
+				Door_Status=1;	
 				set_door_pwm(600);
+				Door_Open=0;
 			}
 			if(Door_Close)
 			{
 				Door_Status=1;
-				Door_Close=0;
 				set_door_pwm(-600);
+				Door_Close=0;
 			}
 			if(Door_Stop)
 			{
-				Door_Stop=0;
-				Door_Status=0;
 				set_door_pwm(0);
+				Door_Stop=0;
 			}
 		}
 	}
@@ -367,5 +368,21 @@ void device_Num_change(void)
 		g_device_NO_Hex=0x03;
 	if(g_device_NO==4)
 		g_device_NO_Hex=0x04;
+}
+void car_default()
+{
+	set_door_pwm(0);
+	if(Car_Psg)
+		Car_Psg=0;
+	if(Door_Open)
+		Door_Open=0;
+	if(Door_Close)
+		Door_Close=0;
+	if(Door_Status)
+		Door_Status=0;
+	if(Door_Stop)
+		Door_Stop=0;
+	if(DoorC!=0)
+		DoorC=0;
 }
 

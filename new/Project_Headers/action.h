@@ -54,6 +54,7 @@ extern struct
 
 extern void control_car_action(void);
 extern void device_Num_change(void);
+extern void car_default(void);
 void speed_up_bridge1();
 void puncture_ballon();
 void puncture_ballon_2();

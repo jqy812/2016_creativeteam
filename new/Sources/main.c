@@ -57,6 +57,7 @@ void Mode0_DebugCamera(void)
 		}
 		if(fieldover==1&&Car_Stop==0)
 		{
+			car_default();
 			fieldover=0; 
 			set_speed_pwm(500); 
 			FindBlackLine();              //寻迹处理                        jqy     
