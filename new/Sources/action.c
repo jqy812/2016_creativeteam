@@ -14,7 +14,7 @@ int Door_Close=0;
 int g_f_red=0;//信号灯标志位
 int car_direction=1;//车身绝对方向：1234北东南西
 int old_car_direction=1;//车身上一次绝对方向：1234北东南西
-
+int bz=-1;
 
 /*------------------------------*/
 /* 车灯控制程序    掉头                                         */  
@@ -240,8 +240,25 @@ void WiFi_control_car_4_action(WORD cmd)
 /*-----------------------------------------------------------------------*/
 void control_car_action(void)
 {
+#if 1
+        if (RFID_site_data.is_new_site&&RFID_site_data.old_site!=RFID_site_data.site )//
+		{
+			RFID_site_data.is_new_site=0;
+			RFID_site_data.old_site=0x00000000;
+			RFID_site_data.site = 0x00000000;
+			RFID_site_data.time = 0x00000000;
+			//RFID_control_car_1_action(RFID_site_data.roadnum);			
+			LCD_Fill(0x00);
+			bz=-bz;
+			set_speed_pwm(500);
+			delay_ms(100);
+			set_steer_helm_basement(data_steer_helm_basement.left_limit);
+			delay_ms(1500);
+		}
+#endif
 	if(WIFI_ADDRESS_CAR_1 == g_device_NO)
 	{
+
 		if (RFID_site_data.is_new_site && RFID_site_data.old_site!=RFID_site_data.site)
 		{
 			RFID_site_data.is_new_site = 0;

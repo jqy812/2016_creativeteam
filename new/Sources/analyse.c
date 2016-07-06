@@ -309,9 +309,23 @@ void FindBlackLine(void)
 	//DetectSlope();					//检测坡道
 	AnalyzeRoadType();				//分析赛道类型	
 	CenterLineFill();				//中线补线
+#if 1
+//	if(RoadType==20||RoadType==6)
+	{
+	for(i=RoadEnd;i<RoadStart/2-10;i++)
+		CenterLine[i]=(CenterLine[i]+11);
+	for(i=RoadStart/2-10;i<=RoadStart;i++)
+		CenterLine[i]=(CenterLine[i]+22);
+	}
+#endif
 #if 0
-	for(i=RoadEnd;i<=RoadStart;++i)
-		CenterLine[i]=(CenterLine[i]+15);
+//	if(RoadType==21||RoadType==22)
+	{
+	for(i=RoadEnd;i<RoadStart/2;++i)
+		CenterLine[i]=(CenterLine[i]+2);
+	for(i=RoadStart/2;i<=RoadStart;++i)
+		CenterLine[i]=(CenterLine[i]+7);
+	}
 #endif
 	TargetOffset();					//目标控制量
 }
@@ -1980,7 +1994,7 @@ void AnalyzeRoadType()
 ***************************************************/
 byte JudgeBarrier()
 {
-	signed char i,m,n;
+	signed char i,m,n,o,p;
 	byte Flag1=0;//控制语句辅助标志位
 	byte Flag2=0;//控制语句辅助标志位
 	byte Flag3=0;//控制语句辅助标志位
@@ -2168,10 +2182,41 @@ byte JudgeBarrier()
 			D1=0;
 		}
 	}
-
+	o=0;
+	p=0;
+#if 1
+	for(i=ROW;i>=0;i--)
+	{
+		for(n=20;n<(COLUMN-1);n++)
+		{
+			if(g_pix[i][n]==0)
+			{
+				break;
+			}			
+		}
+		BlackLine[1][i]=n;
+	}
+#endif
+	while(BlackLine[1][o]==0)
+		o++;
+	for(i=o;i<ROW;i++)
+	{
+	    if(BlackLine[1][i]<BlackLine[1][i-1])
+	    	p++;
+	    if(BlackLine[1][i]>BlackLine[1][i-1] && p>4)
+	    {
+	    	p=100;
+	    	break;
+	    }
+	}
+	if(p==100)
+		RoadType=66;
+	LCD_Write_Num(105,3,p,3);
 	if((RoadType==Barrier1)||(RoadType==Barrier2))
 		return 1;
-	else
+	else if(RoadType==66)
+		return 1;
+	else	
 		return 0;	
 }
 

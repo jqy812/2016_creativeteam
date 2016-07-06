@@ -13,9 +13,10 @@ BYTE data_number;
 int supersonic_on_off=1;
 int biaoji=0;
 int jishu=0;
-int jia=0;
+int zhangai=1;
 int i;
 int j;
+extern int bz;
 BYTE video_sender;
 
 void Mode0_DebugCamera(void);
@@ -37,10 +38,11 @@ void main(void)
 }
 void Mode0_DebugCamera(void)
 {
-	set_speed_pwm(300); 
+	set_speed_pwm(500); 
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
 //	LCD_write_english_string(96,0,"T");
 //	LCD_write_english_string(96,2,"R");
+	jishu=0;
 	for (;;)
 	{
 		control_car_action();//ouyang
@@ -55,7 +57,7 @@ void Mode0_DebugCamera(void)
 					
 			execute_remote_cmd(remote_frame_data+5);
 		}
-		if(fieldover==1&&Car_Stop==0)
+		if(fieldover==1&&Car_Stop==0&&zhangai==1)
 		{
 			car_default();
 			fieldover=0; 
@@ -78,6 +80,24 @@ void Mode0_DebugCamera(void)
 			else LCD_write_english_string(96,1,"+");
 			LCD_Write_Num(105,1,ABS(target_offset),2);
 			LCD_Write_Num(105,2,RoadType,2);
+			if(RoadType==12 || RoadType==13)
+			{
+				jishu++;
+			//	set_speed_pwm(200);
+			}
+			else if(RoadType==66)
+				jishu++;
+			if(jishu==6 && bz==1)
+			{
+				zhangai=0;
+			//	set_speed_pwm(0);
+				jishu=0;
+			}
+			if(jishu==10 && bz==-1)
+			{
+				zhangai=0;
+				jishu=0;
+			}
 #if 0                                     //应用于之后直角转弯程序（初版，未经测试）                  jqy
 			if(flag_Rightangle_l)	
 			{ 
@@ -98,6 +118,46 @@ void Mode0_DebugCamera(void)
 			EMIOS_0.CH[3].CSR.B.FLAG = 1;
 			EMIOS_0.CH[3].CCR.B.FEN=1;
 		}
+#if 1
+		if(zhangai==0 && bz==1)
+		{
+			delay_ms(200);
+			set_steer_helm_basement(data_steer_helm_basement.left_limit);   
+			set_speed_pwm(500);
+			delay_ms(560);
+			set_steer_helm_basement(data_steer_helm_basement.right_limit);
+			delay_ms(560);
+			set_steer_helm_basement(data_steer_helm_basement.center);
+			delay_ms(560);
+			zhangai=1;
+		}
+#endif
+#if 1
+		if(zhangai==0 && bz==-1)
+		{
+			delay_ms(500);
+			set_speed_pwm(0);
+			jishu=0;
+			delay_ms(1000);
+		//	zhangai=1;
+		}
+		while(zhangai==0)
+		{
+			set_speed_pwm(0);
+		    FindBlackLine(); 
+	//		supersonic();
+		    if(RoadType!=12 && RoadType!=13)
+		    	if(RoadType!=66)
+		    		jishu++;
+		    EMIOS_0.CH[3].CSR.B.FLAG = 1;
+		    EMIOS_0.CH[3].CCR.B.FEN=1;
+		    if(jishu==20)
+		    {
+		    	zhangai=1;
+		    	jishu=0;
+		    }
+		}
+#endif
 	}
 }
 

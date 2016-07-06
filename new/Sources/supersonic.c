@@ -1,6 +1,7 @@
 ﻿#define __SUPERSONIC_C_
 #include "includes.h"
 int sign=0;
+extern int zhangai;
 
 //**********************超声0***************************
 void init_supersonic_trigger_0(void)
@@ -244,6 +245,7 @@ void get_supersonic_time_3(void)
 }
 
 
+#if 0
 void supersonic(void)
 {
  	trigger_supersonic_0();
@@ -292,3 +294,39 @@ void supersonic(void)
  			sign=0;
  	}
 }
+#endif
+#if 1
+void supersonic(void)
+{
+ 	trigger_supersonic_0();
+    get_supersonic_time_0();
+    if(((WORD)(tmp_time.R)/100)>400)
+    {
+    	sign++;
+    	trigger_supersonic_0();
+    	get_supersonic_time_0();
+    	LCD_Write_Num(96,6,((WORD)(tmp_time.R)/100),5);
+    }
+    else if(((WORD)(tmp_time.R)/100)<400)
+    {
+    	sign=0;
+    	trigger_supersonic_0();
+    	get_supersonic_time_0();
+    	LCD_Write_Num(96,6,((WORD)(tmp_time.R)/100),5);
+    }
+#if 0
+   if(sign>=10)
+   {
+     	set_speed_pwm(-1300);
+     	delay_ms(100);
+     	set_speed_pwm(0);
+    }
+#endif
+ 	if(sign>=5)
+ 	{
+ 		set_speed_pwm(500);
+ 		zhangai=1;
+ 		sign=0;
+ 	}
+}
+#endif
