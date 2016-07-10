@@ -53,10 +53,15 @@
 #define RFID_MODUL_TYPE_OLD (1)
 #define RFID_MODUL_TYPE_NEW (2)
 
-#define ROAD_NUM_1001 (0x3ABE1FBD)//路段名 by 欧阳
+#define ROAD_NUM_1001 (0x3ABE1FBD)//红绿灯路口
 #define ROAD_NUM_1002 (0xCA7C00BD)
-#define ROAD_NUM_4001 (0x545F2F52)
-#define ROAD_NUM_4002 (0xC4632952)
+#define ROAD_NUM_4001 (0xDAA23548)//天少专车
+#define ROAD_NUM_4002 (0x5A934B48)
+#define ROAD_NUM_2101 (0xDA3BFFBC)//左打死路口
+#define ROAD_NUM_2102 (0xCA4900BD)
+#define ROAD_NUM_2103 (0xFA8320BD)
+#define ROAD_NUM_2201 (0xDA945248)//右打死路口
+#define ROAD_NUM_2301 (0x1250DD76)//停车
 
 extern const BYTE rfid_cmd_get_id[];
 extern const BYTE rfid_cmd_get_data[];

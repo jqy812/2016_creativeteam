@@ -16,7 +16,6 @@ extern WORD Steer_PWM[4];//舵机输出值记录
 extern word speedcounter1,speedcounter2;
 extern signed int currentspeed,targetspeed;		//当前速度、目标速度
 extern signed int Error,PreError,SumError;
-
 extern double Speed_kp,Speed_ki,Speed_kd;	//电机PID值
 extern signed int Motor_PWM;				//电机底层控制量
 

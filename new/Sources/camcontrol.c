@@ -42,12 +42,12 @@ void SteerControl()
 	//最低速
 //	if(Slope==1)					{Steer_kp=10;Steer_kd=5;}
 //	else if(Slope==2)				{Steer_kp=8;Steer_kd=5;}
-#if 0
+#if 0                     //3号车PID参数       jqy
 	if(ABS(target_offset)<6) 	{Steer_kp=5;Steer_kd=5;}
-	else if(ABS(target_offset)<26)  {Steer_kp=15.2+target_offset*target_offset/100;Steer_kd=10;}
-	else {Steer_kp=15.8+target_offset*target_offset/500;Steer_kd=5;}
+	else if(ABS(target_offset)<26)  {Steer_kp=8.2+target_offset*target_offset/100;Steer_kd=10;}
+	else {Steer_kp=9.8+target_offset*target_offset/500;Steer_kd=5;}
 #endif
-#if 1
+#if 1                    //1号车PID参数       jqy
 	if(ABS(target_offset)<6) 	{Steer_kp=6;Steer_kd=5;}
 	else if(ABS(target_offset)<26)  {Steer_kp=15.8+target_offset*target_offset/100;Steer_kd=10;}
 	else {Steer_kp=16.2+target_offset*target_offset/500;Steer_kd=5;}
@@ -68,7 +68,7 @@ void SteerControl()
 	//舵机限值+舵机输出
 //	set_steer_helm(Steer_PWM[3]);
 //	LCD_Write_Num(105,5,(int)Steer_PWM[3],4);
-	set_speed_pwm(500);
+	set_speed_pwm(300);
 	set_steer_helm_basement(Steer_PWM[3]);
 //	EMIOS_0.CH[9].CBDR.R = Steer_PWM[3];
 	LCD_Write_Num(105,5,(int)Steer_PWM[3],4);

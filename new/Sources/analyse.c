@@ -310,7 +310,7 @@ void FindBlackLine(void)
 	AnalyzeRoadType();				//分析赛道类型	
 	CenterLineFill();				//中线补线
 #if 1
-//	if(RoadType==20||RoadType==6)
+//	if(RoadType==20||RoadType==6)           //1号车中线偏移参数       jqy
 	{
 	for(i=RoadEnd;i<RoadStart/2-10;i++)
 		CenterLine[i]=(CenterLine[i]+11);
@@ -319,12 +319,12 @@ void FindBlackLine(void)
 	}
 #endif
 #if 0
-//	if(RoadType==21||RoadType==22)
+//	if(RoadType==21||RoadType==22)           //3号车中线偏移参数       jqy
 	{
-	for(i=RoadEnd;i<RoadStart/2;++i)
-		CenterLine[i]=(CenterLine[i]+2);
-	for(i=RoadStart/2;i<=RoadStart;++i)
-		CenterLine[i]=(CenterLine[i]+7);
+	for(i=RoadEnd;i<RoadStart/2-10;i++)
+		CenterLine[i]=(CenterLine[i]);
+	for(i=RoadStart/2-10;i<=RoadStart;i++)
+		CenterLine[i]=(CenterLine[i]-2);
 	}
 #endif
 	TargetOffset();					//目标控制量
@@ -1994,7 +1994,7 @@ void AnalyzeRoadType()
 ***************************************************/
 byte JudgeBarrier()
 {
-	signed char i,m,n,o,p;
+	signed char i,m,n,o,p,gg,cc;
 	byte Flag1=0;//控制语句辅助标志位
 	byte Flag2=0;//控制语句辅助标志位
 	byte Flag3=0;//控制语句辅助标志位
@@ -2184,12 +2184,12 @@ byte JudgeBarrier()
 	}
 	o=0;
 	p=0;
-#if 1
+#if 1           //道路类型66  判断方法      jqy
 	for(i=ROW;i>=0;i--)
 	{
-		for(n=20;n<(COLUMN-1);n++)
+		for(n=20;n<COLUMN-1;n++)
 		{
-			if(g_pix[i][n]==0)
+			if(g_pix[i][n-1]!=0 && g_pix[i][n]==0)
 			{
 				break;
 			}			
@@ -2197,24 +2197,56 @@ byte JudgeBarrier()
 		BlackLine[1][i]=n;
 	}
 #endif
-	while(BlackLine[1][o]==0)
+	while(BlackLine[1][o]==COLUMN-1)
+	{
+		BlackLine[1][o]=0;
 		o++;
+	}
+//	gg=0;
+//	if(o<14)
+//		o=14;
+//	BlackLine[1][o-5]=0;BlackLine[1][o-4]=0;BlackLine[1][o-3]=0;BlackLine[1][o-2]=0;BlackLine[1][o-1]=0;
 	for(i=o;i<ROW;i++)
 	{
-	    if(BlackLine[1][i]<BlackLine[1][i-1])
-	    	p++;
-	    if(BlackLine[1][i]>BlackLine[1][i-1] && p>4)
+	    if(BlackLine[1][i-5]-BlackLine[1][i]>=5)
 	    {
-	    	p=100;
-	    	break;
+	    	if(p==0)
+	    		gg=i;
+	    	p++;
 	    }
+	    if(BlackLine[1][i]-BlackLine[1][i-5]>=5 && p>2)
+	    	if(i-gg>12)
+	        {
+	    	    p=100;
+	    	    break;
+	        }
 	}
 	if(p==100)
 		RoadType=66;
-	LCD_Write_Num(105,3,p,3);
+	
+	cc=0;
+	for(i=ROW;i>=12;i--)          //道路类型88  判断方法      jqy
+	{
+		gg=0;
+		for(n=0;n<COLUMN-1;n++)
+			if(g_pix[i][n]!=0)		
+				gg++;
+		if(g_pix[i][gg-1]!=0 && g_pix[i][gg]==0)
+			gg=0;
+		if(gg<18 && gg>3)
+		{
+			cc++;
+			LCD_Write_Num(105,3,gg,4);
+		}
+	}
+	if(cc>8)
+		RoadType=88;
+//	LCD_Write_Num(105,3,p,3);
 	if((RoadType==Barrier1)||(RoadType==Barrier2))
 		return 1;
 	else if(RoadType==66)
+		return 1;
+	else if(RoadType==88)
 		return 1;
 	else	
 		return 0;	

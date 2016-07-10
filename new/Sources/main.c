@@ -27,6 +27,7 @@ void Mode3_Andriod(void);
 void main(void)
 {
 	init_all_and_POST();
+
 	if(mode==0)
 		Mode0_DebugCamera();//图像显示屏显示，车速20，显示offset RoadType，舵机打角，wifi_car_action不激活
 	else if(mode==1)
@@ -38,13 +39,22 @@ void main(void)
 }
 void Mode0_DebugCamera(void)
 {
-	set_speed_pwm(500); 
+//	set_speed_pwm(300); 
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
 //	LCD_write_english_string(96,0,"T");
 //	LCD_write_english_string(96,2,"R");
 	jishu=0;
+#if 0
+	while(bz==-1)
+	{
+		set_speed_pwm(-300); 
+		control_car_action();
+	}
+#endif		
+	bz=-1;
 	for (;;)
 	{
+	//	LCD_Write_Num(105,4,bz,2);
 		control_car_action();//ouyang
 		if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
 		{
@@ -61,7 +71,7 @@ void Mode0_DebugCamera(void)
 		{
 			car_default();
 			fieldover=0; 
-			set_speed_pwm(500); 
+			set_speed_pwm(300); 
 			FindBlackLine();              //寻迹处理                        jqy     
 	    	//Display_Video();
 			CenterLineWithVideo();        //摄像头数据处理              jqy     
@@ -80,23 +90,45 @@ void Mode0_DebugCamera(void)
 			else LCD_write_english_string(96,1,"+");
 			LCD_Write_Num(105,1,ABS(target_offset),2);
 			LCD_Write_Num(105,2,RoadType,2);
-			if(RoadType==12 || RoadType==13)
-			{
-				jishu++;
+			LCD_Write_Num(105,6,bz,2);
+	//		if(RoadType==12 || RoadType==13)
+	//		{
+	//			jishu++;
 			//	set_speed_pwm(200);
-			}
-			else if(RoadType==66)
+	//		}
+	//		else
+			if(RoadType==66)      //道路类型66，表示单车道障碍    jqy
 				jishu++;
-			if(jishu==6 && bz==1)
+			if(jishu>=6 && bz==1)   //bz位为1时，进行超车    jqy
 			{
 				zhangai=0;
 			//	set_speed_pwm(0);
 				jishu=0;
 			}
-			if(jishu==10 && bz==-1)
+		//	if(jishu==10 && bz==-1)
+			if(jishu>=8 && bz==0)   //bz位为1时，进行避障停车   jqy
 			{
 				zhangai=0;
 				jishu=0;
+			}
+			if(RoadType==88 && bz==2)    //道路类型88，表示双车道障碍，需掉头绕行    jqy
+			{
+			//	delay_ms(100);
+				set_speed_pwm(0);
+				delay_ms(2000);
+				set_steer_helm_basement(data_steer_helm_basement.left_limit);
+				set_speed_pwm(300);
+				delay_ms(1600);/////
+				set_speed_pwm(0);
+				set_steer_helm_basement(data_steer_helm_basement.right_limit);
+				delay_ms(1000);
+				set_speed_pwm(-300);
+				delay_ms(1200);/////
+				set_speed_pwm(0);
+				set_steer_helm_basement(data_steer_helm_basement.left_limit);
+				delay_ms(1000);
+				set_speed_pwm(300);
+				delay_ms(1500);/////
 			}
 #if 0                                     //应用于之后直角转弯程序（初版，未经测试）                  jqy
 			if(flag_Rightangle_l)	
@@ -119,29 +151,33 @@ void Mode0_DebugCamera(void)
 			EMIOS_0.CH[3].CCR.B.FEN=1;
 		}
 #if 1
-		if(zhangai==0 && bz==1)
+		if(zhangai==0 && bz==1)          //超车处理参数，适用于1号车          jqy
 		{
-			delay_ms(200);
+	//		delay_ms(200);
 			set_steer_helm_basement(data_steer_helm_basement.left_limit);   
-			set_speed_pwm(500);
-			delay_ms(560);
+			delay_ms(420);
+	//		delay_ms(650);
 			set_steer_helm_basement(data_steer_helm_basement.right_limit);
-			delay_ms(560);
+			delay_ms(450);
+	//		delay_ms(550);
 			set_steer_helm_basement(data_steer_helm_basement.center);
-			delay_ms(560);
+			delay_ms(300);
+	//		delay_ms(560);
 			zhangai=1;
 		}
 #endif
 #if 1
-		if(zhangai==0 && bz==-1)
+	//	if(zhangai==0 && bz==-1)
+		if(zhangai==0 && bz==0)          //避障停车处理参数，适用于1号车         jqy
 		{
-			delay_ms(500);
+			set_steer_helm_basement(data_steer_helm_basement.center);
+			delay_ms(800);
 			set_speed_pwm(0);
 			jishu=0;
 			delay_ms(1000);
 		//	zhangai=1;
 		}
-		while(zhangai==0)
+		while(zhangai==0)                //前车未离开，本车不能前进            jqy
 		{
 			set_speed_pwm(0);
 		    FindBlackLine(); 
@@ -149,12 +185,15 @@ void Mode0_DebugCamera(void)
 		    if(RoadType!=12 && RoadType!=13)
 		    	if(RoadType!=66)
 		    		jishu++;
+		    LCD_Write_Num(105,4,jishu,2);
 		    EMIOS_0.CH[3].CSR.B.FLAG = 1;
 		    EMIOS_0.CH[3].CCR.B.FEN=1;
-		    if(jishu==20)
+		    if(jishu>=50)
 		    {
 		    	zhangai=1;
 		    	jishu=0;
+		    	bz=-2;               ///////////////////////
+		    	delay_ms(2000);
 		    }
 		}
 #endif
