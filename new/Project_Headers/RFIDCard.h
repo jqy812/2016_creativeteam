@@ -53,8 +53,16 @@
 #define RFID_MODUL_TYPE_OLD (1)
 #define RFID_MODUL_TYPE_NEW (2)
 
-#define ROAD_NUM_1001 (0x3ABE1FBD)//红绿灯路口
-#define ROAD_NUM_1002 (0xCA7C00BD)
+//#define ROAD_NUM_1001 (0x3ABE1FBD)
+//#define ROAD_NUM_1002 (0xCA7C00BD)
+#define ROAD_NUM_1101 (0x7C349722)//红绿灯路口0x11类型
+#define ROAD_NUM_1102 (0x8C139722)
+#define ROAD_NUM_1103 (0xAC3D7422)
+#define ROAD_NUM_1104 (0x3221EDD3)
+#define ROAD_NUM_1105 (0x4C8E9222)
+#define ROAD_NUM_1106 (0x0CF59622)
+#define ROAD_NUM_1201 (0x12517BD6)
+#define ROAD_NUM_1202 (0xE22576D6)
 #define ROAD_NUM_4001 (0xDAA23548)//天少专车
 #define ROAD_NUM_4002 (0x5A934B48)
 #define ROAD_NUM_2101 (0xDA3BFFBC)//左打死路口
@@ -62,6 +70,14 @@
 #define ROAD_NUM_2103 (0xFA8320BD)
 #define ROAD_NUM_2201 (0xDA945248)//右打死路口
 #define ROAD_NUM_2301 (0x1250DD76)//停车
+#define ROAD_NUM_3001 (0xC269EAD3)//（桥）正常行驶
+#define ROAD_NUM_3002 (0x9CC73424)
+#define ROAD_NUM_3003 (0xD23487D6)
+#define ROAD_NUM_3004 (0xC26F49D6)
+#define ROAD_NUM_3101 (0x6C388622)//（桥）加速
+#define ROAD_NUM_3102 (0x5CD07422)
+#define ROAD_NUM_3201 (0x82AA86D6)//（桥）减速
+#define ROAD_NUM_3202 (0x822875D6)
 
 extern const BYTE rfid_cmd_get_id[];
 extern const BYTE rfid_cmd_get_data[];

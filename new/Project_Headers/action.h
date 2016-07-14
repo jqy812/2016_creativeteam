@@ -35,7 +35,10 @@ extern int Door_Status;
 extern int Door_Stop;
 extern int Car_Psg;
 extern int Door_Open;
+extern Light_2_Ctrl;
+extern int Door_Delay;
 extern int Door_Close;
+extern int Door_Close_Run;
 /* 刺气球数据 */
 #ifdef __ACTION_C_
 struct
@@ -55,6 +58,7 @@ extern struct
 extern void control_car_action(void);
 extern void device_Num_change(void);
 extern void car_default(void);
+void BMW_Taxi();
 void speed_up_bridge1();
 void puncture_ballon();
 void puncture_ballon_2();

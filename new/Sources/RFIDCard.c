@@ -159,10 +159,22 @@ int init_RFID_modul_type(void)
 /*-----------------------------------------------------------------------*/
 WORD RFID_Num_Exp(DWORD site)
 {
-	if(site== ROAD_NUM_1001)
-		return 0x1001;
-	if(site== ROAD_NUM_1002)
-		return 0x1002;
+	if(site== ROAD_NUM_1101)
+		return 0x1101;
+	if(site== ROAD_NUM_1102)
+		return 0x1102;
+	if(site== ROAD_NUM_1103)
+		return 0x1103;
+	if(site== ROAD_NUM_1104)
+		return 0x1104;
+	if(site== ROAD_NUM_1105)
+		return 0x1105;
+	if(site== ROAD_NUM_1106)
+		return 0x1106;
+	if(site== ROAD_NUM_1201)
+		return 0x1201;
+	if(site== ROAD_NUM_1202)
+		return 0x1202;
 	if(site== ROAD_NUM_4001)
 		return 0x4001;
 	if(site== ROAD_NUM_4002)
@@ -177,4 +189,20 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x2201;
 	if(site== ROAD_NUM_2301)
 		return 0x2301;
+	if(site== ROAD_NUM_3001)
+		return 0x3001;
+	if(site== ROAD_NUM_3002)
+		return 0x3002;
+	if(site== ROAD_NUM_3003)
+		return 0x3003;
+	if(site== ROAD_NUM_3004)
+		return 0x3004;
+	if(site== ROAD_NUM_3101)
+		return 0x3101;
+	if(site== ROAD_NUM_3102)
+		return 0x3102;
+	if(site== ROAD_NUM_3201)
+		return 0x3201;
+	if(site== ROAD_NUM_3202)
+		return 0x3202;
 }

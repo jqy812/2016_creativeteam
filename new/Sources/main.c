@@ -4,12 +4,12 @@ WORD helm_use=0;
 int16_t motor_use=0;
 int direction;
 BYTE haha;
-BYTE high2;
-BYTE low2;
-BYTE high3;
-BYTE low3;
-BYTE device_number2;
-BYTE data_number;
+short high2;
+short low2;
+short high3;
+short low3;
+short device_number2;
+short data_number;
 int supersonic_on_off=1;
 int biaoji=0;
 int jishu=0;
@@ -27,7 +27,6 @@ void Mode3_Andriod(void);
 void main(void)
 {
 	init_all_and_POST();
-
 	if(mode==0)
 		Mode0_DebugCamera();//图像显示屏显示，车速20，显示offset RoadType，舵机打角，wifi_car_action不激活
 	else if(mode==1)
@@ -44,6 +43,8 @@ void Mode0_DebugCamera(void)
 //	LCD_write_english_string(96,0,"T");
 //	LCD_write_english_string(96,2,"R");
 	jishu=0;
+	if(WIFI_ADDRESS_CAR_3 == g_device_NO)
+		Car_Waitfororder=1;
 #if 0
 	while(bz==-1)
 	{
@@ -67,11 +68,11 @@ void Mode0_DebugCamera(void)
 					
 			execute_remote_cmd(remote_frame_data+5);
 		}
-		if(fieldover==1&&Car_Stop==0&&zhangai==1)
+		if(fieldover==1&&Car_Stop==0&&zhangai==1&&Car_Waitfororder==0)
 		{
 			car_default();
 			fieldover=0; 
-			set_speed_pwm(300); 
+			set_speed_pwm(350); 
 			FindBlackLine();              //寻迹处理                        jqy     
 	    	//Display_Video();
 			CenterLineWithVideo();        //摄像头数据处理              jqy     

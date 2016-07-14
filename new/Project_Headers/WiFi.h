@@ -95,6 +95,7 @@ extern BYTE g_device_NO;
 extern int g_start_all;
 extern int sending_waiter;
 extern int have_responsed;
+extern int Car_Waitfororder;
 extern int Light_Status;
 extern BYTE waiting_for_response;
 extern BYTE g_device_NO_Hex;/* 设备号 即WiFi地址 */

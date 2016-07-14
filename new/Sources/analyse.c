@@ -7,6 +7,8 @@
 
 #include "includes.h"
 
+extern int bz;
+
 //找线变量定义
 signed char BlackLine[2][ROWS];	  //左右线的数组
 byte StartRow[2];       	  //线的起点
@@ -309,7 +311,7 @@ void FindBlackLine(void)
 	//DetectSlope();					//检测坡道
 	AnalyzeRoadType();				//分析赛道类型	
 	CenterLineFill();				//中线补线
-#if 1
+#if 0
 //	if(RoadType==20||RoadType==6)           //1号车中线偏移参数       jqy
 	{
 	for(i=RoadEnd;i<RoadStart/2-10;i++)
@@ -319,12 +321,19 @@ void FindBlackLine(void)
 	}
 #endif
 #if 0
-//	if(RoadType==21||RoadType==22)           //3号车中线偏移参数       jqy
+	if(bz==-1)           //3号车中线偏移参数       jqy
 	{
-	for(i=RoadEnd;i<RoadStart/2-10;i++)
-		CenterLine[i]=(CenterLine[i]);
-	for(i=RoadStart/2-10;i<=RoadStart;i++)
+	for(i=RoadEnd;i<RoadStart/2;i++)
+		CenterLine[i]=(CenterLine[i]-10);
+	for(i=RoadStart/2;i<=RoadStart;i++)
 		CenterLine[i]=(CenterLine[i]-2);
+	}
+	if(bz==1)           //3号车中线偏移参数       jqy
+	{
+	for(i=RoadEnd;i<RoadStart/2+8;i++)
+		CenterLine[i]=(CenterLine[i]-5);
+	for(i=RoadStart/2-10;i<=RoadStart;i++)
+		CenterLine[i]=(CenterLine[i]+3);
 	}
 #endif
 	TargetOffset();					//目标控制量
