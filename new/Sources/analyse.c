@@ -7,6 +7,11 @@
 
 #include "includes.h"
 
+//2016赛季 参数定义
+extern int bz;
+extern int jishu;
+extern int zhangai;
+
 //找线变量定义
 signed char BlackLine[2][ROWS];	  //左右线的数组
 byte StartRow[2];       	  //线的起点
@@ -309,24 +314,28 @@ void FindBlackLine(void)
 	//DetectSlope();					//检测坡道
 	AnalyzeRoadType();				//分析赛道类型	
 	CenterLineFill();				//中线补线
-#if 1
-//	if(RoadType==20||RoadType==6)           //1号车中线偏移参数       jqy
+	if(g_device_NO==1)           //1号车中线偏移参数       jqy
 	{
 	for(i=RoadEnd;i<RoadStart/2-10;i++)
 		CenterLine[i]=(CenterLine[i]+11);
 	for(i=RoadStart/2-10;i<=RoadStart;i++)
 		CenterLine[i]=(CenterLine[i]+22);
 	}
-#endif
-#if 0
-//	if(RoadType==21||RoadType==22)           //3号车中线偏移参数       jqy
+	 
+	if(g_device_NO==2)           //2号车中线偏移参数       jqy
 	{
 	for(i=RoadEnd;i<RoadStart/2-10;i++)
-		CenterLine[i]=(CenterLine[i]);
+		CenterLine[i]=(CenterLine[i]+10);
 	for(i=RoadStart/2-10;i<=RoadStart;i++)
-		CenterLine[i]=(CenterLine[i]-2);
+		CenterLine[i]=(CenterLine[i]+20);
 	}
-#endif
+	if(g_device_NO==3)           //3号车中线偏移参数       jqy
+	{
+	for(i=RoadEnd;i<RoadStart/2-10;i++)
+		CenterLine[i]=(CenterLine[i]+14);
+	for(i=RoadStart/2-10;i<=RoadStart;i++)
+		CenterLine[i]=(CenterLine[i]+27);
+	}
 	TargetOffset();					//目标控制量
 }
 
@@ -2818,4 +2827,39 @@ void NearOffset()
 		}
 	}
 	target_offset/=sum_weight;
+}
+
+void Typejudge()
+{
+	if(RoadType==66)      //道路类型66，表示单车道障碍    jqy
+		jishu++;
+	if(jishu>=6 && bz==1)   //bz位为1时，进行超车    jqy
+	{
+		zhangai=0;
+		jishu=0;
+	}
+	if(jishu>=8 && bz==0)   //bz位为1时，进行避障停车   jqy
+	{
+		zhangai=0;
+		jishu=0;
+	}
+	if(RoadType==88 && bz==2)    //道路类型88，表示双车道障碍，需掉头绕行    jqy
+	{
+		set_speed_pwm(0);
+		delay_ms(2000);
+		set_steer_helm_basement(data_steer_helm_basement.left_limit);
+		set_speed_pwm(320);
+		delay_ms(1600);/////
+		set_speed_pwm(0);
+		set_steer_helm_basement(data_steer_helm_basement.right_limit);
+		delay_ms(1000);
+		set_speed_pwm(-320);
+		delay_ms(1200);/////
+		set_speed_pwm(0);
+		set_steer_helm_basement(data_steer_helm_basement.left_limit);
+		delay_ms(1000);
+		set_speed_pwm(320);
+		delay_ms(1500);
+		bz=5;/////
+	}
 }

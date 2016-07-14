@@ -68,7 +68,8 @@ void fly_bridge();
 void push_box1();
 void Car_UTurn();
 void set_car_direction(SBYTE act);
-
+//******************************2016赛季****************************************//
+void zhangai_run();
 
 
 extern void WiFi_control_car_1_action(WORD cmd);

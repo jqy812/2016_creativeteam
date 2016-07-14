@@ -206,5 +206,7 @@ void MidOffset();
 void FarOffset();
 
 void GetParam(uint8_t start, uint8_t end);
+//******************************2016赛季****************************************//
+void Typejudge();
 
 #endif /* ANALYSE_H_ */

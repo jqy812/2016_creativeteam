@@ -61,7 +61,21 @@
 #define ROAD_NUM_2102 (0xCA4900BD)
 #define ROAD_NUM_2103 (0xFA8320BD)
 #define ROAD_NUM_2201 (0xDA945248)//右打死路口
+#define ROAD_NUM_2202 (0x526480D6)
+#define ROAD_NUM_2203 (0x223E7AD6)
 #define ROAD_NUM_2301 (0x1250DD76)//停车
+
+#define ROAD_NUM_2401 (0x827958D6)//直行
+#define ROAD_NUM_2402 (0x72147CD6)
+
+#define ROAD_NUM_3001 (0xC269EAD3)//（桥）正常行驶
+#define ROAD_NUM_3002 (0x9CC73424)
+#define ROAD_NUM_3003 (0xD23487D6)
+#define ROAD_NUM_3004 (0xC26F49D6)
+#define ROAD_NUM_3101 (0x6C388622)//（桥）加速
+#define ROAD_NUM_3102 (0x5CD07422)
+#define ROAD_NUM_3201 (0x621C82D6)//（桥）减速
+#define ROAD_NUM_3202 (0x822875D6)
 
 extern const BYTE rfid_cmd_get_id[];
 extern const BYTE rfid_cmd_get_data[];
