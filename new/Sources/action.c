@@ -325,7 +325,6 @@ void RFID_control_car_2_action(DWORD site)
 	//	delay_ms(300);
 	//	fieldover=1;
 	}
-#endif
 	//rfid_ask_road(0x01, 0xFF, 0xCD, site);//CD=CARD
 	//road_stop();
 	if((site>>12)==0x1||(site>>12)==0x3)//在红绿灯路口
@@ -682,6 +681,7 @@ void control_car_action(void)
 			WiFi_control_car_1_action(g_net_control_data.cmd);
 		}
 	}
+#endif
 }
 void device_Num_change(void)//把设备号换成16进制（好像没啥用）
 {
