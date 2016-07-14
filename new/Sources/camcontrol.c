@@ -23,7 +23,9 @@ unsigned int Counter_Error=0;		//光编接触不牢靠错误计数量
 ////********************起始线停车参数******************************************
 byte stop_flag=0;
 byte stop_delay=0;
-	
+
+//********************2016赛季参数******************************************
+extern int velocity;
 
 //*****************************************************************************************************************
 //************************************************角度控制************************************************    	  *
@@ -42,16 +44,28 @@ void SteerControl()
 	//最低速
 //	if(Slope==1)					{Steer_kp=10;Steer_kd=5;}
 //	else if(Slope==2)				{Steer_kp=8;Steer_kd=5;}
-#if 1                     //3号车PID参数       jqy
+
+if(g_device_NO==3)         //3号车PID参数       jqy
+{
 	if(ABS(target_offset)<6) 	{Steer_kp=5;Steer_kd=5;}
-	else if(ABS(target_offset)<26)  {Steer_kp=8.2+target_offset*target_offset/100;Steer_kd=10;}
-	else {Steer_kp=9.8+target_offset*target_offset/500;Steer_kd=5;}
-#endif
-#if 0                    //1号车PID参数       jqy
+	else if(ABS(target_offset)<26)  {Steer_kp=7.2+target_offset*target_offset/100;Steer_kd=10;}
+	else {Steer_kp=10.8+target_offset*target_offset/500;Steer_kd=5;}
+}
+
+if(g_device_NO==2)         //2号车PID参数       jqy
+{
+	if(ABS(target_offset)<6) 	{Steer_kp=5;Steer_kd=5;}
+	else if(ABS(target_offset)<26)  {Steer_kp=18.2+target_offset*target_offset/100;Steer_kd=10;}
+	else {Steer_kp=20.8+target_offset*target_offset/500;Steer_kd=5;}
+}
+
+if(g_device_NO==1)                   //1号车PID参数       jqy
+{
 	if(ABS(target_offset)<6) 	{Steer_kp=6;Steer_kd=5;}
 	else if(ABS(target_offset)<26)  {Steer_kp=15.8+target_offset*target_offset/100;Steer_kd=10;}
 	else {Steer_kp=16.2+target_offset*target_offset/500;Steer_kd=5;}
-#endif
+}
+
 #if 0
 	if(ABS(target_offset)<5) 		{Steer_kp=5;Steer_kd=5;}
 			else if(ABS(target_offset)<10)  {Steer_kp=5;Steer_kd=5;}
@@ -68,7 +82,7 @@ void SteerControl()
 	//舵机限值+舵机输出
 //	set_steer_helm(Steer_PWM[3]);
 //	LCD_Write_Num(105,5,(int)Steer_PWM[3],4);
-	set_speed_pwm(350);
+	set_speed_pwm(velocity);
 	set_steer_helm_basement(Steer_PWM[3]);
 //	EMIOS_0.CH[9].CBDR.R = Steer_PWM[3];
 	LCD_Write_Num(105,5,(int)Steer_PWM[3],4);
