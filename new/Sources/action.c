@@ -91,6 +91,17 @@ void RFID_control_car_1_action(WORD site)
 			set_speed_pwm(0);
 		}
 	}
+	if((site>>8)==0x41)
+	{
+		if(site==0x4101)//入库
+		{
+			sending_service_package(0x44,0xCCDD,0x0001);
+		}
+		if(site==0x4102)//出库
+		{
+			sending_service_package(0x44,0xCCDD,0x0002);
+		}
+	}
 	if((site>>8)==0x21 && (site>>0)!=0x2103)//在左打死路口         并起道路动作切换功能，日后需更改               jqy
 	{
 		LCD_Fill(0x00);
@@ -107,7 +118,8 @@ void RFID_control_car_1_action(WORD site)
 		set_speed_pwm(320);
 	//	delay_ms(100);
 		set_steer_helm_basement(data_steer_helm_basement.left_limit);
-		delay_ms(950);
+	//	delay_ms(950);
+		delay_ms(850);
 	//	set_steer_helm_basement(data_steer_helm_basement.center);
 	//	delay_ms(300);
 	//	fieldover=1;
@@ -302,7 +314,20 @@ void RFID_control_car_2_action(DWORD site)
 		{
 			Car_Stop=1;
 			LCD_Fill(0x00);
+			set_speed_pwm(-100);
+			delay_ms(50);
 			set_speed_pwm(0);
+		}
+	}
+	if((site>>8)==0x41)
+	{
+		if(site==0x4101)//入库
+		{
+			sending_service_package(0x44,0xCCDD,0x0001);
+		}
+		if(site==0x4102)//出库
+		{
+			sending_service_package(0x44,0xCCDD,0x0002);
 		}
 	}
 	if((site>>8)==0x21)//在左打死路口         并起道路动作切换功能，日后需更改               jqy
@@ -402,7 +427,20 @@ void RFID_control_car_3_action(DWORD site)
 		{
 			Car_Stop=1;
 			LCD_Fill(0x00);
+			set_speed_pwm(-500);
+			delay_ms(50);
 			set_speed_pwm(0);
+		}
+	}
+	if((site>>8)==0x41)
+	{
+		if(site==0x4101)//入库
+		{
+			sending_service_package(0x44,0xCCDD,0x0001);
+		}
+		if(site==0x4102)//出库
+		{
+			sending_service_package(0x44,0xCCDD,0x0002);
 		}
 	}
 	if((site>>8)==0x21 && (site>>0)!=0x2103)//在左打死路口
@@ -429,7 +467,7 @@ void RFID_control_car_3_action(DWORD site)
 	//	LCD_Fill(0x00);
 		jishu=1;
 	}
-	if((site>>12)==0x04)//在接客区
+	if((site>>8)==0x40)//在接客区
 	{
 		sending_service_package(0x44,0x0020,site);
 		Car_Stop=1;
@@ -542,12 +580,11 @@ void control_car_action(void)
 {
 	if(WIFI_ADDRESS_CAR_1 == g_device_NO)
 	{
-
-		if (RFID_site_data.is_new_site )//&& RFID_site_data.old_site!=RFID_site_data.site
+		if (RFID_site_data.is_new_site && RFID_site_data.old_site!=RFID_site_data.site)
 		{
-//			RFID_site_data.old_site=0x00000000;
-//			RFID_site_data.site = 0x00000000;
-//			RFID_site_data.time = 0x00000000;
+			RFID_site_data.old_site=0x00000000;
+			RFID_site_data.site = 0x00000000;
+			RFID_site_data.time = 0x00000000;
 			RFID_site_data.is_new_site = 0;
 			RFID_control_car_1_action(RFID_site_data.roadnum);
 		}
@@ -562,7 +599,7 @@ void control_car_action(void)
 	if(WIFI_ADDRESS_CAR_2 == g_device_NO)
 	{
 
-		if (RFID_site_data.is_new_site)// && RFID_site_data.old_site!=RFID_site_data.site
+		if (RFID_site_data.is_new_site && RFID_site_data.old_site!=RFID_site_data.site)
 		{
 			RFID_site_data.old_site=0x00000000;
 			RFID_site_data.site = 0x00000000;
@@ -574,13 +611,17 @@ void control_car_action(void)
 		{
 			if(Light_Status==1)
 			{
+				set_speed_pwm(350);
+				delay_ms(1000);
+				set_steer_helm_basement(data_steer_helm_basement.left_limit);
+				delay_ms(1000);
 				Car_Stop=0;
 			}
 		}
 	}
 	if(WIFI_ADDRESS_CAR_3 == g_device_NO)
 	{
-		if (RFID_site_data.is_new_site )//&& RFID_site_data.old_site!=RFID_site_data.site
+		if (RFID_site_data.is_new_site && RFID_site_data.old_site!=RFID_site_data.site)
 		{
 			RFID_site_data.is_new_site = 0;
 			RFID_control_car_3_action(RFID_site_data.roadnum);
@@ -696,6 +737,11 @@ void device_Num_change(void)//把设备号换成16进制（好像没啥用）
 }
 void car_default()//每次开车将宝马所有标志位置为默认状态，防止起冲突
 {
+	if(WIFI_ADDRESS_CAR_1 == g_device_NO)
+	{
+		have_responsed=1;
+		waiting_for_response=0;
+	}
 	if(WIFI_ADDRESS_CAR_3 == g_device_NO)
 	{
 		if(Door_Close_Run)

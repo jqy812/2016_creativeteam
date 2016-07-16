@@ -66,7 +66,6 @@ void Mode0_DebugCamera(void)
 	jishu=0;
 	if(WIFI_ADDRESS_CAR_3 == g_device_NO)
 		Car_Waitfororder=1;
-
 	if(g_device_NO==1) 
 	{
 	    velocity=350;
@@ -76,12 +75,7 @@ void Mode0_DebugCamera(void)
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
 	for (;;)
 	{
-		control_car_action();//ouyang
-		if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
-		{
-			WIFICHEKER=0;
-			wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
-		}
+		control_car_action();//ouyang	
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
 			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
@@ -108,6 +102,11 @@ void Mode0_DebugCamera(void)
 			EMIOS_0.CH[3].CCR.B.FEN=1;
 		}
 		zhangai_run();                          //避障参数
+		if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
+		{
+			WIFICHEKER=0;
+			wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
+		}
 	}
 }
 

@@ -307,6 +307,8 @@ void delay_ms(DWORD ms)
 	for (i = 0; i < ms; i++)
 	{
 		delay_us(1000);
+		if(RFID_site_data.is_new_site && (RFID_site_data.roadnum>>8)==0x11)//读到红绿灯卡强制停止delay
+			break;
 	}
 }
 

@@ -2215,14 +2215,14 @@ byte JudgeBarrier()
 //	BlackLine[1][o-5]=0;BlackLine[1][o-4]=0;BlackLine[1][o-3]=0;BlackLine[1][o-2]=0;BlackLine[1][o-1]=0;
 	for(i=o;i<ROW;i++)
 	{
-	    if(BlackLine[1][i-5]-BlackLine[1][i]>=5)
+	    if(BlackLine[1][i-3]>BlackLine[1][i])
 	    {
 	    	if(p==0)
 	    		gg=i;
 	    	p++;
 	    }
-	    if(BlackLine[1][i]-BlackLine[1][i-5]>=5 && p>2)
-	    	if(i-gg>12)
+	    if(BlackLine[1][i]>BlackLine[1][i-3] && p>2)
+	    	if(i-gg>8)
 	        {
 	    	    p=100;
 	    	    break;
@@ -2843,6 +2843,7 @@ void Typejudge()
 	}
 	if(RoadType==88 && bz==2)    //道路类型88，表示双车道障碍，需掉头绕行    jqy
 	{
+		sending_service_package(0x33,0xBB00,0x0000);//向上位机报告拥堵,直到上位机回复
 		set_speed_pwm(0);
 		delay_ms(2000);
 		set_steer_helm_basement(data_steer_helm_basement.left_limit);
