@@ -345,6 +345,9 @@ void set_steer_helm_basement_right_limit(WORD helmData)
 /*-----------------------------------------------------------------------*/
 int update_steer_helm_basement_to_steer_helm(void)
 {
+	data_steer_helm_basement.left_limit=2800;
+	data_steer_helm_basement.center=3800;
+	data_steer_helm_basement.right_limit=4800;
 	if(data_steer_helm_basement.left_limit < data_steer_helm_basement.center && data_steer_helm_basement.center < data_steer_helm_basement.right_limit)
 	{
 		data_steer_helm_basement.direction = 1;

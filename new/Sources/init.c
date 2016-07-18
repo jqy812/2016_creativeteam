@@ -235,9 +235,9 @@ void initEMIOS_0Image(void)
 /*-----------------------------------------------------------------------*/
 void init_choose_mode(void)
 {
-	mode=3;
+	//mode=3;
 	//mode=2;//尝试
-	//mode=switch1*2+switch4;
+	mode=switch1*2+switch4;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -402,10 +402,13 @@ void init_all_and_POST(void)
 		LCD_P8x16Str(0,0, (BYTE*)"TF..NOK");
 		suicide();
 	}
-	
-	/* 读取设备号 */
+#endif	
+	/* 设备号 */
 
 	LCD_P8x16Str(0, 4, (BYTE*)"DeviceNo=");
+	 g_device_NO=4;
+	LCD_PrintoutInt(72, 4, g_device_NO);
+#if 0
 	if (!read_device_no_from_TF())
 	{
 		if (WIFI_ADDRESS_WITHOUT_INIT != g_device_NO)
@@ -424,7 +427,7 @@ void init_all_and_POST(void)
 	device_Num_change();
 #endif
 	/* 开启RFID读卡器主动模式 */
-#if 0//ouyang
+//#if 0//ouyang
 	if (!init_RFID_modul_type())
 	{
 		g_devices_init_status.RFIDCard_energetic_mode_enable_is_OK = 1;
@@ -439,8 +442,20 @@ void init_all_and_POST(void)
 	delay_ms(1000);
 	/* 换屏 */
 	LCD_Fill(0x00);
-#endif
-
+//#endif
+	/* 舵机1参数 */
+	LCD_P8x16Str(0, 0, (BYTE*)"StH.L=");
+	update_steer_helm_basement_to_steer_helm();
+	LCD_PrintoutInt(48, 0, data_steer_helm_basement.left_limit);
+	set_steer_helm_basement(data_steer_helm_basement.left_limit);
+	delay_ms(500);
+	LCD_P8x16Str(0, 2, (BYTE*)"StH.R=");
+	LCD_PrintoutInt(48, 2, data_steer_helm_basement.right_limit);
+	set_steer_helm_basement(data_steer_helm_basement.right_limit);
+	delay_ms(500);
+	LCD_P8x16Str(0, 4, (BYTE*)"StH.C=");
+	LCD_PrintoutInt(48, 4, data_steer_helm_basement.center);
+	set_steer_helm_basement(data_steer_helm_basement.center);
 #if 0
 	/* 读取舵机参数 */
 	LCD_P8x16Str(0, 0, (BYTE*)"StH.L=");

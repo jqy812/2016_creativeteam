@@ -12,7 +12,7 @@ int Light_Status=0;//默认红灯
 int Traffic_Jam=0;//堵车
 BYTE remote_frame_data[REMOTE_FRAME_LENGTH];
 BYTE remote_frame_data_send[REMOTE_FRAME_LENGTH];
-BYTE g_device_NO = WIFI_ADDRESS_CAR_1;
+BYTE g_device_NO = WIFI_ADDRESS_CAR_4;
 BYTE g_device_NO_Hex;/* 设备号 即WiFi地址 */
 BYTE des;
 WORD cmd_WIFI;
