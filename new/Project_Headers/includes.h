@@ -76,6 +76,8 @@ typedef unsigned short word;
 #define RightL SIU.GPDO[17].B.PDO
 #define RunL SIU.GPDO[72].B.PDO
 #define StopL SIU.GPDO[73].B.PDO
+// haha
+#define Mag SIU.GPDO[0].B.PDO//xiong
 
 /***************DIP*****************/
 #define switch1 SIU.GPDI[53].R//PD5左

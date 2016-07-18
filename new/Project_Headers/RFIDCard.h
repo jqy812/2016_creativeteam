@@ -83,8 +83,6 @@
 #define ROAD_NUM_3202 (0x822875D6)
 #define ROAD_NUM_4001 (0xDAA23548)//天少专车
 #define ROAD_NUM_4002 (0x5A934B48)
-#define ROAD_NUM_4101 (0xB28B7DD6)//停车场入口
-#define ROAD_NUM_4102 (0x328F80D6)//停车场出口
 
 extern const BYTE rfid_cmd_get_id[];
 extern const BYTE rfid_cmd_get_data[];

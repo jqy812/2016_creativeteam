@@ -91,17 +91,6 @@ void RFID_control_car_1_action(WORD site)
 			set_speed_pwm(0);
 		}
 	}
-	if((site>>8)==0x41)
-	{
-		if(site==0x4101)//入库
-		{
-			sending_service_package(0x44,0xCCDD,0x0001);
-		}
-		if(site==0x4102)//出库
-		{
-			sending_service_package(0x44,0xCCDD,0x0002);
-		}
-	}
 	if((site>>8)==0x21 && (site>>0)!=0x2103)//在左打死路口         并起道路动作切换功能，日后需更改               jqy
 	{
 		LCD_Fill(0x00);
@@ -319,17 +308,6 @@ void RFID_control_car_2_action(DWORD site)
 			set_speed_pwm(0);
 		}
 	}
-	if((site>>8)==0x41)
-	{
-		if(site==0x4101)//入库
-		{
-			sending_service_package(0x44,0xCCDD,0x0001);
-		}
-		if(site==0x4102)//出库
-		{
-			sending_service_package(0x44,0xCCDD,0x0002);
-		}
-	}
 	if((site>>8)==0x21)//在左打死路口         并起道路动作切换功能，日后需更改               jqy
 	{
 		LCD_Fill(0x00);
@@ -430,17 +408,6 @@ void RFID_control_car_3_action(DWORD site)
 			set_speed_pwm(-500);
 			delay_ms(50);
 			set_speed_pwm(0);
-		}
-	}
-	if((site>>8)==0x41)
-	{
-		if(site==0x4101)//入库
-		{
-			sending_service_package(0x44,0xCCDD,0x0001);
-		}
-		if(site==0x4102)//出库
-		{
-			sending_service_package(0x44,0xCCDD,0x0002);
 		}
 	}
 	if((site>>8)==0x21 && (site>>0)!=0x2103)//在左打死路口

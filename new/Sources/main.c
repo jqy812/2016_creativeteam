@@ -349,11 +349,15 @@ void Mode3_Andriod(void)
     {
 		
 #if 1
-			LCD_PrintoutInt(0, 0, (int)Light_Status);
+//			LCD_PrintoutInt(0, 0, (int)Light_Status);
 			
-			high2=((WORD)(remote_frame_data[5])<<8);
-			low2=(WORD)(remote_frame_data[6]);
-			device_number2=(high2|low2);
+//			high2=((WORD)(remote_frame_data[5])<<8);
+//			low2=(WORD)(remote_frame_data[6]);
+		     //put in wifi.c xiong
+//			device_number2=(high2|low2);
+			device_number2=1;
+			LCD_PrintoutInt(0, 0, (int)high2);
+			LCD_PrintoutInt(0, 2, (int)low2);
 			LCD_PrintoutInt(0, 4, (int)device_number2);
 		
 			high3=((WORD)(remote_frame_data[7])<<8);
@@ -364,7 +368,8 @@ void Mode3_Andriod(void)
 			
 			if ( device_number2==1)
 				{
-					set_steer_helm_basement(data_number);
+					EMIOS_0.CH[10].CBDR.R = data_number;
+					EMIOS_0.CH[9].CBDR.R = data_number;
 				}
 			else if (device_number2==5)
 				{

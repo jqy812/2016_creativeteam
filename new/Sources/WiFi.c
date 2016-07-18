@@ -18,6 +18,8 @@ BYTE des;
 WORD cmd_WIFI;
 WORD sending_data;
 BYTE waiting_for_response=0;
+extern short high2;
+extern short low2;
 int  lost_data=0;
 
 /*-----------------------------------------------------------------------*/
@@ -212,6 +214,8 @@ int rev_remote_frame_2(BYTE rev)
 		if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCC) 
 			Door_Close_Run=1;//关门并开车
 	}
+	high2=((WORD)(remote_frame_data[5])<<8);
+	low2=(WORD)(remote_frame_data[6]);
 	remote_frame_data[5]=0x00;
 	remote_frame_data[6]=0x00;//每次读完把cmd位置0，不置0每次都会有冲突）
 	return g_remote_frame_state;

@@ -76,6 +76,8 @@ void init_led(void)
 	SIU.PCR[13].R = 0x0203;/* PA13  */
 	SIU.PCR[14].R = 0x0203;/* PA14  */
 	SIU.PCR[15].R = 0x0203;/* PA15  */
+	//haha
+	SIU.PCR[0].R = 0x0203;/* xiong  */
 #endif
 	D0 = 1;	/* 1=熄灭 */
 	D1 = 1;
@@ -91,6 +93,7 @@ void init_led(void)
 	RightL = 1;
 	StopL = 1;
 	RunL = 1;
+	Mag = 1;//haha
 }
 
 
@@ -180,6 +183,14 @@ void initEMIOS_0MotorAndSteer(void)
 	EMIOS_0.CH[9].CADR.R = 1;	/* Leading edge when channel counter bus=250*/
 	EMIOS_0.CH[9].CBDR.R = data_steer_helm_basement.center;	/* Trailing edge when channel counter bus=500*/
 	SIU.PCR[9].R = 0x0600;	/* [11:10]选择AFx 此处AF1 /* MPC56xxS: Assign EMIOS_0 ch 21 to pad */
+//haha	
+	EMIOS_0.CH[10].CCR.B.BSL = 0x1;	/* Use counter bus C (default) */
+	EMIOS_0.CH[10].CCR.B.MODE = 0x60;	/* Mode is OPWM Buffered */  
+	EMIOS_0.CH[10].CCR.B.EDPOL = 1;	/* Polarity-leading edge sets output/trailing clears*/
+	EMIOS_0.CH[10].CADR.R = 1;	/* Leading edge when channel counter bus=250*/
+	EMIOS_0.CH[10].CBDR.R = data_steer_helm_basement.center;	/* Trailing edge when channel counter bus=500*/
+	SIU.PCR[10].R = 0x0600;	/* [11:10]选择AFx 此处AF1 /* MPC56xxS: Assign EMIOS_0 ch 21 to pad */
+	
 #if 0
 	/* 信号舵机 PWM PA12 输出0-50000 */
 	EMIOS_0.CH[12].CCR.B.BSL = 0x1;
@@ -224,9 +235,9 @@ void initEMIOS_0Image(void)
 /*-----------------------------------------------------------------------*/
 void init_choose_mode(void)
 {
-	//mode=3;
+	mode=3;
 	//mode=2;//尝试
-	mode=switch1*2+switch4;
+	//mode=switch1*2+switch4;
 }
 
 /*-----------------------------------------------------------------------*/
@@ -307,8 +318,8 @@ void delay_ms(DWORD ms)
 	for (i = 0; i < ms; i++)
 	{
 		delay_us(1000);
-		if(RFID_site_data.is_new_site && (RFID_site_data.roadnum>>8)==0x11)//读到红绿灯卡强制停止delay
-			break;
+//		if(RFID_site_data.is_new_site && (RFID_site_data.roadnum>>8)==0x11)//读到红绿灯卡强制停止delay
+//			break;
 	}
 }
 
@@ -319,8 +330,8 @@ void delay_ms(DWORD ms)
 void init_all_and_POST(void)
 {
 	int i = 0;
-	/* TF卡 */
-	TCHAR *path = "0:";
+//	/* TF卡 */
+//	TCHAR *path = "0:";
 	
 	disable_watchdog();
 	init_modes_and_clock();
@@ -341,7 +352,7 @@ void init_all_and_POST(void)
 //	init_supersonic_receive_1();
 	init_supersonic_receive_2();
 //	init_supersonic_receive_3();
-	init_supersonic_trigger_0();
+//	init_supersonic_trigger_0();
 //	init_supersonic_trigger_1();
 	init_supersonic_trigger_2();
 //	init_supersonic_trigger_3();
@@ -366,7 +377,7 @@ void init_all_and_POST(void)
 	delay_ms(50);
 	LCD_Fill(0x00);	/* 黑屏 */
 	delay_ms(50);
-#if 1	
+#if 0	
 	/* 初始化TF卡 */
 
 	LCD_P8x16Str(0,0, (BYTE*)"TF..");
@@ -411,8 +422,9 @@ void init_all_and_POST(void)
 		suicide();
 	}
 	device_Num_change();
+#endif
 	/* 开启RFID读卡器主动模式 */
-//#if 0//ouyang
+#if 0//ouyang
 	if (!init_RFID_modul_type())
 	{
 		g_devices_init_status.RFIDCard_energetic_mode_enable_is_OK = 1;
@@ -427,9 +439,9 @@ void init_all_and_POST(void)
 	delay_ms(1000);
 	/* 换屏 */
 	LCD_Fill(0x00);
-//#endif
+#endif
 
-
+#if 0
 	/* 读取舵机参数 */
 	LCD_P8x16Str(0, 0, (BYTE*)"StH.L=");
 	if (read_steer_helm_data_from_TF())
@@ -447,7 +459,7 @@ void init_all_and_POST(void)
 	LCD_P8x16Str(0, 4, (BYTE*)"StH.C=");
 	LCD_PrintoutInt(48, 4, data_steer_helm_basement.center);
 	set_steer_helm_basement(data_steer_helm_basement.center);
-
+#endif
 	/* 读取mode号 */
 	LCD_P8x16Str(0, 6, (BYTE*)"MODE=");
 	LCD_PrintoutInt(40, 6, mode);
@@ -457,7 +469,6 @@ void init_all_and_POST(void)
 
 	/* 换屏 */
 	LCD_Fill(0x00);
-
 	/* 速度闭环测试 */	
 	g_f_enable_speed_control = 1;
 	LCD_P8x16Str(0, 4, (BYTE*)"S.T=0");
@@ -466,7 +477,6 @@ void init_all_and_POST(void)
 	
 	/* 换屏 */
 	LCD_Fill(0x00);
-#endif
 
 }
 //
