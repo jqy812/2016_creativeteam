@@ -193,8 +193,6 @@ WORD RFID_Num_Exp(DWORD site)
 			return 0x2203;
 	if(site== ROAD_NUM_2302)
 		return 0x2302;
-
-
 	if(site== ROAD_NUM_2401)
 		return 0x2401;
 	if(site== ROAD_NUM_2402)

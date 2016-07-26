@@ -561,13 +561,10 @@ void control_car_action(void)
 {
 	if(WIFI_ADDRESS_CAR_1 == g_device_NO)
 	{
-
-		if (RFID_site_data.is_new_site && RFID_site_data.old_site!=RFID_site_data.site)
+		if (RFID_site_data.is_new_site)
 		{
-			RFID_site_data.old_site=0x00000000;
-			RFID_site_data.site = 0x00000000;
-			RFID_site_data.time = 0x00000000;
 			RFID_site_data.is_new_site = 0;
+			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);
 			RFID_control_car_1_action(RFID_site_data.roadnum);
 		}
 		if(Car_Stop)
@@ -582,12 +579,10 @@ void control_car_action(void)
 	if(WIFI_ADDRESS_CAR_2 == g_device_NO)
 	{
 
-		if (RFID_site_data.is_new_site && RFID_site_data.old_site!=RFID_site_data.site)// 
+		if (RFID_site_data.is_new_site)
 		{
-			RFID_site_data.old_site=0x00000000;
-			RFID_site_data.site = 0x00000000;
-			RFID_site_data.time = 0x00000000;
 			RFID_site_data.is_new_site = 0;
+			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);
 			RFID_control_car_2_action(RFID_site_data.roadnum);
 		}
 		if(Car_Stop)
@@ -600,12 +595,11 @@ void control_car_action(void)
 	}
 	if(WIFI_ADDRESS_CAR_3 == g_device_NO)
 	{
-		if (RFID_site_data.is_new_site )//&& RFID_site_data.old_site!=RFID_site_data.site
+		if (RFID_site_data.is_new_site )
 		{
 			RFID_site_data.is_new_site = 0;
+			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);;
 			RFID_control_car_3_action(RFID_site_data.roadnum);
-			RFID_site_data.old_site=0x0;
-			RFID_site_data.site=0x0;
 		}
 		if(Car_Stop==1 && Car_Psg == 0 )
 		{

@@ -108,17 +108,17 @@ void Mode0_DebugCamera(void)
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
 	for (;;)
 	{
+		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
+		{
+			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;		
+		//	execute_remote_cmd(remote_frame_data+5);
+			Wifi_Ctrl();
+		}
 		control_car_action();//ouyang
 		if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
 		{
 			WIFICHEKER=0;
 			wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
-		}
-		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
-		{
-			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
-					
-			execute_remote_cmd(remote_frame_data+5);
 		}
 		if(fieldover==1&&Car_Stop==0&&zhangai==1&&Car_Waitfororder==0)
 		{

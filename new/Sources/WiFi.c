@@ -170,42 +170,6 @@ int rev_remote_frame_2(BYTE rev)
 			g_remote_frame_state = REMOTE_FRAME_STATE_OK;	//CheckSum Success
 		}
 	}
-	if(remote_frame_data[2] == 0x33 )//熊老板上位机
-	{
-		if (remote_frame_data[3] == g_device_NO_Hex && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)   
-		{	
-			have_responsed=1;	
-		}// 检查是否得到应答 
-		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01)   
-		{
-			order_received =1;
-			if(remote_frame_data[8]==0x0A)
-				Light_Status=0;	
-			if(remote_frame_data[8]==0x0B)
-				Light_Status=1;	
-		}// 红绿灯状态
-	}
-	
-	if(remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex)//天少发过来
-	{
-		if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x66)
-		{
-			Car_Waitfororder=0;
-			sending_service_package(0x44,0x0000,0xAAAA);
-		}
-		if ( remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)
-			have_responsed=1;	// 检查天少是否回答 
-		if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x0B)
-			Door_Open=1;	//天少远程开门
-		if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCB)
-			Door_Close=1;
-		if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01) 
-			Car_Stop=0;//天少开车
-		if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCC) 
-			Door_Close_Run=1;//关门并开车
-	}
-	remote_frame_data[5]=0x00;
-	remote_frame_data[6]=0x00;//每次读完把cmd位置0，不置0每次都会有冲突
 	return g_remote_frame_state;
 }
 
@@ -415,6 +379,44 @@ void ancillary_wifi_sender (void)
 {                                      		    
 	generate_remote_frame_2(g_device_NO_Hex, des, cmd_WIFI, 2, (const BYTE *)(&sending_data));
 }
-
+void Wifi_Ctrl()
+{
+	if(remote_frame_data[2] == 0x33 )//熊老板上位机
+	{
+		if (remote_frame_data[3] == g_device_NO_Hex && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)   
+		{	
+			have_responsed=1;	
+		}// 检查是否得到应答 
+		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01)   
+		{
+			order_received =1;
+			if(remote_frame_data[8]==0x0A)
+				Light_Status=0;	
+			if(remote_frame_data[8]==0x0B)
+				Light_Status=1;	
+		}// 红绿灯状态
+	}	
+	if(remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex)//天少发过来
+	{
+		if ( remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)
+				have_responsed=1;	// 检查天少是否回答 
+		if(g_device_NO == 3)
+		{
+			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x66)
+			{
+				Car_Waitfororder=0;
+				sending_service_package(0x44,0x0000,0xAAAA);
+			}
+			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x0B)
+				Door_Open=1;	//天少远程开门
+			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCB)
+				Door_Close=1;
+			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01) 
+				Car_Stop=0;//天少开车
+			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCC) 
+				Door_Close_Run=1;//关门并开车
+		}
+	}
+}
 
 
