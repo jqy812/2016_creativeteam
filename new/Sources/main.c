@@ -110,11 +110,10 @@ void Mode0_DebugCamera(void)
 	{
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
-			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;		
-		//	execute_remote_cmd(remote_frame_data+5);
+			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
 			Wifi_Ctrl();
 		}
-		control_car_action();//ouyang
+		control_car_action();
 		if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
 		{
 			WIFICHEKER=0;

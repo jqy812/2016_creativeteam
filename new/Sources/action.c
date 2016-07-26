@@ -82,7 +82,7 @@ void set_car_direction(SBYTE act)
 /*-----------------------------------------------------------------------*/
 void RFID_control_car_1_action(WORD site)
 {
-	if((site>>12)==0x1)//在红绿灯路口||(site>>12)==0x3
+	if((site>>8)==0x11)//在红绿灯路口1
 	{
 		sending_service_package(0x33,0x00CD,site);
 		if(Light_Status==0)
@@ -328,7 +328,7 @@ void RFID_control_car_2_action(DWORD site)
 #endif
 	//rfid_ask_road(0x01, 0xFF, 0xCD, site);//CD=CARD
 	//road_stop();
-	if((site>>12)==0x1)//在红绿灯路口||(site>>12)==0x3
+	if((site>>8)==0x11)//在红绿灯路口1
 	{
 		sending_service_package(0x33,0x00CD,site);
 		if(Light_Status==0)
@@ -414,7 +414,7 @@ void RFID_control_car_2_action(DWORD site)
 /*-----------------------------------------------------------------------*/
 void RFID_control_car_3_action(DWORD site)
 {
-	if((site>>8)==0x11||(site>>8)==0x12)//在红绿灯路口
+	if((site>>8)==0x11)//在红绿灯路口1
 	{
 		sending_service_package(0x33,0x00CD,site);
 		if(Light_Status==0)
@@ -561,7 +561,7 @@ void control_car_action(void)
 {
 	if(WIFI_ADDRESS_CAR_1 == g_device_NO)
 	{
-		if (RFID_site_data.is_new_site)
+		if (RFID_site_data.is_new_site == 1)
 		{
 			RFID_site_data.is_new_site = 0;
 			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);
@@ -579,7 +579,7 @@ void control_car_action(void)
 	if(WIFI_ADDRESS_CAR_2 == g_device_NO)
 	{
 
-		if (RFID_site_data.is_new_site)
+		if (RFID_site_data.is_new_site == 1)
 		{
 			RFID_site_data.is_new_site = 0;
 			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);
@@ -595,7 +595,7 @@ void control_car_action(void)
 	}
 	if(WIFI_ADDRESS_CAR_3 == g_device_NO)
 	{
-		if (RFID_site_data.is_new_site )
+		if (RFID_site_data.is_new_site == 1)
 		{
 			RFID_site_data.is_new_site = 0;
 			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);;
