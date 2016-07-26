@@ -178,7 +178,7 @@ void initEMIOS_0MotorAndSteer(void)
 	EMIOS_0.CH[9].CCR.B.MODE = 0x60;	/* Mode is OPWM Buffered */  
     EMIOS_0.CH[9].CCR.B.EDPOL = 1;	/* Polarity-leading edge sets output/trailing clears*/
 	EMIOS_0.CH[9].CADR.R = 1;	/* Leading edge when channel counter bus=250*/
-	EMIOS_0.CH[9].CBDR.R = data_steer_helm_basement.center;	/* Trailing edge when channel counter bus=500*/
+//	EMIOS_0.CH[9].CBDR.R = data_steer_helm_basement.center;	/* Trailing edge when channel counter bus=500*/
 	SIU.PCR[9].R = 0x0600;	/* [11:10]选择AFx 此处AF1 /* MPC56xxS: Assign EMIOS_0 ch 21 to pad */
 #if 0
 	/* 信号舵机 PWM PA12 输出0-50000 */
@@ -308,7 +308,16 @@ void delay_ms(DWORD ms)
 	{
 		delay_us(1000);
 		if(RFID_site_data.is_new_site && (RFID_site_data.roadnum>>8)==0x11)//读到红绿灯卡强制停止delay
+		{
+			set_speed_pwm(-500);
 			break;
+		}
+	//	if(RFID_site_data.is_new_site && (RFID_site_data.roadnum>>0)==0x2302)//2号库停车卡
+	//	{
+	//		set_speed_pwm(0);
+	//		Car_Stop=1;
+	//		break;
+	//	}
 	}
 }
 
@@ -412,7 +421,7 @@ void init_all_and_POST(void)
 	}
 	device_Num_change();
 	/* 开启RFID读卡器主动模式 */
-//#if 0//ouyang
+#if 1//ouyang
 	if (!init_RFID_modul_type())
 	{
 		g_devices_init_status.RFIDCard_energetic_mode_enable_is_OK = 1;
@@ -427,7 +436,7 @@ void init_all_and_POST(void)
 	delay_ms(1000);
 	/* 换屏 */
 	LCD_Fill(0x00);
-//#endif
+#endif
 
 
 	/* 读取舵机参数 */

@@ -17,6 +17,7 @@ int zhangai=1;
 int i;
 int j;
 extern int bz;
+extern int right;
 int velocity;
 BYTE video_sender;
 
@@ -41,6 +42,7 @@ void Mode0_DebugCamera(void)
 {
 	if(g_device_NO==3) 
 	{
+#if 0
 		delay_ms(8000);
 		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.03+data_steer_helm_basement.center);
 		set_speed_pwm(-350); 
@@ -62,20 +64,56 @@ void Mode0_DebugCamera(void)
 				velocity=400;
 			}
 		}
+#endif
+		velocity=400;
 	}
-	jishu=0;
-	if(WIFI_ADDRESS_CAR_3 == g_device_NO)
-		Car_Waitfororder=1;
-	if(g_device_NO==1) 
+//	if(WIFI_ADDRESS_CAR_3 == g_device_NO)
+//		Car_Waitfororder=1;
+
+	if(g_device_NO==1)    //电压8.7V
 	{
-	    velocity=350;
+	//	set_steer_helm_basement(data_steer_helm_basement.right_limit);   //出库参数，因RFID没有，故写在这，日后更改
+	//	set_speed_pwm(320);
+	//	delay_ms(1500);
+	    velocity=300;
 	}
 	if(g_device_NO==2) 
-	    velocity=300;
+	{
+#if 0
+		delay_ms(10000);
+		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.03+data_steer_helm_basement.center);
+		set_speed_pwm(-300); 
+		while(jishu==0)
+		{
+			control_car_action();
+			if(jishu==1)
+			{
+				set_speed_pwm(1000);
+				delay_ms(80);
+				set_speed_pwm(0);
+				delay_ms(1500);
+				set_steer_helm_basement(data_steer_helm_basement.left_limit);
+				set_speed_pwm(300);
+				delay_ms(1600);
+				set_steer_helm_basement(data_steer_helm_basement.center);
+				delay_ms(100);
+				fieldover=1;
+				sending_service_package(0x44,0xAABB,0x0001);
+			}
+		}
+#endif
+	    velocity=280;
+	}
+	jishu=0;
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
 	for (;;)
 	{
-		control_car_action();//ouyang	
+		control_car_action();//ouyang
+		if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
+		{
+			WIFICHEKER=0;
+			wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
+		}
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
 			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
@@ -96,17 +134,13 @@ void Mode0_DebugCamera(void)
 			else LCD_write_english_string(96,1,"+");
 			LCD_Write_Num(105,1,ABS(target_offset),2);
 			LCD_Write_Num(105,2,RoadType,2);
-			LCD_Write_Num(105,6,bz,2);
+			LCD_Write_Num(105,6,right,2);
 			SteerControl();          //舵机控制              jqy
 			EMIOS_0.CH[3].CSR.B.FLAG = 1;
 			EMIOS_0.CH[3].CCR.B.FEN=1;
 		}
-		zhangai_run();                          //避障参数
-		if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
-		{
-			WIFICHEKER=0;
-			wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
-		}
+		if(g_device_NO==1) 
+			zhangai_run();                          //避障参数
 	}
 }
 

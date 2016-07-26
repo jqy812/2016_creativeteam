@@ -323,9 +323,9 @@ void FindBlackLine(void)
 	if(g_device_NO==2)           //2号车中线偏移参数       jqy
 	{
 	for(i=RoadEnd;i<RoadStart/2-10;i++)
-		CenterLine[i]=(CenterLine[i]+10);
+		CenterLine[i]=(CenterLine[i]+9);
 	for(i=RoadStart/2-10;i<=RoadStart;i++)
-		CenterLine[i]=(CenterLine[i]+20);
+		CenterLine[i]=(CenterLine[i]+16);
 	}
 	if(g_device_NO==3)           //3号车中线偏移参数       jqy
 	{
@@ -2204,6 +2204,7 @@ byte JudgeBarrier()
 		BlackLine[1][i]=n;
 	}
 #endif
+#if 1
 	while(BlackLine[1][o]==COLUMN-1)
 	{
 		BlackLine[1][o]=0;
@@ -2230,7 +2231,7 @@ byte JudgeBarrier()
 	}
 	if(p==100)
 		RoadType=66;
-	
+
 	cc=0;
 	for(i=ROW;i>=12;i--)          //道路类型88  判断方法      jqy
 	{
@@ -2240,7 +2241,7 @@ byte JudgeBarrier()
 				gg++;
 		if(g_pix[i][gg-1]!=0 && g_pix[i][gg]==0)
 			gg=0;
-		if(gg<18 && gg>3)
+		if(gg<25 && gg>5)
 		{
 			cc++;
 			LCD_Write_Num(105,3,gg,4);
@@ -2248,6 +2249,7 @@ byte JudgeBarrier()
 	}
 	if(cc>8)
 		RoadType=88;
+#endif
 //	LCD_Write_Num(105,3,p,3);
 	if((RoadType==Barrier1)||(RoadType==Barrier2))
 		return 1;
@@ -2831,19 +2833,20 @@ void Typejudge()
 {
 	if(RoadType==66)      //道路类型66，表示单车道障碍    jqy
 		jishu++;
-	if(jishu>=6 && bz==1)   //bz位为1时，进行超车    jqy
+//	if(RoadType==12 || RoadType==12)      //道路类型66，表示单车道障碍    jqy
+//		jishu++;
+	if(jishu>=4 && bz==1)   //bz位为1时，进行超车    jqy
 	{
 		zhangai=0;
 		jishu=0;
 	}
-	if(jishu>=8 && bz==0)   //bz位为1时，进行避障停车   jqy
+	if(jishu>=1 && bz==0)   //bz位为1时，进行避障停车   jqy
 	{
 		zhangai=0;
 		jishu=0;
 	}
-	if(RoadType==88 && bz==2)    //道路类型88，表示双车道障碍，需掉头绕行    jqy
+	if(RoadType==88 && bz==2 && g_device_NO==1)    //道路类型88，表示双车道障碍，需掉头绕行    jqy
 	{
-		sending_service_package(0x33,0xBB00,0x0000);//向上位机报告拥堵,直到上位机回复
 		set_speed_pwm(0);
 		delay_ms(2000);
 		set_steer_helm_basement(data_steer_helm_basement.left_limit);
@@ -2860,5 +2863,26 @@ void Typejudge()
 		set_speed_pwm(320);
 		delay_ms(1500);
 		bz=5;/////
+	}
+	if(RoadType==88 && bz==2 && g_device_NO==2)    //道路类型88，表示双车道障碍，需掉头绕行    jqy
+	{
+		set_speed_pwm(-500);
+		delay_ms(50);
+		set_speed_pwm(0);
+		delay_ms(2000);
+		set_steer_helm_basement(data_steer_helm_basement.left_limit);
+		set_speed_pwm(320);
+		delay_ms(1200);/////
+		set_speed_pwm(0);
+		set_steer_helm_basement(data_steer_helm_basement.right_limit);
+		delay_ms(1000);
+		set_speed_pwm(-320);
+		delay_ms(800);/////
+		set_speed_pwm(0);
+		set_steer_helm_basement(data_steer_helm_basement.left_limit);
+		delay_ms(1000);
+		set_speed_pwm(320);
+		delay_ms(1300);/////
+		bz=5;
 	}
 }

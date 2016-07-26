@@ -63,16 +63,24 @@
 #define ROAD_NUM_1106 (0x0CF59622)
 #define ROAD_NUM_1201 (0x12517BD6)
 #define ROAD_NUM_1202 (0xE22576D6)
-
+#define ROAD_NUM_4001 (0xDAA23548)//天少专车
+#define ROAD_NUM_4002 (0x5A934B48)
 #define ROAD_NUM_2101 (0xDA3BFFBC)//左打死路口
 #define ROAD_NUM_2102 (0xCA4900BD)
 #define ROAD_NUM_2103 (0xFA8320BD)
 #define ROAD_NUM_2201 (0xDA945248)//右打死路口
 #define ROAD_NUM_2202 (0x526480D6)
 #define ROAD_NUM_2203 (0x223E7AD6)
-#define ROAD_NUM_2301 (0x1250DD76)//停车
+
+#define ROAD_NUM_2302 (0x92AB82D6)//2号库停车卡
+
 #define ROAD_NUM_2401 (0x827958D6)//直行
 #define ROAD_NUM_2402 (0x72147CD6)
+
+#define ROAD_NUM_2501 (0x1250DD76)//入库卡（收费卡）
+
+#define ROAD_NUM_2601 (0x72D079D6)//进停车场
+
 #define ROAD_NUM_3001 (0xC269EAD3)//（桥）正常行驶
 #define ROAD_NUM_3002 (0x9CC73424)
 #define ROAD_NUM_3003 (0xD23487D6)
@@ -81,10 +89,6 @@
 #define ROAD_NUM_3102 (0x5CD07422)
 #define ROAD_NUM_3201 (0x82AA86D6)//（桥）减速
 #define ROAD_NUM_3202 (0x822875D6)
-#define ROAD_NUM_4001 (0xDAA23548)//天少专车
-#define ROAD_NUM_4002 (0x5A934B48)
-#define ROAD_NUM_4101 (0xB28B7DD6)//停车场入口
-#define ROAD_NUM_4102 (0x328F80D6)//停车场出口
 
 extern const BYTE rfid_cmd_get_id[];
 extern const BYTE rfid_cmd_get_data[];
