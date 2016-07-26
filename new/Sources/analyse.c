@@ -334,6 +334,13 @@ void FindBlackLine(void)
 	for(i=RoadStart/2-10;i<=RoadStart;i++)
 		CenterLine[i]=(CenterLine[i]+27);
 	}
+	if(g_device_NO==4)           //4号车中线偏移参数       jqy
+	{
+	for(i=RoadEnd;i<RoadStart/2-10;i++)
+		CenterLine[i]=(CenterLine[i]+9);
+	for(i=RoadStart/2-10;i<=RoadStart;i++)
+		CenterLine[i]=(CenterLine[i]+17);
+	}
 	TargetOffset();					//目标控制量
 }
 
@@ -2213,7 +2220,7 @@ byte JudgeBarrier()
 //	if(o<14)
 //		o=14;
 //	BlackLine[1][o-5]=0;BlackLine[1][o-4]=0;BlackLine[1][o-3]=0;BlackLine[1][o-2]=0;BlackLine[1][o-1]=0;
-	for(i=o;i<ROW;i++)
+	for(i=14;i<ROW;i++)          ///////////仅对特种车使用
 	{
 	    if(BlackLine[1][i-3]>BlackLine[1][i])
 	    {
@@ -2230,7 +2237,7 @@ byte JudgeBarrier()
 	}
 	if(p==100)
 		RoadType=66;
-	
+#if 0	
 	cc=0;
 	for(i=ROW;i>=12;i--)          //道路类型88  判断方法      jqy
 	{
@@ -2248,6 +2255,7 @@ byte JudgeBarrier()
 	}
 	if(cc>8)
 		RoadType=88;
+#endif
 //	LCD_Write_Num(105,3,p,3);
 	if((RoadType==Barrier1)||(RoadType==Barrier2))
 		return 1;
@@ -2831,7 +2839,7 @@ void Typejudge()
 {
 	if(RoadType==66)      //道路类型66，表示单车道障碍    jqy
 		jishu++;
-	if(jishu>=6 && bz==1)   //bz位为1时，进行超车    jqy
+	if(jishu>=2 && bz==1)   //bz位为1时，进行超车    jqy
 	{
 		zhangai=0;
 		jishu=0;

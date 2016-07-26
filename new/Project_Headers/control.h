@@ -15,7 +15,7 @@
 
 /* 速度PWM */
 #define SPEED_PWM_MIN (1)
-#define SPEED_PWM_MAX (1900)
+#define SPEED_PWM_MAX (500)
 #define SPEED_PWM_TEST (20)
 
 /* 速度光编 */
@@ -114,7 +114,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_speed_pid = { 15, 1, 5 };
+} data_speed_pid = { 10, 0.5, 6 };
 #else
 extern struct
 {
@@ -165,8 +165,8 @@ extern void control_speed_motor(int speed_target);
 extern int abs(int data);
 extern void set_steer_helm(SWORD helmData);
 extern void Road_Stop(void);
-
-
+extern void Hang_Up(void);
+extern int speed_pwm_tp;
 
 
 

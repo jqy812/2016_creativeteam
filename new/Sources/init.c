@@ -7,6 +7,7 @@ int DoorC=0;
 int sending_test;
 FATFS fatfs1;	/* 会被文件系统引用，不得释放 */
 int mode=0;
+int WarnC=0;
 
 /*-----------------------------------------------------------------------*/
 /* 设置单片机的模式和时钟                                                */
@@ -341,6 +342,8 @@ void init_all_and_POST(void)
 	/* 初始化SPI总线 */
 	init_DSPI_1();
 	init_pit();
+	delay_ms(5);
+	init_pit_1s_L();
 	init_led();
 	init_DIP();
 	init_serial_port_1();//Wifi_ouyang
@@ -361,7 +364,7 @@ void init_all_and_POST(void)
 	//init_DSPI_2();
 	//init_I2C();
 	init_choose_mode();
-	init_pit_1s_L();
+	
 	
 	/* 初始化SPI总线 */
 	//init_DSPI_1();
@@ -492,7 +495,9 @@ void init_all_and_POST(void)
 	
 	/* 换屏 */
 	LCD_Fill(0x00);
-
+	RunL=0;
+	StopL=0;
+	EMIOS_0.CH[10].CBDR.R = 2000;
 }
 //
 
@@ -511,15 +516,16 @@ void init_pit_1s_L(void)
 {
 	/* NOTE:  DIVIDER FROM SYSCLK TO PIT ASSUMES DEFAULT DIVIDE BY 1 */
 	PIT.PITMCR.R = 0x00000001;	/* Enable PIT and configure timers to stop in debug modem */
-	PIT.CH[1].LDVAL.R = 800000;	/* 800000==10ms */
-	PIT.CH[1].TCTRL.R = 0x00000003;	/* Enable PIT1 interrupt and make PIT active to count */
-	INTC_InstallINTCInterruptHandler(Pit_1s_L,60,1);	/* PIT 1 interrupt vector with priority 1 */
+	PIT.CH[2].LDVAL.R = 800000;	/* 800000==10ms */
+	PIT.CH[2].TCTRL.R = 0x00000003;	/* Enable PIT1 interrupt and make PIT active to count */
+	INTC_InstallINTCInterruptHandler(Pit_1s_L,61,4);	/* PIT 1 interrupt vector with priority 1 */
 }
 void Pit_1s_L(void)//10ms
 {
 	static int time_counter;
 	time_counter++;
 	Lcounter++;
+	WarnC++;
 	if(Lcounter==160)
 	{
 		Lcounter=0;
@@ -534,17 +540,22 @@ void Pit_1s_L(void)//10ms
 		time_counter=0;
 	    sending_test=1;
 	}
-	if(Door_Status==1)
+//	if(Door_Status==1)
+//	{
+//		DoorC++;
+//	}
+//	if(DoorC==300)
+//	{
+//		Door_Status=0;
+//		Door_Stop=1;
+//		DoorC=0;
+//	}
+	if(WarnC==100)
 	{
-		DoorC++;
+		WarnC=0;
+		StopL=~StopL;
 	}
-	if(DoorC==300)
-	{
-		Door_Status=0;
-		Door_Stop=1;
-		DoorC=0;
-	}
-	PIT.CH[1].TFLG.B.TIF = 1;	// MPC56xxB/P/S: Clear PIT 1 flag by writing 1
+	PIT.CH[2].TFLG.B.TIF = 1;	// MPC56xxB/P/S: Clear PIT 1 flag by writing 1
 }
 
 

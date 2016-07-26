@@ -11,7 +11,8 @@ int update_steer_helm_basement_to_steer_helm(void);
 int g_f_big_U=0;
 int g_f_big_U_2=0;
 int counter=0;
-
+int hangdata=0;
+int speed_pwm_tp;
 DWORD tmp_a, tmp_b;
 
 
@@ -44,25 +45,12 @@ void PitISR(void)
 	/* end:encoder */
 
 	/* 开始执行速度控制算法 */
-//	if (g_f_enable_speed_control)
-//	{
-//		//SpeedControl();//不同路段PID,尚未调,不可用
-//		contorl_speed_encoder_pid();
-//	}
-	if(counter==3)
+	if (g_f_enable_speed_control)
 	{
-		//g_f_enable_supersonic=1;                    //jiej
-		if (g_f_enable_supersonic)
-		{
-			trigger_supersonic_2();
-			get_supersonic_time_2();
-			//while((ABS((WORD)(tmp_time.R))/100)<100)
-			//{}				
-			LCD_Write_Num(96,6,(ABS((WORD)(tmp_time.R))/100),5);
-		}
-		//delay_ms(1000);   jqy
-		counter=0;
+		//SpeedControl();//不同路段PID,尚未调,不可用
+		contorl_speed_encoder_pid();
 	}
+	
 	
 #if 0
 	/* 发送位置 */
@@ -85,8 +73,8 @@ void set_speed_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 {
 	if (speed_pwm>0)	//forward
 	{
-		StopL = 0;
-		RunL = 1;
+		//StopL = 0;
+		//RunL = 1;
 		if (speed_pwm>SPEED_PWM_MAX)
 		{
 			speed_pwm = SPEED_PWM_MAX;
@@ -97,8 +85,8 @@ void set_speed_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 	}
 	else if (speed_pwm<0)	//backward
 	{
-		StopL = 1;
-		RunL = 0;
+		//StopL = 1;
+		//RunL = 0;
 		speed_pwm = 0-speed_pwm;
 		if (speed_pwm>SPEED_PWM_MAX)
 		{
@@ -110,8 +98,8 @@ void set_speed_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 	}
 	else
 	{
-		StopL = 1;
-		RunL = 0;
+		//StopL = 1;
+		//RunL = 0;
 		EMIOS_0.CH[21].CBDR.R = 1;
 		EMIOS_0.CH[22].CBDR.R = 1;	
 	}
@@ -193,6 +181,7 @@ void contorl_speed_encoder_pid(void)
 	else if (speed_pwm<0-SPEED_PWM_MAX)
 			speed_pwm =0- SPEED_PWM_MAX;    //防止溢出（造成负数）
 	set_speed_pwm(speed_pwm);
+	speed_pwm_tp=speed_pwm;
 	e2=e1;
 	e1=e0;	
 }
@@ -286,18 +275,18 @@ void set_steer_helm_basement(WORD helmData)
 		}
 	if(helmData <=3700)
 	{
-		LeftL = 1;
-		RightL = 0;
+	//	LeftL = 1;
+	//	RightL = 0;
 	}
 	else if(helmData >=3800)
 	{
-		RightL = 1;
-		LeftL = 0;
+	//	RightL = 1;
+	//	LeftL = 0;
 	}
 	else
 	{
-		LeftL = 0;
-		RightL = 0;
+	//	LeftL = 0;
+	//	RightL = 0;
 	}
 #endif
 	EMIOS_0.CH[9].CBDR.R = helmData;
@@ -411,8 +400,8 @@ void set_door_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 	}
 	else if (speed_pwm<0)	//backward
 	{
-		StopL = 1;
-		RunL = 0;
+		//StopL = 1;
+		//RunL = 0;
 		speed_pwm = 0-speed_pwm;
 		if (speed_pwm>SPEED_PWM_MAX)
 		{
@@ -423,8 +412,8 @@ void set_door_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 	}
 	else
 	{
-		StopL = 1;
-		RunL = 0;
+		//StopL = 1;
+		//RunL = 0;
 		EMIOS_0.CH[18].CBDR.R = 1;
 		EMIOS_0.CH[20].CBDR.R = 1;	
 	}
@@ -432,4 +421,17 @@ void set_door_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 void Road_Stop(void)
 {
 	set_speed_pwm(0);
+}
+void Hang_Up()
+{
+	EMIOS_0.CH[10].CBDR.R = 7000;
+	delay_ms(1000);
+	LeftL=~LeftL;
+	RunL=~RunL;
+	RightL=~RightL;
+	for(hangdata=7000;hangdata>=2000;hangdata=hangdata-1000)
+	{
+		EMIOS_0.CH[10].CBDR.R = hangdata;
+		delay_ms(500);
+	}
 }

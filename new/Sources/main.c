@@ -39,6 +39,7 @@ void main(void)
 }
 void Mode0_DebugCamera(void)
 {
+//	Hang_Up();
 	if(g_device_NO==3) 
 	{
 		delay_ms(8000);
@@ -72,10 +73,19 @@ void Mode0_DebugCamera(void)
 	}
 	if(g_device_NO==2) 
 	    velocity=300;
+	if(g_device_NO==4) 
+	{
+		g_f_enable_speed_control=1;
+		set_speed_pwm(150);
+	}
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
 	for (;;)
 	{
 		control_car_action();//ouyang	
+		while(bz==6)
+		{
+			control_car_action();
+		}
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
 			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
@@ -86,8 +96,9 @@ void Mode0_DebugCamera(void)
 		{
 			car_default();
 			fieldover=0; 
-			set_speed_pwm(velocity); 
-			FindBlackLine();              //寻迹处理                        jqy     
+			set_speed_target(16);	
+		//	set_speed_pwm(velocity); 
+			FindBlackLine();//寻迹处理                        jqy     
 			CenterLineWithVideo();        //摄像头数据处理              jqy     
 	     	Video_Show();                 //显示屏显示                     jqy
 	     	Typejudge();                  //赛道避障类型判断         jqy
@@ -96,8 +107,12 @@ void Mode0_DebugCamera(void)
 			else LCD_write_english_string(96,1,"+");
 			LCD_Write_Num(105,1,ABS(target_offset),2);
 			LCD_Write_Num(105,2,RoadType,2);
-			LCD_Write_Num(105,6,bz,2);
-			SteerControl();          //舵机控制              jqy
+	//		LCD_Write_Num(105,6,data_encoder.speed_now,3);
+			LCD_Write_Num(105,5,speed_pwm_tp,4);
+	//		LCD_Write_Num(105,4,data_speed_pid.p,2);
+	//		LCD_Write_Num(105,5,data_speed_pid.i,2);
+	//		LCD_Write_Num(105,6,data_speed_pid.d,2);
+			SteerControl();//舵机控制              jqy
 			EMIOS_0.CH[3].CSR.B.FLAG = 1;
 			EMIOS_0.CH[3].CCR.B.FEN=1;
 		}
@@ -108,6 +123,7 @@ void Mode0_DebugCamera(void)
 			wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
 		}
 	}
+	
 }
 
 void Mode1_SendVideo(void)

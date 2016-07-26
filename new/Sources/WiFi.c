@@ -193,6 +193,12 @@ int rev_remote_frame_2(BYTE rev)
 			{
 				Traffic_Jam=1;//出现拥堵
 			}
+			if(remote_frame_data[5]==0x33)
+			{
+				set_speed_KP(remote_frame_data[6]);
+				set_speed_KI(remote_frame_data[7]);
+				set_speed_KD(remote_frame_data[8]);
+			}
 		}
 	}
 	
@@ -217,7 +223,7 @@ int rev_remote_frame_2(BYTE rev)
 	high2=((WORD)(remote_frame_data[5])<<8);
 	low2=(WORD)(remote_frame_data[6]);
 	remote_frame_data[5]=0x00;
-	remote_frame_data[6]=0x00;//每次读完把cmd位置0，不置0每次都会有冲突）
+//	remote_frame_data[6]=0x00;//每次读完把cmd位置0，不置0每次都会有冲突）
 	return g_remote_frame_state;
 }
 

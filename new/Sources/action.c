@@ -21,7 +21,7 @@ int old_car_direction=1;//车身上一次绝对方向：1234北东南西
 //********************2016赛季参数******************************************
 extern int velocity;
 extern int zhangai;
-int bz=-1;
+int bz=-6;
 int time=1;;
 extern int jishu;
 
@@ -450,7 +450,67 @@ void RFID_control_car_3_action(DWORD site)
 /*-----------------------------------------------------------------------*/
 void RFID_control_car_4_action(DWORD site)
 {
-	return;
+	if((site>>12)==0x1)//在红绿灯路口||(site>>12)==0x3
+	{
+		sending_service_package(0x33,0x00CD,site);
+		if(Light_Status==0)
+		{
+			Car_Stop=1;
+			LCD_Fill(0x00);
+			set_speed_pwm(0);
+		}
+	}
+	if((site>>8)==0x21 && (site>>0)!=0x2103)//在左打死路口         并起道路动作切换功能，日后需更改               jqy
+	{
+		LCD_Fill(0x00);
+		if(bz==-1)
+			bz=1;
+		else if(bz==1)
+			bz=-2;
+		else if(bz==-2)
+			bz=2;
+		else if(bz==2)
+			bz=-1;
+	//	bz=-bz;
+		jishu=0;
+		set_speed_pwm(0);
+		set_speed_pwm(280);////////标志位，防止在其他种类道路上行驶时计数累加            jqy
+		set_steer_helm_basement(data_steer_helm_basement.left_limit);
+		delay_ms(1400);
+	}
+	if((site>>8)==0x22)//在右打死路口                          仅起测试作用，可更改        jqy
+	{
+	//	LCD_Fill(0x00);
+	//	set_speed_pwm(300);
+	//	delay_ms(100);
+	//	set_steer_helm_basement(data_steer_helm_basement.right_limit);
+	//	delay_ms(700);
+		bz=0;
+		delay_ms(300);
+		fieldover=1;
+	}
+	if((site>>0)==0x3102 && bz!=-6)
+	{
+		set_speed_pwm(-500);
+		delay_ms(50);
+		set_speed_pwm(0);
+		delay_ms(1000);
+		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.01+data_steer_helm_basement.center);
+		set_speed_pwm(-250);
+		bz=6;
+	//	fieldover=1;
+	}
+	if((site>>0)==0x3202 && bz==6)
+	{
+		set_speed_pwm(1000);
+		delay_ms(50);
+		set_speed_pwm(0);
+		Hang_Up();
+		delay_ms(1000);
+		bz=-6;
+	//	velocity=400;
+	//	fieldover=1;
+	}
 }
 
 /*-----------------------------------------------------------------------*/
@@ -608,7 +668,7 @@ void control_car_action(void)
 			BMW_Taxi();
 		}
 	}
-	if(WIFI_ADDRESS_CAR_2 == g_device_NO)
+	if(WIFI_ADDRESS_CAR_4 == g_device_NO)
 	{
 		if (RFID_site_data.is_new_site && RFID_site_data.old_site!=RFID_site_data.site)
 		{
@@ -616,7 +676,7 @@ void control_car_action(void)
 			RFID_site_data.site = 0x00000000;
 			RFID_site_data.time = 0x00000000;
 			RFID_site_data.is_new_site = 0;
-			RFID_control_car_2_action(RFID_site_data.roadnum);
+			RFID_control_car_4_action(RFID_site_data.roadnum);
 		}
 		if(Car_Stop)
 		{
@@ -770,15 +830,20 @@ void zhangai_run()
 		{
 	//		delay_ms(200);
 			set_steer_helm_basement(data_steer_helm_basement.left_limit);   
-			delay_ms(420);
+			delay_ms(640);
 	//		delay_ms(650);
 			set_steer_helm_basement(data_steer_helm_basement.right_limit);
-			delay_ms(450);
+			delay_ms(670);
 	//		delay_ms(550);
 			set_steer_helm_basement(data_steer_helm_basement.center);
-			delay_ms(300);
-	//		delay_ms(560);
+			delay_ms(100);
+			
+	//	    set_speed_pwm(0);
+	//	    Hang_Up();
+	//		delay_ms(600);
 			zhangai=1;
+			fieldover=1;
+			bz=-1;
 		}
 #endif
 #if 1
@@ -800,7 +865,7 @@ void zhangai_run()
 		    if(RoadType!=12 && RoadType!=13)
 		    	if(RoadType!=66)
 		    		jishu++;
-		    LCD_Write_Num(105,4,jishu,2);
+	//	    LCD_Write_Num(105,4,jishu,2);
 		    EMIOS_0.CH[3].CSR.B.FLAG = 1;
 		    EMIOS_0.CH[3].CCR.B.FEN=1;
 		    if(jishu>=50)

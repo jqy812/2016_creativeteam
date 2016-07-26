@@ -45,6 +45,7 @@ void SteerControl()
 //	if(Slope==1)					{Steer_kp=10;Steer_kd=5;}
 //	else if(Slope==2)				{Steer_kp=8;Steer_kd=5;}
 
+	
 if(g_device_NO==3)         //3号车PID参数       jqy
 {
 	if(ABS(target_offset)<6) 	{Steer_kp=5;Steer_kd=5;}
@@ -59,13 +60,18 @@ if(g_device_NO==2)         //2号车PID参数       jqy
 	else {Steer_kp=20.8+target_offset*target_offset/500;Steer_kd=5;}
 }
 
+if(g_device_NO==4)                   //4号车PID参数       jqy
+{
+	if(ABS(target_offset)<6) 	{Steer_kp=6;Steer_kd=5;}
+	else if(ABS(target_offset)<26)  {Steer_kp=28.6+target_offset*target_offset/100;Steer_kd=10;}
+	else {Steer_kp=30.2+target_offset*target_offset/500;Steer_kd=5;}
+}
 if(g_device_NO==1)                   //1号车PID参数       jqy
 {
 	if(ABS(target_offset)<6) 	{Steer_kp=6;Steer_kd=5;}
 	else if(ABS(target_offset)<26)  {Steer_kp=15.8+target_offset*target_offset/100;Steer_kd=10;}
 	else {Steer_kp=16.2+target_offset*target_offset/500;Steer_kd=5;}
 }
-
 #if 0
 	if(ABS(target_offset)<5) 		{Steer_kp=5;Steer_kd=5;}
 			else if(ABS(target_offset)<10)  {Steer_kp=5;Steer_kd=5;}
@@ -82,10 +88,10 @@ if(g_device_NO==1)                   //1号车PID参数       jqy
 	//舵机限值+舵机输出
 //	set_steer_helm(Steer_PWM[3]);
 //	LCD_Write_Num(105,5,(int)Steer_PWM[3],4);
-	set_speed_pwm(velocity);
+//	set_speed_pwm(350);
 	set_steer_helm_basement(Steer_PWM[3]);
 //	EMIOS_0.CH[9].CBDR.R = Steer_PWM[3];
-	LCD_Write_Num(105,5,(int)Steer_PWM[3],4);
+//	LCD_Write_Num(105,5,(int)Steer_PWM[3],4);
 	//存舵机值和offset值
 	Steer_PWM[0]=Steer_PWM[1];Steer_PWM[1]=Steer_PWM[2];Steer_PWM[2]=Steer_PWM[3];
 	last_offset=target_offset;
