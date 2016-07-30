@@ -330,9 +330,9 @@ void FindBlackLine(void)
 	if(g_device_NO==3)           //3号车中线偏移参数       jqy
 	{
 	for(i=RoadEnd;i<RoadStart/2-10;i++)
-		CenterLine[i]=(CenterLine[i]+14);
+		CenterLine[i]=(CenterLine[i]+9);
 	for(i=RoadStart/2-10;i<=RoadStart;i++)
-		CenterLine[i]=(CenterLine[i]+27);
+		CenterLine[i]=(CenterLine[i]+16);
 	}
 	TargetOffset();					//目标控制量
 }

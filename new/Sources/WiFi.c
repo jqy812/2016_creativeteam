@@ -8,7 +8,7 @@ int g_start_all=0;
 int have_responsed;
 int order_received; 
 int Car_Waitfororder=0;
-int Light_Status=0;//默认红灯
+int Light_Status=1;//默认红灯
 BYTE remote_frame_data[REMOTE_FRAME_LENGTH];
 BYTE remote_frame_data_send[REMOTE_FRAME_LENGTH];
 BYTE g_device_NO = WIFI_ADDRESS_CAR_1;
@@ -18,6 +18,7 @@ WORD cmd_WIFI;
 WORD sending_data;
 BYTE waiting_for_response=0;
 int  lost_data=0;
+extern int place[4];
 
 /*-----------------------------------------------------------------------*/
 /* 执行远程命令                                                          */
@@ -404,6 +405,18 @@ void Wifi_Ctrl()
 		{
 			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x66)
 			{
+				if(remote_frame_data[7]==0x01)
+					place[1]=1;
+				if(remote_frame_data[7]==0x02)
+					place[2]=1;
+				if(remote_frame_data[7]==0x03)
+					place[3]=1;
+				if(remote_frame_data[8]==0x01)
+					place[1]=2;
+				if(remote_frame_data[8]==0x02)
+					place[2]=2;
+				if(remote_frame_data[8]==0x03)
+					place[3]=2;
 				Car_Waitfororder=0;
 				sending_service_package(0x44,0x0000,0xAAAA);
 			}

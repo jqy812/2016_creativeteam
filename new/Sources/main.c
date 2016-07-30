@@ -40,10 +40,19 @@ void main(void)
 }
 void Mode0_DebugCamera(void)
 {
+	if(WIFI_ADDRESS_CAR_3 == g_device_NO)
+		Car_Waitfororder=1;
 	if(g_device_NO==3) 
 	{
-#if 0
-		delay_ms(8000);
+#if 1
+		while(Car_Waitfororder==1)
+		{
+			if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
+			{
+				g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
+				Wifi_Ctrl();
+			}
+		}
 		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.03+data_steer_helm_basement.center);
 		set_speed_pwm(-350); 
 		while(jishu==0)
@@ -52,24 +61,21 @@ void Mode0_DebugCamera(void)
 			if(jishu==1)
 			{
 				set_speed_pwm(1000);
-				delay_ms(80);
+				delay_ms(100);
 				set_speed_pwm(0);
 				delay_ms(1500);
 				set_steer_helm_basement(data_steer_helm_basement.left_limit);
 				set_speed_pwm(500);
-				delay_ms(1800);
-				set_steer_helm_basement(data_steer_helm_basement.center);
-				delay_ms(100);
+				delay_ms(1400);
+				set_steer_helm_basement(data_steer_helm_basement.right_limit);
+				delay_ms(400);
 				fieldover=1;
-				velocity=400;
+				velocity=360;
 			}
 		}
 #endif
-		velocity=400;
 	}
-//	if(WIFI_ADDRESS_CAR_3 == g_device_NO)
-//		Car_Waitfororder=1;
-
+	
 	if(g_device_NO==1)    //电压8.7V
 	{
 	//	set_steer_helm_basement(data_steer_helm_basement.right_limit);   //出库参数，因RFID没有，故写在这，日后更改
@@ -102,7 +108,7 @@ void Mode0_DebugCamera(void)
 			}
 		}
 #endif
-	    velocity=280;
+	    velocity=300;
 	}
 	jishu=0;
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
@@ -138,7 +144,7 @@ void Mode0_DebugCamera(void)
 			EMIOS_0.CH[3].CSR.B.FLAG = 1;
 			EMIOS_0.CH[3].CCR.B.FEN=1;
 		}
-		if(g_device_NO==1) 
+	//	if(g_device_NO==1) 
 			zhangai_run();                          //避障参数
 	}
 }

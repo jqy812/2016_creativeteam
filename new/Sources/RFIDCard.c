@@ -177,8 +177,14 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x1202;
 	if(site== ROAD_NUM_4001)
 		return 0x4001;
+	if(site== ROAD_NUM_4001_1)
+			return 0x4001;
 	if(site== ROAD_NUM_4002)
 		return 0x4002;
+	if(site== ROAD_NUM_4003)
+		return 0x4003;
+	if(site== ROAD_NUM_4003_1)
+		return 0x4003;
 	if(site== ROAD_NUM_2101)
 		return 0x2101;
 	if(site== ROAD_NUM_2102)
@@ -188,15 +194,11 @@ WORD RFID_Num_Exp(DWORD site)
 	if(site== ROAD_NUM_2201)
 		return 0x2201;
 	if(site== ROAD_NUM_2202)
-			return 0x2202;
+		return 0x2202;
 	if(site== ROAD_NUM_2203)
-			return 0x2203;
+		return 0x2203;
 	if(site== ROAD_NUM_2302)
 		return 0x2302;
-	if(site== ROAD_NUM_2401)
-		return 0x2401;
-	if(site== ROAD_NUM_2402)
-		return 0x2402;
 	if(site== ROAD_NUM_2501)
 		return 0x2501;
 	if(site== ROAD_NUM_2601)

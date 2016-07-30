@@ -45,13 +45,21 @@ void SteerControl()
 //	if(Slope==1)					{Steer_kp=10;Steer_kd=5;}
 //	else if(Slope==2)				{Steer_kp=8;Steer_kd=5;}
 
-if(g_device_NO==3)         //3号车PID参数       jqy
+	
+if(g_device_NO==3 && right==0)         //3号车PID参数       jqy
 {
-	if(ABS(target_offset)<6) 	{Steer_kp=5;Steer_kd=5;}
+	if(ABS(target_offset)<6) 	{Steer_kp=8;Steer_kd=5;}
 	else if(ABS(target_offset)<26)  {Steer_kp=7.2+target_offset*target_offset/100;Steer_kd=10;}
 	else {Steer_kp=10.8+target_offset*target_offset/500;Steer_kd=5;}
 }
-
+if(g_device_NO==3 && right==1)         //3号车PID参数   转弯    jqy
+{
+	if(ABS(target_offset)<5) 	{Steer_kp=20;Steer_kd=5;}
+    else if(ABS(target_offset)<9) 	{Steer_kp=30;Steer_kd=5;}
+	else if(ABS(target_offset)<14) 	{Steer_kp=42;Steer_kd=5;}
+	else if(ABS(target_offset)<26)  {Steer_kp=58.2+target_offset*target_offset/100;Steer_kd=5;}
+	else {Steer_kp=36.8+target_offset*target_offset/500;Steer_kd=5;}
+}
 #if 1
 if(g_device_NO==2 && right==1)         //2号车PID参数   转弯    jqy
 {

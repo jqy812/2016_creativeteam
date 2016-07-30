@@ -63,8 +63,14 @@
 #define ROAD_NUM_1106 (0x0CF59622)
 #define ROAD_NUM_1201 (0x12517BD6)
 #define ROAD_NUM_1202 (0xE22576D6)
-#define ROAD_NUM_4001 (0xDAA23548)//天少专车
-#define ROAD_NUM_4002 (0x5A934B48)
+
+//天少专车地点号
+#define ROAD_NUM_4001 (0xDAA23548)//桥下住宅区
+#define ROAD_NUM_4001_1 (0x827958D6)
+#define ROAD_NUM_4002 (0x5A934B48)//CBD工作区
+#define ROAD_NUM_4003 (0xAC907522)//警察局
+#define ROAD_NUM_4003_1 (0x72147CD6)
+
 #define ROAD_NUM_2101 (0xDA3BFFBC)//左打死路口
 #define ROAD_NUM_2102 (0xCA4900BD)
 #define ROAD_NUM_2103 (0xFA8320BD)
@@ -73,9 +79,6 @@
 #define ROAD_NUM_2203 (0x223E7AD6)
 
 #define ROAD_NUM_2302 (0x92AB82D6)//2号库停车卡
-
-#define ROAD_NUM_2401 (0x827958D6)//直行
-#define ROAD_NUM_2402 (0x72147CD6)
 
 #define ROAD_NUM_2501 (0x1250DD76)//入库卡（收费卡）
 
