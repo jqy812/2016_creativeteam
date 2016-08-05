@@ -79,6 +79,7 @@
 #define WIFI_ADDRESS_CAR_2 (2)	/* 宝马x6*/
 #define WIFI_ADDRESS_CAR_3 (3)	/* 宝马i8 */
 #define WIFI_ADDRESS_CAR_4 (4)	/* 匪车2 */
+#define WIFI_ADDRESS_CAR_7 (7)	/* 7号车*/
 #define WIFI_ADDRESS_DRAWBRIDGE (5)	/* 吊桥 */
 #define WIFI_ADDRESS_DRAHTBRIDGE (6)	/* 钢丝桥 */
 #define WIFI_ADDRESS_PC (7)	/* PC上位机 */

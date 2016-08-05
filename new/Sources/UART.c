@@ -54,10 +54,10 @@ void serial_port_0_TX(BYTE data)
 	LINFLEX_0.BDRL.B.DATA0 = data;	//发送语句
 	while(!LINFLEX_0.UARTSR.B.DTF)
 	{
-//		if (i++ >= 1000)
-//		{
-//			break;	/* 防止DTF置位失败 */
-//		}
+		if (i++ >= 10000)
+		{
+			break;	/* 防止DTF置位失败 */
+		}
 	}
 	LINFLEX_0.UARTSR.B.DTF=1;
 }

@@ -313,36 +313,12 @@ void FindBlackLine(void)
 	//DetectSlope();					//检测坡道
 	AnalyzeRoadType();				//分析赛道类型	
 	CenterLineFill();				//中线补线
-	if(g_device_NO==1)           //1号车中线偏移参数       jqy
+	if(g_device_NO==7)           //7号车中线偏移参数       jqy
 	{
-		if(up==0)
-		{
-			for(i=RoadEnd;i<RoadStart/2-10;i++)
-				CenterLine[i]=(CenterLine[i]+11);
-			for(i=RoadStart/2-10;i<=RoadStart;i++)
-				CenterLine[i]=(CenterLine[i]+22);
-		}
-		if(up==1)
-		{
-		    for(i=RoadEnd;i<RoadStart/2-10;i++)
-				CenterLine[i]=(CenterLine[i]+7);
-			for(i=RoadStart/2-10;i<=RoadStart;i++)
-				CenterLine[i]=(CenterLine[i]+16);
-		}
-	}
-	if(g_device_NO==2)           //2号车中线偏移参数       jqy
-	{
-	for(i=RoadEnd;i<RoadStart/2-10;i++)
-		CenterLine[i]=(CenterLine[i]+9);
-	for(i=RoadStart/2-10;i<=RoadStart;i++)
-		CenterLine[i]=(CenterLine[i]+16);
-	}
-	if(g_device_NO==3)           //3号车中线偏移参数       jqy
-	{
-	for(i=RoadEnd;i<RoadStart/2-10;i++)
-		CenterLine[i]=(CenterLine[i]+9);
-	for(i=RoadStart/2-10;i<=RoadStart;i++)
-		CenterLine[i]=(CenterLine[i]+16);
+		for(i=RoadEnd;i<RoadStart/2-10;i++)
+			CenterLine[i]=(CenterLine[i]+3);
+		for(i=RoadStart/2-10;i<=RoadStart;i++)
+			CenterLine[i]=(CenterLine[i]+8);
 	}
 	TargetOffset();					//目标控制量
 }

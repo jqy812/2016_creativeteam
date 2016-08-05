@@ -344,7 +344,7 @@ void init_all_and_POST(void)
 	
 	/* 初始化SPI总线 */
 	init_DSPI_1();
-//	init_pit();
+	init_pit();
 	init_led();
 	init_DIP();
 	init_serial_port_1();//Wifi_ouyang
@@ -503,7 +503,7 @@ void init_pit_1s_L(void)
 	PIT.PITMCR.R = 0x00000001;	/* Enable PIT and configure timers to stop in debug modem */
 	PIT.CH[1].LDVAL.R = 800000;	/* 800000==10ms */
 	PIT.CH[1].TCTRL.R = 0x00000003;	/* Enable PIT1 interrupt and make PIT active to count */
-	INTC_InstallINTCInterruptHandler(Pit_1s_L,60,1);	/* PIT 1 interrupt vector with priority 1 */
+	INTC_InstallINTCInterruptHandler(Pit_1s_L,61,4);	/* PIT 1 interrupt vector with priority 1 */
 }
 void Pit_1s_L(void)//10ms
 {

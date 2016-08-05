@@ -77,7 +77,6 @@ int rev_RFID_frame(BYTE rev)
 			explane_RFID_ret_data((const BYTE *)(rfid_frame_data+3), (WORD)(rfid_frame_data[2]-1));
 		}
 	}
-	
 	return g_rfid_frame_state;
 }
 
