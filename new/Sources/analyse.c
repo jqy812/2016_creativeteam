@@ -10,7 +10,7 @@
 extern int bz;
 extern int jishu;
 extern int zhangai;
-
+extern int up;
 //找线变量定义
 signed char BlackLine[2][ROWS];	  //左右线的数组
 byte StartRow[2];       	  //线的起点
@@ -315,10 +315,20 @@ void FindBlackLine(void)
 	CenterLineFill();				//中线补线
 	if(g_device_NO==1)           //1号车中线偏移参数       jqy
 	{
-	for(i=RoadEnd;i<RoadStart/2-10;i++)
-		CenterLine[i]=(CenterLine[i]+11);
-	for(i=RoadStart/2-10;i<=RoadStart;i++)
-		CenterLine[i]=(CenterLine[i]+22);
+		if(up==0)
+		{
+			for(i=RoadEnd;i<RoadStart/2-10;i++)
+				CenterLine[i]=(CenterLine[i]+11);
+			for(i=RoadStart/2-10;i<=RoadStart;i++)
+				CenterLine[i]=(CenterLine[i]+22);
+		}
+		if(up==1)
+		{
+		    for(i=RoadEnd;i<RoadStart/2-10;i++)
+				CenterLine[i]=(CenterLine[i]+7);
+			for(i=RoadStart/2-10;i<=RoadStart;i++)
+				CenterLine[i]=(CenterLine[i]+16);
+		}
 	}
 	if(g_device_NO==2)           //2号车中线偏移参数       jqy
 	{
@@ -2847,6 +2857,35 @@ void Typejudge()
 	}
 	if(RoadType==88 && bz==2 && g_device_NO==1)    //道路类型88，表示双车道障碍，需掉头绕行    jqy
 	{
+	//	delay_ms(300);
+		set_speed_pwm(-800);
+		delay_ms(70);
+		set_speed_pwm(0);
+		jishu=0;
+		Car_Stop=1;
+		while(Car_Stop==1)
+		{
+			if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
+			{
+				g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
+				Wifi_Ctrl();
+			}
+			if(order_received==1)
+			{
+				order_received=0;
+				generate_remote_frame_2(g_device_NO_Hex, 0x33, 0x0000, 2, (const BYTE *)(&response_data));
+			}
+			FindBlackLine();
+			CenterLineWithVideo(); 
+			Video_Show();
+			LCD_Write_Num(105,2,RoadType,2);
+			control_car_action();
+			EMIOS_0.CH[3].CSR.B.FLAG = 1;
+			EMIOS_0.CH[3].CCR.B.FEN=1;
+		}
+		zhangai=1;
+		bz=-1;
+#if 0
 		set_speed_pwm(0);
 		delay_ms(2000);
 		set_steer_helm_basement(data_steer_helm_basement.left_limit);
@@ -2863,13 +2902,19 @@ void Typejudge()
 		set_speed_pwm(320);
 		delay_ms(1500);
 		bz=5;/////
+#endif
 	}
 	if(RoadType==88 && bz==2 && g_device_NO==2)    //道路类型88，表示双车道障碍，需掉头绕行    jqy
 	{
+		sending_service_package(0x33,0x0088,0x00);
 		set_speed_pwm(-500);
 		delay_ms(50);
 		set_speed_pwm(0);
 		delay_ms(2000);
+		set_speed_pwm(-320);
+		delay_ms(1000);
+		set_speed_pwm(0);
+		delay_ms(1500);
 		set_steer_helm_basement(data_steer_helm_basement.left_limit);
 		set_speed_pwm(320);
 		delay_ms(1200);/////

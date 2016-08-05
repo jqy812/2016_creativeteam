@@ -7,8 +7,11 @@ int g_remote_frame_cnt = 0;
 int g_start_all=0;
 int have_responsed;
 int order_received; 
+WORD response_data=0x0;
 int Car_Waitfororder=0;
-int Light_Status=1;//默认红灯
+int Light_Status=0;//默认红灯
+int Traffic_Jam=0;//默认畅通
+int End=0;
 BYTE remote_frame_data[REMOTE_FRAME_LENGTH];
 BYTE remote_frame_data_send[REMOTE_FRAME_LENGTH];
 BYTE g_device_NO = WIFI_ADDRESS_CAR_1;
@@ -19,7 +22,8 @@ WORD sending_data;
 BYTE waiting_for_response=0;
 int  lost_data=0;
 extern int place[4];
-
+extern int used;
+extern int Emergency;
 /*-----------------------------------------------------------------------*/
 /* 执行远程命令                                                          */
 /*-----------------------------------------------------------------------*/
@@ -384,10 +388,19 @@ void Wifi_Ctrl()
 {
 	if(remote_frame_data[2] == 0x33 )//熊老板上位机
 	{
+		if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x66)
+		{
+			order_received =1;
+			Car_Waitfororder=0;
+		}
 		if (remote_frame_data[3] == g_device_NO_Hex && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)   
 		{	
 			have_responsed=1;	
 		}// 检查是否得到应答 
+		if (remote_frame_data[3] == 0x03 && remote_frame_data[5]==0x99 && remote_frame_data[6]==0x01)   
+		{	
+			End=1;	
+		}// 第一幕终止 
 		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01)   
 		{
 			order_received =1;
@@ -396,6 +409,21 @@ void Wifi_Ctrl()
 			if(remote_frame_data[8]==0x0B)
 				Light_Status=1;	
 		}// 红绿灯状态
+		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x88 && remote_frame_data[8]==0x88)   
+		{
+			order_received =1;
+			Traffic_Jam=1;
+		}// 拥堵状态	
+		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x2A && remote_frame_data[8]==0x2A)   
+		{
+			order_received =1;
+			Emergency=1;
+		}// 紧急状态	
+		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x2B && remote_frame_data[8]==0x2B)   
+		{
+			order_received =1;
+			Emergency=0;
+		}// 紧急状态	解除		
 	}	
 	if(remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex)//天少发过来
 	{
@@ -405,6 +433,7 @@ void Wifi_Ctrl()
 		{
 			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x66)
 			{
+				used=0;
 				if(remote_frame_data[7]==0x01)
 					place[1]=1;
 				if(remote_frame_data[7]==0x02)
@@ -419,6 +448,8 @@ void Wifi_Ctrl()
 					place[3]=2;
 				Car_Waitfororder=0;
 				sending_service_package(0x44,0x0000,0xAAAA);
+				delay_ms(500);
+				sending_service_package(0x44,0x0000,0xAAAA);
 			}
 			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x0B)
 				Door_Open=1;	//天少远程开门
@@ -428,6 +459,43 @@ void Wifi_Ctrl()
 				Car_Stop=0;//天少开车
 			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCC) 
 				Door_Close_Run=1;//关门并开车
+			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0x3B) 
+			{
+				if (remote_frame_data[8]==0x01)
+				{
+					RFID_site_data.is_new_site = 1 ;
+					RFID_site_data.old_site=RFID_site_data.site;
+					RFID_site_data.site=ROAD_NUM_2501;
+				}
+				if (remote_frame_data[8]==0x02)
+				{
+					RFID_site_data.is_new_site = 1 ;
+					RFID_site_data.old_site=RFID_site_data.site;
+					RFID_site_data.site=ROAD_NUM_1101;
+				}
+				if (remote_frame_data[8]==0x03)
+				{
+					RFID_site_data.is_new_site = 1 ;
+					RFID_site_data.old_site=RFID_site_data.site;
+					if(place[1]==1)
+						RFID_site_data.site=ROAD_NUM_4001;
+					else if(place[2]==1)
+						RFID_site_data.site=ROAD_NUM_4002;
+					else if(place[3]==1)
+						RFID_site_data.site=ROAD_NUM_4003;
+				}
+				if (remote_frame_data[8]==0x04)
+				{
+					RFID_site_data.is_new_site = 1 ;
+					RFID_site_data.old_site=RFID_site_data.site;
+					if(place[1]==2)
+						RFID_site_data.site=ROAD_NUM_4001;
+					else if(place[2]==2)
+						RFID_site_data.site=ROAD_NUM_4002;
+					else if(place[3]==2)
+						RFID_site_data.site=ROAD_NUM_4003;
+				}					
+			}
 		}
 	}
 }

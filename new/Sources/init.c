@@ -7,7 +7,7 @@ int DoorC=0;
 int sending_test;
 FATFS fatfs1;	/* 会被文件系统引用，不得释放 */
 int mode=0;
-
+extern int Game_over;
 /*-----------------------------------------------------------------------*/
 /* 设置单片机的模式和时钟                                                */
 /*-----------------------------------------------------------------------*/
@@ -307,11 +307,17 @@ void delay_ms(DWORD ms)
 	for (i = 0; i < ms; i++)
 	{
 		delay_us(1000);
-//		if(RFID_site_data.is_new_site==1 && (RFID_site_data.roadnum>>8)==0x11)//读到红绿灯卡强制停止delay
-//		{
-//			set_speed_pwm(-500);
-//			break;
-//		}
+		if(RFID_site_data.is_new_site==1 && Game_over==1)//读到红绿灯卡强制停止delay
+		{
+			RFID_site_data.is_new_site = 0;
+			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);
+			if((RFID_site_data.roadnum>>8)==0x23)
+			{
+				set_speed_pwm(-500);
+				break;
+			}
+			Game_over=0;
+		}
 	//	if(RFID_site_data.is_new_site && (RFID_site_data.roadnum>>0)==0x2302)//2号库停车卡
 	//	{
 	//		set_speed_pwm(0);
@@ -504,7 +510,7 @@ void Pit_1s_L(void)//10ms
 	static int time_counter;
 	time_counter++;
 	Lcounter++;
-	if(Lcounter==160)
+	if(Lcounter==80)
 	{
 		Lcounter=0;
 		WIFICHEKER=1;
