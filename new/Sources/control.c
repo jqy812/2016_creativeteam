@@ -250,7 +250,7 @@ void set_steer_helm(SWORD helmData)
 		helmData = data_steer_helm.right_limit;
 	}
 	helm_data_record = helmData;
-//	helmData = (WORD)(helmData*data_steer_helm_basement.direction + data_steer_helm_basement.center);
+	helmData = (WORD)(helmData*data_steer_helm_basement.direction + data_steer_helm_basement.center);
 //	LCD_Write_Num(96,6,(ABS((WORD)(helmData))),5);
 //	delay_ms(500);
 	set_steer_helm_basement(helmData);
@@ -276,28 +276,27 @@ void set_steer_helm_basement(WORD helmData)
 //	{
 //		helmData = 5000;
 //	}
-	if(helmData <= data_steer_helm_basement.left_limit)
-		{
-			helmData = data_steer_helm_basement.left_limit;
-		}
+	if(data_steer_helm_basement.direction==1)
+	{
+		if(helmData <= data_steer_helm_basement.left_limit)
+			{
+				helmData = data_steer_helm_basement.left_limit;
+			}
 		else if(helmData >= data_steer_helm_basement.right_limit)
-		{
-			helmData = data_steer_helm_basement.right_limit;
-		}
-	if(helmData <=3700)
-	{
-		LeftL = 1;
-		RightL = 0;
+			{
+				helmData = data_steer_helm_basement.right_limit;
+			}
 	}
-	else if(helmData >=3800)
+	if(data_steer_helm_basement.direction==-1)
 	{
-		RightL = 1;
-		LeftL = 0;
-	}
-	else
-	{
-		LeftL = 0;
-		RightL = 0;
+		if(helmData >= data_steer_helm_basement.left_limit)
+			{
+				helmData = data_steer_helm_basement.left_limit;
+			}
+		else if(helmData <= data_steer_helm_basement.right_limit)
+			{
+				helmData = data_steer_helm_basement.right_limit;
+			}
 	}
 #endif
 	EMIOS_0.CH[9].CBDR.R = helmData;
