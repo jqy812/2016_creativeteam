@@ -8,6 +8,7 @@ int sending_test;
 FATFS fatfs1;	/* 会被文件系统引用，不得释放 */
 int mode=0;
 extern int Game_over;
+extern int out;
 /*-----------------------------------------------------------------------*/
 /* 设置单片机的模式和时钟                                                */
 /*-----------------------------------------------------------------------*/
@@ -307,23 +308,36 @@ void delay_ms(DWORD ms)
 	for (i = 0; i < ms; i++)
 	{
 		delay_us(1000);
-		if(RFID_site_data.is_new_site==1 && Game_over==1)//读到红绿灯卡强制停止delay
+//		if(RFID_site_data.is_new_site==1 && Game_over==1)//读到红绿灯卡强制停止delay
+//		{
+//			RFID_site_data.is_new_site = 0;
+//			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);
+//			if((RFID_site_data.roadnum>>8)==0x23)
+//			{
+//				set_speed_pwm(-500);
+//				break;
+//			}
+//			Game_over=0;
+//		}
+//		if(RFID_site_data.is_new_site && (RFID_site_data.roadnum>>0)==0x1102)//读到红绿灯
+//		{
+//			set_speed_pwm(0);
+//			Car_Stop=1;
+//			break;
+//		}
+		if(out==1)
 		{
-			RFID_site_data.is_new_site = 0;
-			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);
-			if((RFID_site_data.roadnum>>8)==0x23)
+			if(RFID_site_data.is_new_site==1)//读到出库卡
 			{
-				set_speed_pwm(-500);
-				break;
+				RFID_site_data.is_new_site = 0;
+				RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);
+				if((RFID_site_data.roadnum>>8)==0x24)
+				{
+					out=0;
+					break;
+				}
 			}
-			Game_over=0;
 		}
-	//	if(RFID_site_data.is_new_site && (RFID_site_data.roadnum>>0)==0x2302)//2号库停车卡
-	//	{
-	//		set_speed_pwm(0);
-	//		Car_Stop=1;
-	//		break;
-	//	}
 	}
 }
 

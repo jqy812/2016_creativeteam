@@ -77,7 +77,6 @@ int rev_RFID_frame(BYTE rev)
 			explane_RFID_ret_data((const BYTE *)(rfid_frame_data+3), (WORD)(rfid_frame_data[2]-1));
 		}
 	}
-	
 	return g_rfid_frame_state;
 }
 
@@ -113,7 +112,7 @@ void explane_RFID_ret_data(const BYTE *data, WORD length)
 			RFID_site_data.old_site=RFID_site_data.site;//余婧添加
 			RFID_site_data.site = cardID;
 			RFID_site_data.is_new_site = 1;
-			RFID_site_data.time = g_time_basis_PIT;
+			//RFID_site_data.time = g_time_basis_PIT;
 		}
 	}
 }
@@ -168,6 +167,8 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x1104;
 	if(site== ROAD_NUM_1105)
 		return 0x1105;
+	if(site== ROAD_NUM_1105_1)
+		return 0x1105;
 	if(site== ROAD_NUM_1106)
 		return 0x1106;
 	if(site== ROAD_NUM_1201)
@@ -204,6 +205,12 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x2302;
 	if(site== ROAD_NUM_2303)
 		return 0x2303;
+	if(site== ROAD_NUM_2401)
+		return 0x2401;
+	if(site== ROAD_NUM_2402)
+		return 0x2402;
+	if(site== ROAD_NUM_2403)
+		return 0x2403;
 	if(site== ROAD_NUM_2501)
 		return 0x2501;
 	if(site== ROAD_NUM_2501_1)
@@ -247,6 +254,8 @@ WORD RFID_Num_Exp(DWORD site)
 	if(site== ROAD_NUM_8008)
 		return 0x8008;
 	if(site== ROAD_NUM_8009)
+		return 0x8009;
+	if(site== ROAD_NUM_8009_1)
 		return 0x8009;
 	if(site== ROAD_NUM_8010)
 		return 0x8010;

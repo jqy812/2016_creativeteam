@@ -37,6 +37,9 @@ extern int Traffic_Jam;
 extern int End;
 int Game_over=0;
 int Emergency=0;
+int Hold_a=0;
+int Hold_b=0;
+int out=0;
 /*------------------------------*/
 /* 车灯控制程序    掉头                                         */  
 /*------------------------------*/
@@ -340,6 +343,14 @@ void RFID_control_car_1_action(WORD site)
 	if((site>>0)==0x1105)
 	{
 		bz=-1;
+	}
+	if((site>>0)==0x8005)
+	{
+		Hold_b=1;
+	}
+	if((site>>0)==0x4003)
+	{
+		Hold_b=0;
 	}
 }
 
@@ -890,7 +901,7 @@ void control_car_action(void)
 {
 	if(WIFI_ADDRESS_CAR_1 == g_device_NO)
 	{
-		if (RFID_site_data.is_new_site == 1)
+		if (RFID_site_data.is_new_site == 1 && RFID_site_data.old_site!=RFID_site_data.site)
 		{
 			RFID_site_data.is_new_site = 0;
 			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);
@@ -901,11 +912,14 @@ void control_car_action(void)
 		{
 			if(Light_Status==1 && Road_No==1)
 			{
-				if(bz==2 || (RFID_site_data.roadnum==0x1102))
+				if(bz==2)
 				{
-					delay_ms(1500);
-					LCD_Write_Num(105,6,'he',2);
+					delay_ms(700);
 				}
+				if(RFID_site_data.roadnum==0x1102)
+				{
+					delay_ms(1700);
+				}					
 				delay_ms(1000);
 				fieldover=1;
 				Car_Stop=0;
@@ -921,7 +935,7 @@ void control_car_action(void)
 	if(WIFI_ADDRESS_CAR_2 == g_device_NO)
 	{
 
-		if (RFID_site_data.is_new_site == 1)
+		if (RFID_site_data.is_new_site == 1 && RFID_site_data.old_site!=RFID_site_data.site)
 		{
 			RFID_site_data.is_new_site = 0;
 			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);
@@ -962,7 +976,7 @@ void control_car_action(void)
 	}
 	if(WIFI_ADDRESS_CAR_3 == g_device_NO)
 	{
-		if (RFID_site_data.is_new_site == 1)
+		if (RFID_site_data.is_new_site == 1 && RFID_site_data.old_site!=RFID_site_data.site)
 		{
 			RFID_site_data.is_new_site = 0;
 			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);;
@@ -1189,15 +1203,25 @@ void zhangai_run()
 #if 1
 	else if(zhangai==0 && bz==1)          //超车处理参数，适用于1号车          jqy
 		{
-//			delay_ms(300);
+	    	set_speed_pwm(320);
+		 	delay_ms(300);
 			set_steer_helm_basement(data_steer_helm_basement.left_limit);   
-			delay_ms(470);
+			delay_ms(550);
 			set_steer_helm_basement(data_steer_helm_basement.right_limit);
-			delay_ms(520);
+			delay_ms(630);
 			set_steer_helm_basement(data_steer_helm_basement.center);
-			delay_ms(50);
+			delay_ms(100);
 			zhangai=1;
 			bz=-1;
+			if(Light_Status==0)
+			{
+				set_speed_pwm(-700);
+				delay_ms(70);
+				Car_Stop=1;
+				LCD_Fill(0x00);
+				set_speed_pwm(0);
+			}
+			else delay_ms(300);
 		}
 #endif
 
@@ -1234,4 +1258,119 @@ void zhangai_run()
 		    }
 		}
 #endif
+}
+
+void Start_one()
+{
+	if(g_device_NO==1 && Car_Waitfororder==1)    //电压8.7V
+	{
+		while(Car_Waitfororder==1)
+		{
+			if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
+			{
+				g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
+				Wifi_Ctrl();
+			}
+			if(order_received==1)
+			{
+				order_received=0;
+				generate_remote_frame_2(g_device_NO_Hex, 0x33, 0x0000, 2, (const BYTE *)(&response_data));
+			}
+		}
+		sending_service_package(0x44,0xDDCC,0x0002);
+		velocity=320;
+		set_speed_pwm(velocity);
+		set_steer_helm_basement(data_steer_helm_basement.right_limit);
+		delay_ms(800);
+		sending_service_package(0x44,0xDDCC,0x0002);
+		delay_ms(1000);
+		sending_service_package(0x44,0xAABB,0x0001);
+	}
+	if(g_device_NO==2 && Car_Waitfororder==1) 
+	{
+		while(Car_Waitfororder==1)
+		{
+			if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
+			{
+				g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
+				Wifi_Ctrl();
+			}
+			if(order_received==1)
+			{
+				order_received=0;
+				generate_remote_frame_2(g_device_NO_Hex, 0x33, 0x0000, 2, (const BYTE *)(&response_data));
+			}
+		}
+		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.5+data_steer_helm_basement.center);
+		set_speed_pwm(-300); 
+		jishu=0;
+		while(jishu==0)
+		{
+			control_car_action();
+			if(jishu==1)
+			{
+			//	set_speed_pwm(1000);
+			//	delay_ms(80);
+				sending_service_package(0x44,0xDDCC,0x0002);
+				set_speed_pwm(0);
+				delay_ms(1500);
+				sending_service_package(0x44,0xDDCC,0x0002);
+				set_steer_helm_basement(data_steer_helm_basement.center);
+				set_speed_pwm(310);
+				delay_ms(800);
+				sending_service_package(0x44,0xDDCC,0x0002);
+				delay_ms(1000);
+				sending_service_package(0x44,0xAABB,0x0001);		
+				fieldover=1;	
+			}
+		}
+		bz=-2;
+		velocity=300;
+		jishu=0;
+	}
+	if(g_device_NO==3 && Car_Waitfororder==1) 
+	{
+#if 1
+		while(Car_Waitfororder==1)
+		{
+			if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
+			{
+				g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
+				Wifi_Ctrl();
+			}
+		}
+		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.03+data_steer_helm_basement.center);
+		set_speed_pwm(-300); //-350
+		while(jishu==0)
+		{
+			if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
+			{
+				g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
+				Wifi_Ctrl();
+			}
+			control_car_action();
+			if(jishu==1)
+			{
+				sending_service_package(0x44,0xDDCC,0x0002);
+				set_speed_pwm(1000);
+				delay_ms(80);
+				set_speed_pwm(0);
+				delay_ms(1500);
+				sending_service_package(0x44,0xDDCC,0x0002);
+				set_steer_helm_basement(data_steer_helm_basement.left_limit);
+				set_speed_pwm(450);
+				delay_ms(1000);
+				sending_service_package(0x44,0xAABB,0x0001);
+				out=1;
+				delay_ms(5000);
+				set_steer_helm_basement(data_steer_helm_basement.right_limit);
+				sending_service_package(0x44,0xAABB,0x0001);
+				delay_ms(400);
+				fieldover=1;
+				velocity=360;
+			}
+		}
+#endif
+	}
+	jishu=0;
 }

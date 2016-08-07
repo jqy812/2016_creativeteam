@@ -24,6 +24,7 @@ int  lost_data=0;
 extern int place[4];
 extern int used;
 extern int Emergency;
+extern int Hold_a;
 /*-----------------------------------------------------------------------*/
 /* 执行远程命令                                                          */
 /*-----------------------------------------------------------------------*/
@@ -423,7 +424,18 @@ void Wifi_Ctrl()
 		{
 			order_received =1;
 			Emergency=0;
-		}// 紧急状态	解除		
+		}// 紧急状态	解除
+		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xAA && remote_frame_data[6]==0xAA)   
+		{
+			order_received =1;
+			Hold_a=1;
+		}// 接客状态	
+		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xBB && remote_frame_data[6]==0xBB)   
+		{
+			order_received =1;
+			Hold_a=0;
+			Car_Waitfororder=0;
+		}// 接客状态	解除		
 	}	
 	if(remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex)//天少发过来
 	{
