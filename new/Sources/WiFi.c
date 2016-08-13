@@ -24,6 +24,10 @@ int  lost_data=0;
 extern int place[4];
 extern int used;
 extern int Emergency;
+extern int Polizei;
+extern int Hold_a;
+extern int Hold_b;
+extern int bz;
 /*-----------------------------------------------------------------------*/
 /* 执行远程命令                                                          */
 /*-----------------------------------------------------------------------*/
@@ -424,79 +428,34 @@ void Wifi_Ctrl()
 			order_received =1;
 			Emergency=0;
 		}// 紧急状态	解除		
-	}	
-	if(remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex)//天少发过来
-	{
-		if ( remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)
-				have_responsed=1;	// 检查天少是否回答 
-		if(g_device_NO == 3)
+		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x07 && remote_frame_data[6]==0x08)   
 		{
-			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x66)
-			{
-				used=0;
-				if(remote_frame_data[7]==0x01)
-					place[1]=1;
-				if(remote_frame_data[7]==0x02)
-					place[2]=1;
-				if(remote_frame_data[7]==0x03)
-					place[3]=1;
-				if(remote_frame_data[8]==0x01)
-					place[1]=2;
-				if(remote_frame_data[8]==0x02)
-					place[2]=2;
-				if(remote_frame_data[8]==0x03)
-					place[3]=2;
-				Car_Waitfororder=0;
-				sending_service_package(0x44,0x0000,0xAAAA);
-				delay_ms(500);
-				sending_service_package(0x44,0x0000,0xAAAA);
-			}
-			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x0B)
-				Door_Open=1;	//天少远程开门
-			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCB)
-				Door_Close=1;
-			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01) 
-				Car_Stop=0;//天少开车
-			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCC) 
-				Door_Close_Run=1;//关门并开车
-			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0x3B) 
-			{
-				if (remote_frame_data[8]==0x01)
-				{
-					RFID_site_data.is_new_site = 1 ;
-					RFID_site_data.old_site=RFID_site_data.site;
-					RFID_site_data.site=ROAD_NUM_2501;
-				}
-				if (remote_frame_data[8]==0x02)
-				{
-					RFID_site_data.is_new_site = 1 ;
-					RFID_site_data.old_site=RFID_site_data.site;
-					RFID_site_data.site=ROAD_NUM_1101;
-				}
-				if (remote_frame_data[8]==0x03)
-				{
-					RFID_site_data.is_new_site = 1 ;
-					RFID_site_data.old_site=RFID_site_data.site;
-					if(place[1]==1)
-						RFID_site_data.site=ROAD_NUM_4001;
-					else if(place[2]==1)
-						RFID_site_data.site=ROAD_NUM_4002;
-					else if(place[3]==1)
-						RFID_site_data.site=ROAD_NUM_4003;
-				}
-				if (remote_frame_data[8]==0x04)
-				{
-					RFID_site_data.is_new_site = 1 ;
-					RFID_site_data.old_site=RFID_site_data.site;
-					if(place[1]==2)
-						RFID_site_data.site=ROAD_NUM_4001;
-					else if(place[2]==2)
-						RFID_site_data.site=ROAD_NUM_4002;
-					else if(place[3]==2)
-						RFID_site_data.site=ROAD_NUM_4003;
-				}					
-			}
-		}
+			order_received =1;
+			Polizei=1;
+			Car_Waitfororder=0;
+		}// 警匪追逐开始	
+	}	
+	if(remote_frame_data[2] == 0x01 && g_device_NO==7)
+	{
+		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x07 && remote_frame_data[6]==0x11)   
+		{
+			order_received =1;
+			bz=711;
+		}// 接客状态	
+	}
+	if(remote_frame_data[2] == 0x03 && g_device_NO!=7)
+	{
+		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xAA && remote_frame_data[6]==0xAA)   
+		{
+			order_received =1;
+			Hold_a=1;
+		}// 接客状态	
+		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xBB && remote_frame_data[6]==0xBB)   
+		{
+			order_received =1;
+			Hold_a=0;
+			Car_Waitfororder=0;
+		}// 接客状态	解除
 	}
 }
 

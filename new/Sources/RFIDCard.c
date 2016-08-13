@@ -112,7 +112,7 @@ void explane_RFID_ret_data(const BYTE *data, WORD length)
 			RFID_site_data.old_site=RFID_site_data.site;//余婧添加
 			RFID_site_data.site = cardID;
 			RFID_site_data.is_new_site = 1;
-			RFID_site_data.time = g_time_basis_PIT;
+			//RFID_site_data.time = g_time_basis_PIT;
 		}
 	}
 }
@@ -167,6 +167,8 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x1104;
 	if(site== ROAD_NUM_1105)
 		return 0x1105;
+	if(site== ROAD_NUM_1105_1)
+		return 0x1105;
 	if(site== ROAD_NUM_1106)
 		return 0x1106;
 	if(site== ROAD_NUM_1201)
@@ -199,15 +201,27 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x2203;
 	if(site== ROAD_NUM_2301)
 		return 0x2301;
+	if(site== ROAD_NUM_2301_1)
+		return 0x2301;
 	if(site== ROAD_NUM_2302)
 		return 0x2302;
 	if(site== ROAD_NUM_2303)
 		return 0x2303;
+	if(site== ROAD_NUM_2401)
+		return 0x2401;
+	if(site== ROAD_NUM_2402)
+		return 0x2402;
+	if(site== ROAD_NUM_2403)
+		return 0x2403;
+	if(site== ROAD_NUM_2404)
+		return 0x2404;
 	if(site== ROAD_NUM_2501)
 		return 0x2501;
 	if(site== ROAD_NUM_2501_1)
 		return 0x2501;
 	if(site== ROAD_NUM_2601)
+		return 0x2601;
+	if(site== ROAD_NUM_2601_1)
 		return 0x2601;
 	if(site== ROAD_NUM_3001)
 		return 0x3001;
@@ -247,6 +261,8 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x8008;
 	if(site== ROAD_NUM_8009)
 		return 0x8009;
+	if(site== ROAD_NUM_8009_1)
+		return 0x8009;
 	if(site== ROAD_NUM_8010)
 		return 0x8010;
 	if(site== ROAD_NUM_8011)
@@ -256,6 +272,8 @@ WORD RFID_Num_Exp(DWORD site)
 	if(site== ROAD_NUM_8013)
 		return 0x8013;
 	if(site== ROAD_NUM_8014)
+		return 0x8014;
+	if(site== ROAD_NUM_8014_1)
 		return 0x8014;
 	if(site== ROAD_NUM_8015)
 		return 0x8015;

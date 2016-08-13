@@ -7,13 +7,16 @@ int g_f_enable_mag_steer_control = 0;
 int g_f_enable_speed_control = 0;	/* 启用速度控制标志位 */
 int g_f_enable_supersonic=0;	/* 启用超声探测标志位 */
 int speed = 0;
+int Light_Mode=1;
+int LightCount=0;
 int update_steer_helm_basement_to_steer_helm(void);
 int g_f_big_U=0;
 int g_f_big_U_2=0;
 int counter=0;
-
+int speed_pwm_tp;
 DWORD tmp_a, tmp_b;
-
+int delay_count=0;
+extern int bz;
 
 /*-----------------------------------------------------------------------*/
 /* 舵机初始化 	                                                                      */
@@ -44,25 +47,25 @@ void PitISR(void)
 	/* end:encoder */
 
 	/* 开始执行速度控制算法 */
-//	if (g_f_enable_speed_control)
-//	{
-//		//SpeedControl();//不同路段PID,尚未调,不可用
-//		contorl_speed_encoder_pid();
-//	}
-	if(counter==3)
+	if (g_f_enable_speed_control)
 	{
-		//g_f_enable_supersonic=1;                    //jiej
-		if (g_f_enable_supersonic)
-		{
-			trigger_supersonic_2();
-			get_supersonic_time_2();
-			//while((ABS((WORD)(tmp_time.R))/100)<100)
-			//{}				
-			LCD_Write_Num(96,6,(ABS((WORD)(tmp_time.R))/100),5);
-		}
-		//delay_ms(1000);   jqy
-		counter=0;
+		//SpeedControl();//不同路段PID,尚未调,不可用
+		contorl_speed_encoder_pid();
 	}
+	
+	//光编记步
+	if (data_encoder.is_forward)
+	{
+		data_encoder.speed_real =(SWORD) data_encoder.speed_now;
+	}
+	else
+	{
+		data_encoder.speed_real = 0 - (SWORD) data_encoder.speed_now;
+	}
+	delay_count+=data_encoder.speed_real;
+			
+			
+	
 	
 #if 0
 	/* 发送位置 */
@@ -85,8 +88,8 @@ void set_speed_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 {
 	if (speed_pwm>0)	//forward
 	{
-		StopL = 0;
-		RunL = 1;
+//		StopL = 0;
+//		RunL = 1;
 		if (speed_pwm>SPEED_PWM_MAX)
 		{
 			speed_pwm = SPEED_PWM_MAX;
@@ -97,8 +100,8 @@ void set_speed_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 	}
 	else if (speed_pwm<0)	//backward
 	{
-		StopL = 1;
-		RunL = 0;
+//		StopL = 1;
+//		RunL = 0;
 		speed_pwm = 0-speed_pwm;
 		if (speed_pwm>SPEED_PWM_MAX)
 		{
@@ -110,8 +113,8 @@ void set_speed_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 	}
 	else
 	{
-		StopL = 1;
-		RunL = 0;
+//		StopL = 1;
+//		RunL = 0;
 		EMIOS_0.CH[21].CBDR.R = 1;
 		EMIOS_0.CH[22].CBDR.R = 1;	
 	}
@@ -193,6 +196,7 @@ void contorl_speed_encoder_pid(void)
 	else if (speed_pwm<0-SPEED_PWM_MAX)
 			speed_pwm =0- SPEED_PWM_MAX;    //防止溢出（造成负数）
 	set_speed_pwm(speed_pwm);
+	speed_pwm_tp=speed_pwm;
 	e2=e1;
 	e1=e0;	
 }
@@ -287,7 +291,7 @@ void set_steer_helm_basement(WORD helmData)
 				helmData = data_steer_helm_basement.right_limit;
 			}
 	}
-	if(data_steer_helm_basement.direction==-1)
+	if(data_steer_helm_basement.direction==-1 && bz!=-1)
 	{
 		if(helmData >= data_steer_helm_basement.left_limit)
 			{
@@ -298,6 +302,18 @@ void set_steer_helm_basement(WORD helmData)
 				helmData = data_steer_helm_basement.right_limit;
 			}
 	}
+	else if(bz==-1)
+	{
+		if(helmData >= data_steer_helm_basement.left_limit)
+			{
+				helmData = data_steer_helm_basement.left_limit;
+			}
+		else if(helmData <= (data_steer_helm_basement.center-100))
+			{
+				helmData = (data_steer_helm_basement.center-100);
+			}
+	}
+
 #endif
 	EMIOS_0.CH[9].CBDR.R = helmData;
 }
@@ -407,8 +423,6 @@ void set_door_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 	}
 	else if (speed_pwm<0)	//backward
 	{
-		StopL = 1;
-		RunL = 0;
 		speed_pwm = 0-speed_pwm;
 		if (speed_pwm>SPEED_PWM_MAX)
 		{
@@ -419,13 +433,56 @@ void set_door_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 	}
 	else
 	{
-		StopL = 1;
-		RunL = 0;
 		EMIOS_0.CH[18].CBDR.R = 1;
 		EMIOS_0.CH[20].CBDR.R = 1;	
 	}
 }
-void Road_Stop(void)
+void Light_Ctrl(void)
 {
-	set_speed_pwm(0);
+	if(WIFI_ADDRESS_CAR_7 == g_device_NO)
+	{
+		if(Flash_Light==1)
+		{
+			Flash_Light=0;
+			LightCount++;
+		}
+		if(Light_Mode==0)
+		{
+			if(LightCount>=1)
+				LightCount=1;
+			if(LightCount==1)
+			{
+				LightCount=0;
+				if((RunL==0&&StopL==1)||(RunL==1&&StopL==0))
+				{
+					RunL=0;
+					StopL=0;
+				}
+				else
+				{
+					RunL=~RunL;
+					StopL=~StopL;
+				}
+			}
+		}
+		if(Light_Mode==1)
+		{
+			if(LightCount>=20)
+				LightCount=20;
+			if(LightCount==20)
+			{
+				LightCount=0;
+				if((RunL==0&&StopL==0)||(RunL==1&&StopL==1))
+				{
+					RunL=1;
+					StopL=0;
+				}
+				else
+				{
+					RunL=~RunL;
+					StopL=~StopL;
+				}
+			}
+		}
+	}
 }

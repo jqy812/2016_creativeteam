@@ -20,6 +20,8 @@ extern int bz;
 extern int right;
 int velocity;
 BYTE video_sender;
+extern int Hold_a;
+extern int Hold_b;
 
 void Mode0_DebugCamera(void);
 void Mode1_SendVideo(void);
@@ -40,8 +42,19 @@ void main(void)
 }
 void Mode0_DebugCamera(void)
 {
+	
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
-	velocity=300;///////////////////////////////////////////
+	g_f_enable_speed_control=1;
+	if(g_device_NO==7)
+	{   
+		Car_Waitfororder=1; /////////////////////////
+		velocity=60;
+		Start_one();
+	}
+	if(g_device_NO==8)
+	{
+		velocity=16;
+	}
 	for (;;)
 	{
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
@@ -50,21 +63,10 @@ void Mode0_DebugCamera(void)
 			Wifi_Ctrl();
 		}
 		control_car_action();
-//		if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
-//		{
-//			WIFICHEKER=0;
-//			wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
-//		}
-		if(order_received==1)
-		{
-			order_received=0;
-			generate_remote_frame_2(g_device_NO_Hex, 0x33, 0x0000, 2, (const BYTE *)(&response_data));
-		}
 		if(fieldover==1&&Car_Stop==0&&zhangai==1&&Car_Waitfororder==0)
 		{
-			car_default();
-			fieldover=0; 
-			set_speed_pwm(velocity); 
+			fieldover=0; 	
+			set_speed_target(velocity); 
 			FindBlackLine();              //寻迹处理                        jqy     
 			CenterLineWithVideo();        //摄像头数据处理              jqy     
 	     	Video_Show();                 //显示屏显示                     jqy
@@ -74,12 +76,18 @@ void Mode0_DebugCamera(void)
 			else LCD_write_english_string(96,1,"+");
 			LCD_Write_Num(105,1,ABS(target_offset),2);
 			LCD_Write_Num(105,2,RoadType,2);
-		//	LCD_Write_Num(105,6,right,2);
+			LCD_Write_Num(105,6,bz,2);
+		//	LCD_Write_Num(105,6,data_encoder.is_forward,4);
+		//	LCD_Write_Num(105,7,data_encoder.speed_now,4);
 			SteerControl();          //舵机控制              jqy
+			if(Hold_a==1 && Hold_b==1)
+			{
+				set_speed_target(0);
+				Car_Waitfororder=1;
+			}
 			EMIOS_0.CH[3].CSR.B.FLAG = 1;
 			EMIOS_0.CH[3].CCR.B.FEN=1;
 		}
-	//	if(g_device_NO==1) 
 			zhangai_run();                          //避障参数
 	}
 }

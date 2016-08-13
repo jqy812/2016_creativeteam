@@ -27,6 +27,9 @@ byte stop_delay=0;
 //********************2016赛季参数******************************************
 extern int velocity;
 extern int right;
+int js=0;
+int min_a=8888;
+int min_b=8888;
 //*****************************************************************************************************************
 //************************************************角度控制************************************************    	  *
 //*****************************************************************************************************************
@@ -46,13 +49,18 @@ void SteerControl()
 //	else if(Slope==2)				{Steer_kp=8;Steer_kd=5;}
 
 
-if(g_device_NO==7)                   //1号车PID参数       jqy
+if(g_device_NO==7)                   //7号车PID参数       jqy
 {
 	if(ABS(target_offset)<6) 	{Steer_kp=5;Steer_kd=5;}
-	else if(ABS(target_offset)<26)  {Steer_kp=5.4+target_offset*target_offset/100;Steer_kd=10;}
-	else {Steer_kp=6.8+target_offset*target_offset/500;Steer_kd=5;}
+	else if(ABS(target_offset)<26)  {Steer_kp=7.4+target_offset*target_offset/100;Steer_kd=10;}
+	else {Steer_kp=8.8+target_offset*target_offset/500;Steer_kd=5;}
 }
-
+if(g_device_NO==8)                   //8号车PID参数       jqy
+{
+	if(ABS(target_offset)<6) 	{Steer_kp=8;Steer_kd=5;}
+	else if(ABS(target_offset)<26)  {Steer_kp=14.4+target_offset*target_offset/100;Steer_kd=10;}
+	else {Steer_kp=16.8+target_offset*target_offset/500;Steer_kd=5;}
+}
 #if 0
 	if(ABS(target_offset)<5) 		{Steer_kp=5;Steer_kd=5;}
 			else if(ABS(target_offset)<10)  {Steer_kp=5;Steer_kd=5;}
@@ -63,10 +71,8 @@ if(g_device_NO==7)                   //1号车PID参数       jqy
 #endif
 //	Steer_PWM[3]=data_steer_helm_basement.center+Steer_kp*target_offset+Steer_kd*(target_offset-last_offset);//位置式PD
 	Steer_PWM[3]=data_steer_helm_basement.center-(Steer_kp*target_offset+Steer_kd*(target_offset-last_offset));//位置式PD
-	//7号车
-	
 	//舵机限值+舵机输出
-	set_speed_pwm(velocity);
+//	set_speed_pwm(velocity);
 	set_steer_helm_basement(Steer_PWM[3]);
 	LCD_Write_Num(105,5,(int)Steer_PWM[3],4);
 	//存舵机值和offset值

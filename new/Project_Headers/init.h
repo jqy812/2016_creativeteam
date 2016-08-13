@@ -8,6 +8,7 @@
 extern FATFS fatfs1;
 extern int mode;
 extern int WIFICHEKER;
+extern int Flash_Light;
 extern int DoorC;
 extern int sending_test;
 

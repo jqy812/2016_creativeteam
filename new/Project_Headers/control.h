@@ -15,7 +15,7 @@
 
 /* 速度PWM */
 #define SPEED_PWM_MIN (1)
-#define SPEED_PWM_MAX (1900)
+#define SPEED_PWM_MAX (500)
 #define SPEED_PWM_TEST (20)
 
 /* 速度光编 */
@@ -34,6 +34,7 @@ extern int g_f_enable_single_bridge_control;
 extern int g_f_enable_fly_bridge;
 extern int g_f_enable_steer_bridge;
 extern int g_f_enable_supersonic;	/* 启用超声探测标志位 */
+extern int Light_Mode;
 
 extern int read_rad_xyz;
 extern int find_mag_back_box;
@@ -43,7 +44,7 @@ extern int find_mag_back_car1;
 extern int g_f_big_U;
 extern int g_f_big_U_2;
 extern int counter;
-
+extern int speed_pwm_tp;
 
 /* 时间基准 */
 #ifdef __CONTROL_C_
@@ -95,14 +96,16 @@ struct
 	WORD cnt_old;
 	WORD cnt_new;
 	WORD speed_now;
+	SWORD speed_real;
 	SWORD is_forward;
-} data_encoder = { 0x0000, 0x0000, 0x0000, 0, };
+} data_encoder = { 0x0000, 0x0000, 0x0000, 0,0, };
 #else
 extern struct
 {
 	WORD cnt_old;
 	WORD cnt_new;
 	WORD speed_now;
+	SWORD speed_real;
 	SWORD is_forward;
 } data_encoder;
 #endif
@@ -114,7 +117,7 @@ struct
 	float p;
 	float i;
 	float d;
-} data_speed_pid = { 15, 1, 5 };
+} data_speed_pid = { 15, 0.2, 1 };
 #else
 extern struct
 {
@@ -164,7 +167,7 @@ extern void control_angle_steer_helm(int angle_target);
 extern void control_speed_motor(int speed_target);
 extern int abs(int data);
 extern void set_steer_helm(SWORD helmData);
-extern void Road_Stop(void);
+extern void Light_Ctrl(void);
 
 
 

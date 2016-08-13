@@ -4,7 +4,10 @@ int Lcounter=0;
 int sending_waiter=0;
 int WIFICHEKER=0;
 int DoorC=0;
+int LightCounter=0;
+int Flash_Light=0;
 int sending_test;
+
 FATFS fatfs1;	/* 会被文件系统引用，不得释放 */
 int mode=0;
 extern int Game_over;
@@ -89,8 +92,8 @@ void init_led(void)
 //车灯全亮
 	LeftL = 1;	/* 0=熄灭 */
 	RightL = 1;
-	StopL = 1;
-	RunL = 1;
+	StopL = 0;
+	RunL = 0;
 }
 
 
@@ -307,17 +310,7 @@ void delay_ms(DWORD ms)
 	for (i = 0; i < ms; i++)
 	{
 		delay_us(1000);
-		if(RFID_site_data.is_new_site==1 && Game_over==1)//读到红绿灯卡强制停止delay
-		{
-			RFID_site_data.is_new_site = 0;
-			RFID_site_data.roadnum=RFID_Num_Exp(RFID_site_data.site);
-			if((RFID_site_data.roadnum>>8)==0x23)
-			{
-				set_speed_pwm(-500);
-				break;
-			}
-			Game_over=0;
-		}
+
 	//	if(RFID_site_data.is_new_site && (RFID_site_data.roadnum>>0)==0x2302)//2号库停车卡
 	//	{
 	//		set_speed_pwm(0);
@@ -345,6 +338,8 @@ void init_all_and_POST(void)
 	/* 初始化SPI总线 */
 	init_DSPI_1();
 	init_pit();
+	delay_ms(5);
+	init_pit_1s_L();
 	init_led();
 	init_DIP();
 	init_serial_port_1();//Wifi_ouyang
@@ -365,7 +360,6 @@ void init_all_and_POST(void)
 	//init_DSPI_2();
 	//init_I2C();
 	init_choose_mode();
-	init_pit_1s_L();
 	
 	/* 初始化SPI总线 */
 	//init_DSPI_1();
@@ -472,7 +466,6 @@ void init_all_and_POST(void)
 
 	/* 换屏 */
 	LCD_Fill(0x00);
-
 	/* 速度闭环测试 */	
 	g_f_enable_speed_control = 1;
 	LCD_P8x16Str(0, 4, (BYTE*)"S.T=0");
@@ -481,6 +474,9 @@ void init_all_and_POST(void)
 	
 	/* 换屏 */
 	LCD_Fill(0x00);
+	RunL=0;
+	StopL=0;
+	RightL = 1;
 #endif
 
 }
@@ -501,8 +497,8 @@ void init_pit_1s_L(void)
 {
 	/* NOTE:  DIVIDER FROM SYSCLK TO PIT ASSUMES DEFAULT DIVIDE BY 1 */
 	PIT.PITMCR.R = 0x00000001;	/* Enable PIT and configure timers to stop in debug modem */
-	PIT.CH[1].LDVAL.R = 800000;	/* 800000==10ms */
-	PIT.CH[1].TCTRL.R = 0x00000003;	/* Enable PIT1 interrupt and make PIT active to count */
+	PIT.CH[2].LDVAL.R = 800000;	/* 800000==10ms */
+	PIT.CH[2].TCTRL.R = 0x00000003;	/* Enable PIT1 interrupt and make PIT active to count */
 	INTC_InstallINTCInterruptHandler(Pit_1s_L,61,4);	/* PIT 1 interrupt vector with priority 1 */
 }
 void Pit_1s_L(void)//10ms
@@ -510,6 +506,12 @@ void Pit_1s_L(void)//10ms
 	static int time_counter;
 	time_counter++;
 	Lcounter++;
+	LightCounter++;
+	if(LightCounter==5)
+	{
+		LightCounter=0;
+		Flash_Light=1;
+	}
 	if(Lcounter==80)
 	{
 		Lcounter=0;
@@ -534,7 +536,11 @@ void Pit_1s_L(void)//10ms
 		Door_Stop=1;
 		DoorC=0;
 	}
-	PIT.CH[1].TFLG.B.TIF = 1;	// MPC56xxB/P/S: Clear PIT 1 flag by writing 1
+	if(Car_Waitfororder==0)
+	{
+		Light_Ctrl();
+	}
+	PIT.CH[2].TFLG.B.TIF = 1;	// MPC56xxB/P/S: Clear PIT 1 flag by writing 1
 }
 
 

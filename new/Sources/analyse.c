@@ -318,7 +318,14 @@ void FindBlackLine(void)
 		for(i=RoadEnd;i<RoadStart/2-10;i++)
 			CenterLine[i]=(CenterLine[i]+3);
 		for(i=RoadStart/2-10;i<=RoadStart;i++)
-			CenterLine[i]=(CenterLine[i]+8);
+			CenterLine[i]=(CenterLine[i]+7);
+	}
+	if(g_device_NO==8)           //7号车中线偏移参数       jqy
+	{
+		for(i=RoadEnd;i<RoadStart/2-10;i++)
+			CenterLine[i]=(CenterLine[i]+5);
+		for(i=RoadStart/2-10;i<=RoadStart;i++)
+			CenterLine[i]=(CenterLine[i]+11);
 	}
 	TargetOffset();					//目标控制量
 }
@@ -2819,14 +2826,12 @@ void Typejudge()
 {
 	if(RoadType==66)      //道路类型66，表示单车道障碍    jqy
 		jishu++;
-//	if(RoadType==12 || RoadType==12)      //道路类型66，表示单车道障碍    jqy
-//		jishu++;
-	if(jishu>=4 && bz==1)   //bz位为1时，进行超车    jqy
+	if(jishu>=2 && bz==1)   //bz位为1时，进行超车    jqy
 	{
 		zhangai=0;
 		jishu=0;
 	}
-	if(jishu>=1 && bz==0)   //bz位为1时，进行避障停车   jqy
+	if(jishu>=1 && bz==0)   //bz位为0时，进行避障停车   jqy
 	{
 		zhangai=0;
 		jishu=0;
