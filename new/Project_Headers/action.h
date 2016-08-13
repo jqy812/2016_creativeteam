@@ -30,16 +30,8 @@
 #define WEST (4)
 extern int car_direction;//车身绝对方向-余婧添加
 extern int g_f_red;//信号灯标志位
-extern int Car_Stop;
-extern int Road_No;
-extern int Door_Status;
-extern int Door_Stop;
-extern int Car_Psg;
-extern int Door_Open;
-extern Light_2_Ctrl;
-extern int Door_Delay;
-extern int Door_Close;
-extern int Door_Close_Run;
+
+
 /* 刺气球数据 */
 #ifdef __ACTION_C_
 struct
@@ -57,9 +49,6 @@ extern struct
 
 
 extern void control_car_action(void);
-extern void device_Num_change(void);
-extern void car_default(void);
-void BMW_Taxi();
 void speed_up_bridge1();
 void puncture_ballon();
 void puncture_ballon_2();
@@ -73,15 +62,14 @@ void fly_bridge();
 void push_box1();
 void Car_UTurn();
 void set_car_direction(SBYTE act);
-//******************************2016赛季****************************************//
-void zhangai_run();
-void Start_one();
+
+
 
 extern void WiFi_control_car_1_action(WORD cmd);
 extern void WiFi_control_car_2_action(WORD cmd);
 extern void WiFi_control_car_3_action(WORD cmd);
 extern void WiFi_control_car_4_action(WORD cmd);
-extern void RFID_control_car_1_action(WORD site);
+extern void RFID_control_car_1_action(DWORD site);
 extern void RFID_control_car_2_action(DWORD site);
 extern void RFID_control_car_3_action(DWORD site);
 extern void RFID_control_car_4_action(DWORD site);

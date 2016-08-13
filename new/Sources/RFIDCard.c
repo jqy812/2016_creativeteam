@@ -77,6 +77,7 @@ int rev_RFID_frame(BYTE rev)
 			explane_RFID_ret_data((const BYTE *)(rfid_frame_data+3), (WORD)(rfid_frame_data[2]-1));
 		}
 	}
+	
 	return g_rfid_frame_state;
 }
 
@@ -112,7 +113,7 @@ void explane_RFID_ret_data(const BYTE *data, WORD length)
 			RFID_site_data.old_site=RFID_site_data.site;//余婧添加
 			RFID_site_data.site = cardID;
 			RFID_site_data.is_new_site = 1;
-			//RFID_site_data.time = g_time_basis_PIT;
+			RFID_site_data.time = g_time_basis_PIT;
 		}
 	}
 }
@@ -151,140 +152,4 @@ int init_RFID_modul_type(void)
 	{
 		return 0;
 	}
-}
-/*-----------------------------------------------------------------------*/
-/* RFID卡对应路段翻译                                              */
-/*-----------------------------------------------------------------------*/
-WORD RFID_Num_Exp(DWORD site)
-{
-	if(site== ROAD_NUM_1101)
-		return 0x1101;
-	if(site== ROAD_NUM_1102)
-		return 0x1102;
-	if(site== ROAD_NUM_1103)
-		return 0x1103;
-	if(site== ROAD_NUM_1104)
-		return 0x1104;
-	if(site== ROAD_NUM_1105)
-		return 0x1105;
-	if(site== ROAD_NUM_1105_1)
-		return 0x1105;
-	if(site== ROAD_NUM_1106)
-		return 0x1106;
-	if(site== ROAD_NUM_1201)
-		return 0x1201;
-	if(site== ROAD_NUM_1202)
-		return 0x1202;
-	if(site== ROAD_NUM_4001)
-		return 0x4001;
-	if(site== ROAD_NUM_4001_1)
-		return 0x4001;
-	if(site== ROAD_NUM_4002)
-		return 0x4002;
-	if(site== ROAD_NUM_4003)
-		return 0x4003;
-	if(site== ROAD_NUM_4003_1)
-		return 0x4003;
-	if(site== ROAD_NUM_2101)
-		return 0x2101;
-	if(site== ROAD_NUM_2101_1)
-		return 0x2101;
-	if(site== ROAD_NUM_2102)
-		return 0x2102;
-	if(site== ROAD_NUM_2102_1)
-		return 0x2102;
-	if(site== ROAD_NUM_2103)
-		return 0x2103;
-	if(site== ROAD_NUM_2202)
-		return 0x2202;
-	if(site== ROAD_NUM_2203)
-		return 0x2203;
-	if(site== ROAD_NUM_2301)
-		return 0x2301;
-	if(site== ROAD_NUM_2301_1)
-		return 0x2301;
-	if(site== ROAD_NUM_2302)
-		return 0x2302;
-	if(site== ROAD_NUM_2303)
-		return 0x2303;
-	if(site== ROAD_NUM_2401)
-		return 0x2401;
-	if(site== ROAD_NUM_2402)
-		return 0x2402;
-	if(site== ROAD_NUM_2403)
-		return 0x2403;
-	if(site== ROAD_NUM_2404)
-		return 0x2404;
-	if(site== ROAD_NUM_2501)
-		return 0x2501;
-	if(site== ROAD_NUM_2501_1)
-		return 0x2501;
-	if(site== ROAD_NUM_2601)
-		return 0x2601;
-	if(site== ROAD_NUM_2601_1)
-		return 0x2601;
-	if(site== ROAD_NUM_3001)
-		return 0x3001;
-	if(site== ROAD_NUM_3002)
-		return 0x3002;
-	if(site== ROAD_NUM_3003)
-		return 0x3003;
-	if(site== ROAD_NUM_3004)
-		return 0x3001;
-	if(site== ROAD_NUM_3005)
-		return 0x3002;
-	if(site== ROAD_NUM_3101)
-		return 0x3101;
-	if(site== ROAD_NUM_3201)
-		return 0x3201;
-	if(site== ROAD_NUM_3202)
-		return 0x3201;
-	if(site== ROAD_NUM_0A01)
-		return 0x0A01;
-	if(site== ROAD_NUM_0A02)
-		return 0x0A02;
-	if(site== ROAD_NUM_8001)
-		return 0x8001;
-	if(site== ROAD_NUM_8002)
-		return 0x8002;
-	if(site== ROAD_NUM_8003)
-		return 0x8003;
-	if(site== ROAD_NUM_8004)
-		return 0x8004;
-	if(site== ROAD_NUM_8005)
-		return 0x8005;
-	if(site== ROAD_NUM_8006)
-		return 0x8006;
-	if(site== ROAD_NUM_8007)
-		return 0x8007;
-	if(site== ROAD_NUM_8008)
-		return 0x8008;
-	if(site== ROAD_NUM_8009)
-		return 0x8009;
-	if(site== ROAD_NUM_8009_1)
-		return 0x8009;
-	if(site== ROAD_NUM_8010)
-		return 0x8010;
-	if(site== ROAD_NUM_8011)
-		return 0x8011;
-	if(site== ROAD_NUM_8012)
-		return 0x8012;
-	if(site== ROAD_NUM_8013)
-		return 0x8013;
-	if(site== ROAD_NUM_8014)
-		return 0x8014;
-	if(site== ROAD_NUM_8014_1)
-		return 0x8014;
-	if(site== ROAD_NUM_8015)
-		return 0x8015;
-	if(site== ROAD_NUM_8016)
-		return 0x8016;
-	if(site== ROAD_NUM_8017)
-		return 0x8017;
-	if(site== ROAD_NUM_8018)
-		return 0x8018;
-	if(site== ROAD_NUM_8019)
-		return 0x8019;
-	if(site== ROAD_NUM_8020)
-		return 0x8020;
 }

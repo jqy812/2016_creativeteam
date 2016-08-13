@@ -1,16 +1,18 @@
 ﻿#define __INIT_C_
 #include "includes.h"
-int Lcounter=0;
-int sending_waiter=0;
-int WIFICHEKER=0;
-int DoorC=0;
-int LightCounter=0;
-int Flash_Light=0;
-int sending_test;
+
 
 FATFS fatfs1;	/* 会被文件系统引用，不得释放 */
 int mode=0;
-extern int Game_over;
+int Lcounter=0;
+int Lcounter_2=0;
+int GetWifiC=0;
+int LightCC=0;
+int LightCC2=0;
+int LightCWifi=0;
+int LightCWifi2=0;
+int sending_waiter;
+int GetWifiS=0;
 /*-----------------------------------------------------------------------*/
 /* 设置单片机的模式和时钟                                                */
 /*-----------------------------------------------------------------------*/
@@ -74,6 +76,12 @@ void init_led(void)
  	SIU.PCR[72].R = 0x0203; /* PE8 */
 	SIU.PCR[73].R = 0x0203;	/* PE9  */	
 
+	//借用MOTOR
+ 	SIU.PCR[65].R = 0x0203;	/* PB0  */
+  	SIU.PCR[66].R = 0x0203; /* PB1 */
+ 	SIU.PCR[69].R = 0x0203; /* PE8 */
+	SIU.PCR[70].R = 0x0203;	/* PE9  */	
+
 	//第二版板载LED
 	SIU.PCR[12].R = 0x0203;/* PA12  */
 	SIU.PCR[13].R = 0x0203;/* PA13  */
@@ -91,9 +99,12 @@ void init_led(void)
 
 //车灯全亮
 	LeftL = 1;	/* 0=熄灭 */
-	RightL = 1;
-	StopL = 0;
-	RunL = 0;
+	YellowL_main = 1;
+	GreenL_main = 1;
+	RedL_main = 1;
+	YellowL_main2 = 1;
+	GreenL_main2 = 1;
+	RedL_main2 = 1;
 }
 
 
@@ -140,20 +151,6 @@ void initEMIOS_0MotorAndSteer(void)
 	EMIOS_0.CH[16].CADR.R = 2000;	/* 设置周期200us 5KHZ */
 	EMIOS_0.CH[16].CCR.B.MODE = 0x50;	/* Modulus Counter Buffered (MCB) */
 	EMIOS_0.CH[16].CCR.B.BSL = 0x3;	/* Use internal counter */
-	 /* 前进输出 OPWMB PE5 输出0-2000 */
-	EMIOS_0.CH[18].CCR.B.BSL = 0x1;	/* Use counter bus D (default) */
-	EMIOS_0.CH[18].CCR.B.MODE = 0x60;	/* Mode is OPWM Buffered */
-	EMIOS_0.CH[18].CCR.B.EDPOL = 1;	/* Polarity-leading edge sets output/trailing clears*/
-	EMIOS_0.CH[18].CADR.R = 0;	/* Leading edge when channel counter bus= */
-	EMIOS_0.CH[18].CBDR.R = 0;	/* Trailing edge when channel counter bus= */
-	SIU.PCR[66].R = 0x0600;	/*[11:10]选择AFx 此处AF1 /* MPC56xxS: Assign EMIOS_0 ch 21 to pad */
-	/* 前进输出 OPWMB PE6 输出0-2000 */
-	EMIOS_0.CH[20].CCR.B.BSL = 0x1;
-	EMIOS_0.CH[20].CCR.B.MODE = 0x60;
-	EMIOS_0.CH[20].CCR.B.EDPOL = 1;
-	EMIOS_0.CH[20].CADR.R = 0;
-	EMIOS_0.CH[20].CBDR.R = 0;
-	SIU.PCR[68].R = 0x0600;
     /* 前进输出 OPWMB PE5 输出0-2000 */
 	EMIOS_0.CH[21].CCR.B.BSL = 0x1;	/* Use counter bus D (default) */
 	EMIOS_0.CH[21].CCR.B.MODE = 0x60;	/* Mode is OPWM Buffered */
@@ -181,7 +178,7 @@ void initEMIOS_0MotorAndSteer(void)
 	EMIOS_0.CH[9].CCR.B.MODE = 0x60;	/* Mode is OPWM Buffered */  
     EMIOS_0.CH[9].CCR.B.EDPOL = 1;	/* Polarity-leading edge sets output/trailing clears*/
 	EMIOS_0.CH[9].CADR.R = 1;	/* Leading edge when channel counter bus=250*/
-//	EMIOS_0.CH[9].CBDR.R = data_steer_helm_basement.center;	/* Trailing edge when channel counter bus=500*/
+	EMIOS_0.CH[9].CBDR.R = data_steer_helm_basement.center;	/* Trailing edge when channel counter bus=500*/
 	SIU.PCR[9].R = 0x0600;	/* [11:10]选择AFx 此处AF1 /* MPC56xxS: Assign EMIOS_0 ch 21 to pad */
 #if 0
 	/* 信号舵机 PWM PA12 输出0-50000 */
@@ -310,13 +307,6 @@ void delay_ms(DWORD ms)
 	for (i = 0; i < ms; i++)
 	{
 		delay_us(1000);
-
-	//	if(RFID_site_data.is_new_site && (RFID_site_data.roadnum>>0)==0x2302)//2号库停车卡
-	//	{
-	//		set_speed_pwm(0);
-	//		Car_Stop=1;
-	//		break;
-	//	}
 	}
 }
 
@@ -332,18 +322,16 @@ void init_all_and_POST(void)
 	
 	disable_watchdog();
 	init_modes_and_clock();
-	initEMIOS_0MotorAndSteer();
-	initEMIOS_0Image();/* 摄像头输入中断初始化 */
+	//initEMIOS_0MotorAndSteer();
+	//initEMIOS_0Image();/* 摄像头输入中断初始化 */
 	
 	/* 初始化SPI总线 */
 	init_DSPI_1();
-	init_pit();
-	delay_ms(5);
-	init_pit_1s_L();
+//	init_pit();
 	init_led();
 	init_DIP();
 	init_serial_port_1();//Wifi_ouyang
-	init_serial_port_2();//rfid_ouyang
+	//init_serial_port_2();//rfid_ouyang
 	init_serial_port_0();
 	//init_ADC();
 	//init_serial_port_3();
@@ -361,6 +349,7 @@ void init_all_and_POST(void)
 	//init_I2C();
 	init_choose_mode();
 	
+	
 	/* 初始化SPI总线 */
 	//init_DSPI_1();
 	
@@ -369,13 +358,13 @@ void init_all_and_POST(void)
 
 	/* 初始化显示屏 */
 	initLCD();
-
+	init_pit_1s_L();
 	//LCD_DISPLAY();
 	LCD_Fill(0xFF);	/* 亮屏 */
 	delay_ms(50);
 	LCD_Fill(0x00);	/* 黑屏 */
 	delay_ms(50);
-#if 1	
+#if 0	
 	/* 初始化TF卡 */
 
 	LCD_P8x16Str(0,0, (BYTE*)"TF..");
@@ -419,9 +408,7 @@ void init_all_and_POST(void)
 	{
 		suicide();
 	}
-	device_Num_change();
 	/* 开启RFID读卡器主动模式 */
-#if 1//ouyang
 	if (!init_RFID_modul_type())
 	{
 		g_devices_init_status.RFIDCard_energetic_mode_enable_is_OK = 1;
@@ -436,7 +423,7 @@ void init_all_and_POST(void)
 	delay_ms(1000);
 	/* 换屏 */
 	LCD_Fill(0x00);
-#endif
+
 
 
 	/* 读取舵机参数 */
@@ -466,6 +453,7 @@ void init_all_and_POST(void)
 
 	/* 换屏 */
 	LCD_Fill(0x00);
+
 	/* 速度闭环测试 */	
 	g_f_enable_speed_control = 1;
 	LCD_P8x16Str(0, 4, (BYTE*)"S.T=0");
@@ -474,9 +462,6 @@ void init_all_and_POST(void)
 	
 	/* 换屏 */
 	LCD_Fill(0x00);
-	RunL=0;
-	StopL=0;
-	RightL = 1;
 #endif
 
 }
@@ -491,60 +476,56 @@ void suicide(void)
 {
 	while (1) { }
 }
-
-
 void init_pit_1s_L(void)
 {
 	/* NOTE:  DIVIDER FROM SYSCLK TO PIT ASSUMES DEFAULT DIVIDE BY 1 */
 	PIT.PITMCR.R = 0x00000001;	/* Enable PIT and configure timers to stop in debug modem */
-	PIT.CH[2].LDVAL.R = 800000;	/* 800000==10ms */
-	PIT.CH[2].TCTRL.R = 0x00000003;	/* Enable PIT1 interrupt and make PIT active to count */
-	INTC_InstallINTCInterruptHandler(Pit_1s_L,61,4);	/* PIT 1 interrupt vector with priority 1 */
+	PIT.CH[1].LDVAL.R = 800000;	/* 800000==10ms */
+	PIT.CH[1].TCTRL.R = 0x00000003;	/* Enable PIT1 interrupt and make PIT active to count */
+	INTC_InstallINTCInterruptHandler(Pit_1s_L,60,1);	/* PIT 1 interrupt vector with priority 1 */
 }
-void Pit_1s_L(void)//10ms
+void Pit_1s_L(void)
 {
-	static int time_counter;
-	time_counter++;
-	Lcounter++;
-	LightCounter++;
-	if(LightCounter==5)
+//	Lcounter++;
+//	Lcounter_2++;
+	if(LightCWifi==1)
 	{
-		LightCounter=0;
-		Flash_Light=1;
+		Lcounter++;
 	}
-	if(Lcounter==80)
+	if(Lcounter==100)
 	{
 		Lcounter=0;
-		WIFICHEKER=1;
+		LightCC=1;
+		LightCWifi=0;
 	}
-	if(Lcounter==10)
+	if(LightCWifi2==1)
 	{
-		sending_waiter++;    //用来发送完等待一段时间
+		Lcounter_2++;
 	}
-	if(time_counter==1000)
+	if(Lcounter_2==400)
 	{
-		time_counter=0;
-	    sending_test=1;
+		Lcounter_2=0;
+		LightCC2=1;
+		LightCWifi2=0;
 	}
-	if(Door_Status==1)
-	{
-		DoorC++;
-	}
-	if(DoorC==300)
-	{
-		Door_Status=0;
-		Door_Stop=1;
-		DoorC=0;
-	}
-	if(Car_Waitfororder==0)
-	{
-		Light_Ctrl();
-	}
-	PIT.CH[2].TFLG.B.TIF = 1;	// MPC56xxB/P/S: Clear PIT 1 flag by writing 1
+//	if(Lcounter==100)
+//	{
+//		Lcounter=0;
+//		LightCC=1;
+//
+//	}
+//	if(Lcounter_2==80)
+//	{
+//		Lcounter_2=0;
+//		LightCWifi=1;
+//	}
+//	if(Lcounter_2==5)
+//	{
+//		sending_waiter++;    //用来发送完等待一段时间
+//	}
+	
+	PIT.CH[1].TFLG.B.TIF = 1;	// MPC56xxB/P/S: Clear PIT 1 flag by writing 1
 }
-
-
-
 
 
 

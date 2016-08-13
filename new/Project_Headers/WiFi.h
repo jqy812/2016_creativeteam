@@ -67,7 +67,7 @@
 #define WIFI_NET_CMD_CAR_REPORT_CACHE_SITE (0x0002)	/* 车报告缓存的位置 即最近一次读到的位置 */
 
 
-#define REMOTE_FRAME_LENGTH (10)                  /* 改为10*/
+#define REMOTE_FRAME_LENGTH (32)
 #define REMOTE_FRAME_STATE_OK (1)
 #define REMOTE_FRAME_STATE_NOK (0)
 
@@ -75,12 +75,10 @@
 #define ANDROID_ADDRESS (3)
 
 #define WIFI_ADDRESS_WITHOUT_INIT (0)	/* 警车1 漂移 */
-#define WIFI_ADDRESS_CAR_1 (1)	/* 路虎*/
-#define WIFI_ADDRESS_CAR_2 (2)	/* 宝马x6*/
-#define WIFI_ADDRESS_CAR_3 (3)	/* 宝马i8 */
+#define WIFI_ADDRESS_CAR_1 (1)	/* 警车1 漂移 */
+#define WIFI_ADDRESS_CAR_2 (2)	/* 警车2 */
+#define WIFI_ADDRESS_CAR_3 (3)	/* 匪车1 */
 #define WIFI_ADDRESS_CAR_4 (4)	/* 匪车2 */
-#define WIFI_ADDRESS_CAR_7 (7)	/* 7号车*/
-#define WIFI_ADDRESS_CAR_8 (8)	/* 8号车*/
 #define WIFI_ADDRESS_DRAWBRIDGE (5)	/* 吊桥 */
 #define WIFI_ADDRESS_DRAHTBRIDGE (6)	/* 钢丝桥 */
 #define WIFI_ADDRESS_PC (7)	/* PC上位机 */
@@ -95,18 +93,11 @@ extern BYTE remote_frame_data[];
 extern int g_remote_frame_state;
 extern BYTE g_device_NO;
 extern int g_start_all;
-extern int sending_waiter;
-extern int have_responsed;
-extern int order_received;
-extern WORD response_data;
-extern int Car_Waitfororder;
 extern int Light_Status;
-extern BYTE waiting_for_response;
-extern BYTE g_device_NO_Hex;/* 设备号 即WiFi地址 */
-extern BYTE des;
-extern WORD cmd_WIFI;
-extern WORD sending_data;
-
+extern int Emergency_Mode;
+extern int have_responsed;
+extern int sending_waiter;
+extern int order_received;
 /* 远程控制标志位 */
 #ifdef __WIFI_C_
 struct
@@ -147,22 +138,10 @@ extern int rev_remote_frame_2(BYTE rev);
 extern void generate_remote_frame_2(BYTE scr, BYTE des, WORD cmd, BYTE length, const BYTE data[]);
 extern void send_remote_request_data(void);
 void send_net_cmd(BYTE des, WORD net_cmd);
-extern void rfid_ask_road(BYTE scr, BYTE des, BYTE length,	WORD cmd ,WORD RFID_Num);
+void rfid_ask_road(BYTE scr, BYTE des, BYTE length, DWORD RFID_Num);
 void report_online(void);
+extern void Wifi_Ctrl();
 
-extern void main_wifi_sender (void);
-extern void ancillary_wifi_sender (void);
-extern void Wifi_Ctrl(void);
-extern void wifi_sender_checker (void);
-extern void sending_service_package ( BYTE toward, WORD cmd, WORD data);
 
-extern struct
-{
-	BYTE scr;
-	BYTE des;
-	BYTE length;
-	WORD cmd;
-	WORD RFID_Num;
-} Temp_Send_Data;
+
 #endif
-

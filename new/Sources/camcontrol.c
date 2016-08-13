@@ -23,13 +23,8 @@ unsigned int Counter_Error=0;		//光编接触不牢靠错误计数量
 ////********************起始线停车参数******************************************
 byte stop_flag=0;
 byte stop_delay=0;
+	
 
-//********************2016赛季参数******************************************
-extern int velocity;
-extern int right;
-int js=0;
-int min_a=8888;
-int min_b=8888;
 //*****************************************************************************************************************
 //************************************************角度控制************************************************    	  *
 //*****************************************************************************************************************
@@ -38,8 +33,8 @@ void SteerControl()
 	//*1***********出错图像角度控制,输出为前三次平均值**************
 	if(RoadType==NoLine||RoadType==Wrong) {
 		Steer_PWM[3]=(Steer_PWM[2]+Steer_PWM[1])/2;
-	//	set_steer_helm_basement(Steer_PWM[3]);
-		set_steer_helm(Steer_PWM[3]);
+		set_steer_helm_basement(Steer_PWM[3]);
+		//set_steer_helm(Steer_PWM[3]);
 		//存舵机值
 		Steer_PWM[0]=Steer_PWM[1];Steer_PWM[1]=Steer_PWM[2];Steer_PWM[2]=Steer_PWM[3];
 		return;
@@ -47,20 +42,16 @@ void SteerControl()
 	//最低速
 //	if(Slope==1)					{Steer_kp=10;Steer_kd=5;}
 //	else if(Slope==2)				{Steer_kp=8;Steer_kd=5;}
-
-
-if(g_device_NO==7)                   //7号车PID参数       jqy
-{
+#if 0
 	if(ABS(target_offset)<6) 	{Steer_kp=5;Steer_kd=5;}
-	else if(ABS(target_offset)<26)  {Steer_kp=7.4+target_offset*target_offset/100;Steer_kd=10;}
-	else {Steer_kp=8.8+target_offset*target_offset/500;Steer_kd=5;}
-}
-if(g_device_NO==8)                   //8号车PID参数       jqy
-{
-	if(ABS(target_offset)<6) 	{Steer_kp=8;Steer_kd=5;}
-	else if(ABS(target_offset)<26)  {Steer_kp=14.4+target_offset*target_offset/100;Steer_kd=10;}
-	else {Steer_kp=16.8+target_offset*target_offset/500;Steer_kd=5;}
-}
+	else if(ABS(target_offset)<26)  {Steer_kp=15.2+target_offset*target_offset/100;Steer_kd=10;}
+	else {Steer_kp=15.8+target_offset*target_offset/500;Steer_kd=5;}
+#endif
+#if 1
+	if(ABS(target_offset)<6) 	{Steer_kp=6;Steer_kd=5;}
+	else if(ABS(target_offset)<26)  {Steer_kp=15.8+target_offset*target_offset/100;Steer_kd=10;}
+	else {Steer_kp=16.2+target_offset*target_offset/500;Steer_kd=5;}
+#endif
 #if 0
 	if(ABS(target_offset)<5) 		{Steer_kp=5;Steer_kd=5;}
 			else if(ABS(target_offset)<10)  {Steer_kp=5;Steer_kd=5;}
@@ -69,11 +60,17 @@ if(g_device_NO==8)                   //8号车PID参数       jqy
 			else if(ABS(target_offset)<40)  {Steer_kp=12;Steer_kd=5;}
 			else							{Steer_kp=12;Steer_kd=5;}
 #endif
-//	Steer_PWM[3]=data_steer_helm_basement.center+Steer_kp*target_offset+Steer_kd*(target_offset-last_offset);//位置式PD
-	Steer_PWM[3]=data_steer_helm_basement.center-(Steer_kp*target_offset+Steer_kd*(target_offset-last_offset));//位置式PD
+//	Steer_PWM[3]=Steer_kp*target_offset+Steer_kd*(target_offset-last_offset);
+	Steer_PWM[3]=data_steer_helm_basement.center+Steer_kp*target_offset+Steer_kd*(target_offset-last_offset);//位置式PD
+	//if(ABS(Steer_PWM[3]-Steer_PWM[2])>250) Steer_PWM[3]=(Steer_PWM[2]+Steer_PWM[1])/2;
+	//感觉不太靠谱，调的不好
+	
 	//舵机限值+舵机输出
-//	set_speed_pwm(velocity);
+//	set_steer_helm(Steer_PWM[3]);
+//	LCD_Write_Num(105,5,(int)Steer_PWM[3],4);
+	set_speed_pwm(500);
 	set_steer_helm_basement(Steer_PWM[3]);
+//	EMIOS_0.CH[9].CBDR.R = Steer_PWM[3];
 	LCD_Write_Num(105,5,(int)Steer_PWM[3],4);
 	//存舵机值和offset值
 	Steer_PWM[0]=Steer_PWM[1];Steer_PWM[1]=Steer_PWM[2];Steer_PWM[2]=Steer_PWM[3];

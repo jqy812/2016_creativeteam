@@ -4,367 +4,194 @@ WORD helm_use=0;
 int16_t motor_use=0;
 int direction;
 BYTE haha;
-short high2;
-short low2;
-short high3;
-short low3;
-short device_number2;
-short data_number;
 int supersonic_on_off=1;
 int biaoji=0;
 int jishu=0;
-int zhangai=1;
+int jia=0;
 int i;
 int j;
-extern int bz;
-extern int right;
-int velocity;
+int LichtZahl=0;
+int Light_success=1;
+int TestLight=0;
 BYTE video_sender;
-extern int Hold_a;
-extern int Hold_b;
+
+BYTE waiting_for_response=0;
+int  lost_data=0;
+BYTE prepared_data_for_ancillary;
 
 void Mode0_DebugCamera(void);
+void Lightcontrol(void);
+void Light_wifi(BYTE LightCon);
 void Mode1_SendVideo(void);
 void Mode2_GO(void);
 void Mode3_Andriod(void);
 
+void main_wifi_sender (BYTE data_input);
+void ancillary_wifi_sender (BYTE data_input2);
+void wifi_sender_checker(void);
+void wifi_receive_checker (void);
 void main(void)
 {
 	init_all_and_POST();
-	if(mode==0)
-		Mode0_DebugCamera();//图像显示屏显示，车速20，显示offset RoadType，舵机打角，wifi_car_action不激活
-	else if(mode==1)
-		Mode1_SendVideo();//推车录图像，仅摄像头图像发上位机
-	else if(mode==2)
-		Mode2_GO();//速度20，WIFI读卡循迹超声全开，图像不显示不发送
-	else if(mode==3)
-		Mode3_Andriod();//远程模式，上位机遥控车
-}
-void Mode0_DebugCamera(void)
-{
-	
+	LCD_Fill(0x00);			
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
-	g_f_enable_speed_control=1;
-	if(g_device_NO==7)
-	{   
-		Car_Waitfororder=1; /////////////////////////
-		velocity=60;
-		Start_one();
-	}
-	if(g_device_NO==8)
-	{
-		velocity=16;
-	}
-	for (;;)
+	Lightcontrol();
+}
+
+
+
+void Lightcontrol(void)
+{
+	RedL_main=1;
+	YellowL_main=0;
+	GreenL_main=0;
+	RedL_main2=1;
+	YellowL_main2=0;
+	GreenL_main2=0;
+	for(;;)
 	{
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
 			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
 			Wifi_Ctrl();
+			//rfid_ask_road(0x05, 0x33, 0x04, 0x00000000);//device_05
 		}
-		control_car_action();
-		if(fieldover==1&&Car_Stop==0&&zhangai==1&&Car_Waitfororder==0)
+		if(Emergency_Mode==0 || mode==3)
 		{
-			fieldover=0; 	
-			set_speed_target(velocity); 
-			FindBlackLine();              //寻迹处理                        jqy     
-			CenterLineWithVideo();        //摄像头数据处理              jqy     
-	     	Video_Show();                 //显示屏显示                     jqy
-	     	Typejudge();                  //赛道避障类型判断         jqy
-			if(target_offset<0)           //显示偏差值及赛道类型      jqy
-				LCD_write_english_string(96,1,"-");
-			else LCD_write_english_string(96,1,"+");
-			LCD_Write_Num(105,1,ABS(target_offset),2);
-			LCD_Write_Num(105,2,RoadType,2);
-			LCD_Write_Num(105,6,bz,2);
-		//	LCD_Write_Num(105,6,data_encoder.is_forward,4);
-		//	LCD_Write_Num(105,7,data_encoder.speed_now,4);
-			SteerControl();          //舵机控制              jqy
-			if(Hold_a==1 && Hold_b==1)
+			if(Light_Status==0)//红灯
 			{
-				set_speed_target(0);
-				Car_Waitfororder=1;
+				if(GreenL_main==1)
+				{
+					YellowL_main=1;				
+					RedL_main=0;				
+					GreenL_main=0;
+					LightCWifi=1;
+				}
+				if(LightCC==1)
+				{
+					LightCC=0;
+					YellowL_main=0;
+					GreenL_main=0;
+					RedL_main=1;
+					GreenL_main2=1;
+					YellowL_main2=0;
+					RedL_main2=0;
+					LightCWifi2=1;
+				}
 			}
-			EMIOS_0.CH[3].CSR.B.FLAG = 1;
-			EMIOS_0.CH[3].CCR.B.FEN=1;
-		}
-			zhangai_run();                          //避障参数
-	}
-}
-
-void Mode1_SendVideo(void)
-{
-	//SetupCCD();	
-	g_f_enable_speed_control = 0;
-	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
-
-	for (;;)
-	{
-
-		if(fieldover)
-		{
-			fieldover=0;
-			FindBlackLine();
-		//	Send_CCD_Video();
-			
-			EMIOS_0.CH[3].CSR.B.FLAG = 1;
-			EMIOS_0.CH[3].CCR.B.FEN=1;
-		}
-		
-	}
-
-}
-
-void Mode2_GO(void)
-{
-	//set_steer_helm_basement(3800);
-	set_speed_pwm(240);
-	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
-
-#if 0
-	for (;;)
-	{
-		trigger_supersonic_0();
-        get_supersonic_time_0();
-	    trigger_supersonic_2();
-		get_supersonic_time_2();
-#if 0
-		if((ABS((WORD)(tmp_time.R))/100)<100)
-		{
-			trigger_supersonic_2();
-			get_supersonic_time_2();
-			LCD_Write_Num(96,6,(ABS((WORD)(tmp_time.R))/100),5);
-			set_speed_pwm(0);
-		}
-#endif
-		if((ABS((WORD)(tmp_time2.R))/100)<70 && (ABS((WORD)(tmp_time.R))/100)<100)
-			jishu++;
-		else if((ABS((WORD)(tmp_time2.R))/100)>70 && (ABS((WORD)(tmp_time.R))/100)>100)
-			jishu=0;
-		if((ABS((WORD)(tmp_time2.R))/100)<270 && (ABS((WORD)(tmp_time.R))/100)<270)
-		{
-			biaoji++;
-			trigger_supersonic_0();
-			get_supersonic_time_0();
-			trigger_supersonic_2();
-			get_supersonic_time_2();
-			LCD_Write_Num(96,6,(ABS((WORD)(tmp_time2.R))/100),5);
-			LCD_Write_Num(96,5,(ABS((WORD)(tmp_time.R))/100),5);
-		}
-		else if((ABS((WORD)(tmp_time2.R))/100)>270 && (ABS((WORD)(tmp_time.R))/100)>270)
-		{
-			biaoji=0;
-			trigger_supersonic_0();
-			get_supersonic_time_0();
-			trigger_supersonic_2();
-			get_supersonic_time_2();
-			LCD_Write_Num(96,6,(ABS((WORD)(tmp_time2.R))/100),5);
-			LCD_Write_Num(96,5,(ABS((WORD)(tmp_time.R))/100),5);
-		}
-
-	//	else if((ABS((WORD)(tmp_time.R))/100)<100)
-	//	{
-	//		set_speed_pwm(0);
-	//		delay_ms(3000);
-	//	}
-		if(biaoji>=300)
-		{
-		//	trigger_supersonic_0();
-		//	get_supersonic_time_0();
-		//	trigger_supersonic_2();
-		//	get_supersonic_time_2();
-		//	LCD_Write_Num(96,6,(ABS((WORD)(tmp_time.R))/100),5);	
-			//for (i = 0; i < 500; i++)
-			//	{
-				//	for (j = 0; j < 9; j++)
-				///	{			
-						set_steer_helm_basement(4800);
-						set_speed_pwm(210);
-						delay_ms(1000);
-					//	trigger_supersonic_2();
-					//	get_supersonic_time_2();
-					//	LCD_Write_Num(96,6,(ABS((WORD)(tmp_time.R))/100),5);
-					//}
-			//	}
-			//for (i = 0; i < 500; i++)
-				//{
-				//	for (j = 0; j < 9; j++)
-				//	{			
-						set_steer_helm_basement(2700);
-						set_speed_pwm(320);
-						delay_ms(1300);
-					//	trigger_supersonic_2();
-					//	get_supersonic_time_2();
-					//	LCD_Write_Num(96,6,(ABS((WORD)(tmp_time.R))/100),5);
-				//	}
-				//}
-			set_steer_helm_basement(STEER_HELM_CENTER);
-			set_speed_pwm(240);
-		//	delay_ms(2000);//////////////
-			biaoji=0;
-			jishu=0;
-			//jishu++;
-			//LCD_Write_Num(0,0,(ABS((WORD)(jishu))/100),5);
-			//biaoji=0;
-		//	set_speed_pwm(0); ////////////////
-			//suicide();////////////
-		}
-		trigger_supersonic_0();
-		get_supersonic_time_0();
-		trigger_supersonic_2();
-		get_supersonic_time_2();
-		if(jishu>=100)
-		{
-			set_speed_pwm(0);
-			suicide();
-		}
-	}
-#endif
-
-	for (;;)
-	{
-	    trigger_supersonic_2();
-		get_supersonic_time_2();
-		if((ABS((WORD)(tmp_time2.R))/100)<270)
-		{
-			biaoji++;
-			trigger_supersonic_2();
-			get_supersonic_time_2();
-			LCD_Write_Num(96,6,(ABS((WORD)(tmp_time2.R))/100),5);
-		}
-		else if((ABS((WORD)(tmp_time2.R))/100)>270)
-		{
-			biaoji=0;
-			trigger_supersonic_2();
-			get_supersonic_time_2();
-			LCD_Write_Num(96,6,(ABS((WORD)(tmp_time2.R))/100),5);
-		}
-		if(biaoji>=300)
-		{	
-			set_steer_helm_basement(4800);
-			set_speed_pwm(210);
-			delay_ms(1000);
-			set_steer_helm_basement(2700);
-			set_speed_pwm(210);
-			delay_ms(1300);
-			set_steer_helm_basement(STEER_HELM_CENTER);
-			set_speed_pwm(240);
-			biaoji=0;
-		}
-		EMIOS_0.CH[3].CSR.B.FLAG = 1;
-		EMIOS_0.CH[3].CCR.B.FEN=1;
-	}
-
-	
-#if 0
-		if(biaoji==0)
-		{
-			while((jishu-jia)>0)
+			if(LightCC2==1)
 			{
-				for (i = 0; i < 10; i++)
-				{
-					for (j = 0; j < 9; j++)
-					{			
-						set_steer_helm_basement(2802);
-						set_speed_pwm(300);
-						trigger_supersonic_2();
-						get_supersonic_time_2();
-						LCD_Write_Num(96,6,(ABS((WORD)(tmp_time.R))/100),5);
-					}
-				}
-				jishu--;
+				LightCC2=0;
+				GreenL_main2=0;
+				YellowL_main2=1;
+				RedL_main2=0;
 			}
-			biaoji=1;
-			
+			if(Light_Status==1)//绿灯
+			{
+				GreenL_main=1;
+				YellowL_main=0;
+				RedL_main=0;
+				GreenL_main2=0;
+				YellowL_main2=0;
+				RedL_main2=1;
+			}
 		}
-#endif
-		LCD_Fill(0x00);
-for (;;)
-{
-		//set_speed_pwm(300);
-	//	set_steer_helm_basement(3875);
-		/* 执行远程命令 */
-		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
+		if(Emergency_Mode==1 && mode==1)
 		{
-			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
-			
-			execute_remote_cmd(remote_frame_data+5);
+			RedL_main=1;
+			RedL_main2=1;
+			GreenL_main=0;
+			GreenL_main2=0;
+			YellowL_main=0;
+			YellowL_main2=0;
 		}
-
-		/* 整车动作控制 */
-		//control_car_action();
-		//fieldover=1;//尝试
-		if(fieldover)
-		{
-			fieldover=0;
-			
-			FindBlackLine();
-		//	if(g_f_red==1&&g_f_stopline==1)
-		//	{
-				//set_speed_target(0);
-			//	set_speed_pwm(0);
-			//	D6=~D6;
-			//}
-			//else
-				set_speed_pwm(300);
-				//set_speed_target(20);
-			Display_Video();
-
-
-
-						if(target_offset<0)
-							LCD_write_english_string(96,1,"-");
-						else LCD_write_english_string(96,1,"+");
-						LCD_Write_Num(105,1,ABS(target_offset),2);
-						LCD_Write_Num(105,2,RoadType,2);
-			SteerControl();
-			
-			EMIOS_0.CH[3].CSR.B.FLAG = 1;
-			EMIOS_0.CH[3].CCR.B.FEN=1;
-		}
-}
+	}
 }
 
-void Mode3_Andriod(void)
+
+
+//*********************************************************************************
+//  主发送程序                 输入： 发送所需的数据      输出： 1 串口发送      2  waiting位     3 串口发送备份给备发送程序    4 发送丢失数
+//*********************************************************************************
+void main_wifi_sender (BYTE data_input)
+{  
+//	***********如果依然在等待回复，放弃上一个发送的等待，并且lostdata数加一***************
+	if (waiting_for_response==1)
+	{
+	   lost_data++;
+	   waiting_for_response=0;
+	}
+//	***********发送函数主体***************	                                    
+	if(data_input==0x0A)				
+		
+//		    rfid_ask_road(0xDD, 0x33, 0x04, 0x00DD000A);
+		rfid_ask_road(0x33, 0xEE, 0x04, 0x0001000A);
+
+	if(data_input==0x0B)
+//			rfid_ask_road(0xDD, 0x33, 0x04, 0x00DD000B);
+		rfid_ask_road(0x33, 0xEE, 0x04, 0x0001000B);
+//  ***********把发送数据交给辅助发送程序*************** 
+	prepared_data_for_ancillary=data_input;
+//  ***********等待回复位置1*************** 
+	waiting_for_response=1;
+	have_responsed=0;  
+	sending_waiter=0;
+}
+
+
+
+
+//*********************************************************************************
+//  辅助发送程序                 输入： 如果未应答，再发送数据      输出：  串口发送    
+//*********************************************************************************
+void ancillary_wifi_sender (BYTE data_input2)
+{                                      
+	if(data_input2==0x0A)				
+		
+	//	    rfid_ask_road(0xDD, 0x33, 0x04, 0x00DD000A);
+		rfid_ask_road(0x33, 0xEE, 0x04, 0x0001000A);
+
+	if(data_input2==0x0B)
+			//rfid_ask_road(0xDD, 0x33, 0x04, 0x00DD000B);
+		rfid_ask_road(0x33, 0xEE, 0x04, 0x0001000B);
+}
+
+
+
+//*********************************************************************************
+//  应答检查程序               定时检查发送的数据是否得到了应答，若未，则使用辅助发送程序再次发送。 直到收到应答或有新的程序要发数据。
+//*********************************************************************************
+void wifi_sender_checker (void)
+{ 
+	if (sending_waiter<1)
+	{
+		return;
+	}
+	else
+	{
+		if (waiting_for_response==1)
+		{
+			if (have_responsed==1)
+			{
+				waiting_for_response=0;
+			}
+			else if (have_responsed==0)
+			{
+				ancillary_wifi_sender (prepared_data_for_ancillary);
+			}
+		}
+	}
+}
+
+
+//*********************************************************************************
+//  收数据检查程序              如果受到了非应答的程序（即实打实的命令），回复收到
+//*********************************************************************************
+void wifi_receive_checker (void)
 {
-	for(;;)
-    {
-		
-#if 1
-			LCD_PrintoutInt(0, 0, (int)Light_Status);
-			
-			high2=((WORD)(remote_frame_data[5])<<8);
-			low2=(WORD)(remote_frame_data[6]);
-			device_number2=(high2|low2);
-			LCD_PrintoutInt(0, 4, (int)device_number2);
-		
-			high3=((WORD)(remote_frame_data[7])<<8);
-			low3=(WORD)(remote_frame_data[8]);
-			data_number=(high3|low3);
-			LCD_PrintoutInt(0, 6, (int)data_number);
-			
-			
-			if ( device_number2==1)
-				{
-					set_steer_helm_basement(data_number);
-				}
-			else if (device_number2==5)
-				{
-					set_speed_pwm(data_number);
-				}
-	   }
-#endif
-//		if(sending_test==1)          
-//		{
-//			sending_test=0;
-//			sending_service_package(0x33,0x0001,0x000a);// BYTE 目标地址 WORD 命令字 WORD 数据字
-//		}
-//		
-//		if(WIFICHEKER==1)            // 有一个时间间隔为了 保证在没有收到的时候不会发疯一样发
-//		{
-//			WIFICHEKER=0;
-//			wifi_sender_checker();//每次检查一次是否收到回复  注意：子函数在被设计为发送完一定时间内不会工作，防止对方还没回答这里不停发
-//		}
-//    }
-	
+	if (order_received == 1)
+	{
+		order_received=0;
+		rfid_ask_road(0xDD, 0x33, 0x04, 0x00000000);
+	}
 }

@@ -7,10 +7,11 @@
 
 extern FATFS fatfs1;
 extern int mode;
-extern int WIFICHEKER;
-extern int Flash_Light;
-extern int DoorC;
-extern int sending_test;
+extern int LightCC;
+extern int LightCC2;
+extern int LightCWifi;
+extern int LightCWifi2;
+extern int GetWifiS;
 
 /* 设备初始化状态 */
 #ifdef __INIT_C_
@@ -56,8 +57,7 @@ extern void delay_us(DWORD us);
 extern void delay_ms(DWORD ms);
 extern void init_all_and_POST(void);
 extern void suicide(void);
-void init_pit_1s_L(void);
-void Pit_1s_L(void);
-
+extern void init_pit_1s_L(void);
+extern void Pit_1s_L(void);
 
 #endif

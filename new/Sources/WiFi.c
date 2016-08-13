@@ -5,29 +5,15 @@
 int g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
 int g_remote_frame_cnt = 0;
 int g_start_all=0;
-int have_responsed;
-int order_received; 
-WORD response_data=0x0;
-int Car_Waitfororder=0;
-int Light_Status=0;//默认红灯
-int Traffic_Jam=0;//默认畅通
-int End=0;
+int Light_Status=0;
+int Emergency_Mode=0;
 BYTE remote_frame_data[REMOTE_FRAME_LENGTH];
 BYTE remote_frame_data_send[REMOTE_FRAME_LENGTH];
-BYTE g_device_NO = WIFI_ADDRESS_CAR_1;
-BYTE g_device_NO_Hex;/* 设备号 即WiFi地址 */
-BYTE des;
-WORD cmd_WIFI;
-WORD sending_data;
-BYTE waiting_for_response=0;
-int  lost_data=0;
-extern int place[4];
-extern int used;
-extern int Emergency;
-extern int Polizei;
-extern int Hold_a;
-extern int Hold_b;
-extern int bz;
+BYTE g_device_NO = WIFI_ADDRESS_CAR_1;	/* 设备号 即WiFi地址 */
+int have_responsed;
+int order_received;
+
+
 /*-----------------------------------------------------------------------*/
 /* 执行远程命令                                                          */
 /*-----------------------------------------------------------------------*/
@@ -113,6 +99,7 @@ void execute_remote_cmd(const BYTE *data)
 	}
 }
 
+
 /*-----------------------------------------------------------------------*/
 /* 接受远程数据帧                                                        */
 /* 第二版                                                                */
@@ -178,7 +165,7 @@ int rev_remote_frame_2(BYTE rev)
 			g_remote_frame_cnt = 0;
 			g_remote_frame_state = REMOTE_FRAME_STATE_OK;	//CheckSum Success
 		}
-	}
+	}	
 	return g_remote_frame_state;
 }
 
@@ -290,27 +277,22 @@ void send_remote_request_data(void)
 	}
 	*/
 }
-#if 0
-void rfid_ask_road(BYTE scr, BYTE des, BYTE length,	WORD cmd ,WORD RFID_Num)
-{ 
-	WORD i = 0,j = 0;
-    byte num_1=0x00,num_2=0x00,num_3=0x00, num_4=0x00;//ou
+void rfid_ask_road(BYTE scr, BYTE des, BYTE length, DWORD RFID_Num)
+{
+	WORD i = 0, j = 0;
+	byte num_1=0x00,num_2=0x00,num_3=0x00, num_4=0x00;//ou
 	byte check;
 	int num_temp=0x00000000;
-	Temp_Send_Data.scr=scr;
-	Temp_Send_Data.des=des;
-	Temp_Send_Data.length=length;
-	Temp_Send_Data.cmd=cmd;
-	Temp_Send_Data.RFID_Num=RFID_Num;
 	remote_frame_data_send[i++] = 0xAA;
 	remote_frame_data_send[i++] = 0xBB;
 	remote_frame_data_send[i++] = scr;
 	remote_frame_data_send[i++] = des;
 	remote_frame_data_send[i++] = length;
+	//ou_取16进制数
 	num_temp=0xFF;
-	num_1=(byte)((cmd>>8)&num_temp);
+	num_1=(byte)((RFID_Num>>24)&num_temp);
 	remote_frame_data_send[i++] = num_1 ;
-	num_2=(byte)(cmd&num_temp);
+	num_2=(byte)((RFID_Num>>16)&num_temp);
 	remote_frame_data_send[i++] = num_2 ;
 	num_3=(byte)((RFID_Num>>8)&num_temp);
 	remote_frame_data_send[i++] = num_3 ;
@@ -324,139 +306,23 @@ void rfid_ask_road(BYTE scr, BYTE des, BYTE length,	WORD cmd ,WORD RFID_Num)
 	remote_frame_data_send[i++] = check;
 	serial_port_0_TX_array(remote_frame_data_send, 10);//ouyang
 }
-#endif 
-// 以下部分非必须程序，用于2016赛季应答机制//
-//*********************************************************************************
-//  打包程序 ，用来使程序可读性更好
-//*********************************************************************************
-void sending_service_package (BYTE toward, WORD cmd, WORD data)
-{  
-	des=toward;
-	cmd_WIFI=cmd;
-	sending_data=data;
-	main_wifi_sender();
-}
-
-//*********************************************************************************
-//  主发送程序                 输入： 发送所需的数据      输出： 1 串口发送      2  waiting位     3 串口发送备份给备发送程序    4 发送丢失数
-//*********************************************************************************
-void main_wifi_sender (void)
-{  
-
-//	***********如果依然在等待回复，放弃上一个发送的等待，并且lostdata数加一***************
-	if (waiting_for_response==1)
-	{
-	   lost_data++;
-	   waiting_for_response=0;
-	}
-//	***********发送函数主体***************	                                    
-	generate_remote_frame_2(g_device_NO_Hex, des, cmd_WIFI, 2, (const BYTE *)(&sending_data));
-//  ***********等待回复位置1*************** 
-	waiting_for_response=1;
-	have_responsed=0;  
-	sending_waiter=0;
-}
-
-//*********************************************************************************
-//  应答检查程序               定时检查发送的数据是否得到了应答，若未，则使用辅助发送程序再次发送。 直到收到应答或有新的程序要发数据。
-//*********************************************************************************
-void wifi_sender_checker (void)
-{ 
-	if (sending_waiter<5)
-	{
-		return;
-	}
-	else
-	{
-		if (waiting_for_response==1)
-		{
-			if (have_responsed==1)
-			{
-				waiting_for_response=0;
-			}
-			else if (have_responsed==0)
-			{
-				ancillary_wifi_sender ();
-			}
-		}
-	}
-}
-//*********************************************************************************
-//  辅助发送程序                 输入： 如果未应答，再发送数据      输出：  串口发送    
-//*********************************************************************************
-void ancillary_wifi_sender (void)
-{                                      		    
-	generate_remote_frame_2(g_device_NO_Hex, des, cmd_WIFI, 2, (const BYTE *)(&sending_data));
-}
 void Wifi_Ctrl()
 {
 	if(remote_frame_data[2] == 0x33 )//熊老板上位机
 	{
-		if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x66)
-		{
-			order_received =1;
-			Car_Waitfororder=0;
-		}
-		if (remote_frame_data[3] == g_device_NO_Hex && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)   
-		{	
-			have_responsed=1;	
-		}// 检查是否得到应答 
-		if (remote_frame_data[3] == 0x03 && remote_frame_data[5]==0x99 && remote_frame_data[6]==0x01)   
-		{	
-			End=1;	
-		}// 第一幕终止 
 		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01)   
 		{
-			order_received =1;
 			if(remote_frame_data[8]==0x0A)
 				Light_Status=0;	
 			if(remote_frame_data[8]==0x0B)
 				Light_Status=1;	
 		}// 红绿灯状态
-		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x88 && remote_frame_data[8]==0x88)   
+		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0xD1)   
 		{
-			order_received =1;
-			Traffic_Jam=1;
-		}// 拥堵状态	
-		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x2A && remote_frame_data[8]==0x2A)   
-		{
-			order_received =1;
-			Emergency=1;
-		}// 紧急状态	
-		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x2B && remote_frame_data[8]==0x2B)   
-		{
-			order_received =1;
-			Emergency=0;
-		}// 紧急状态	解除		
-		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x07 && remote_frame_data[6]==0x08)   
-		{
-			order_received =1;
-			Polizei=1;
-			Car_Waitfororder=0;
-		}// 警匪追逐开始	
+			if(remote_frame_data[7]==0x00 && remote_frame_data[8]==0xD1)
+				Emergency_Mode=1;//打开紧急模式	
+			if(remote_frame_data[7]==0x00 && remote_frame_data[8]==0xD0)
+				Emergency_Mode=0;	
+		}
 	}	
-	if(remote_frame_data[2] == 0x01 && g_device_NO==7)
-	{
-		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x07 && remote_frame_data[6]==0x11)   
-		{
-			order_received =1;
-			bz=711;
-		}// 接客状态	
-	}
-	if(remote_frame_data[2] == 0x03 && g_device_NO!=7)
-	{
-		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xAA && remote_frame_data[6]==0xAA)   
-		{
-			order_received =1;
-			Hold_a=1;
-		}// 接客状态	
-		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xBB && remote_frame_data[6]==0xBB)   
-		{
-			order_received =1;
-			Hold_a=0;
-			Car_Waitfororder=0;
-		}// 接客状态	解除
-	}
 }
-
-

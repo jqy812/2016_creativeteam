@@ -6,11 +6,7 @@
  */
 
 #include "includes.h"
-//2016赛季 参数定义
-extern int bz;
-extern int jishu;
-extern int zhangai;
-extern int up;
+
 //找线变量定义
 signed char BlackLine[2][ROWS];	  //左右线的数组
 byte StartRow[2];       	  //线的起点
@@ -313,20 +309,10 @@ void FindBlackLine(void)
 	//DetectSlope();					//检测坡道
 	AnalyzeRoadType();				//分析赛道类型	
 	CenterLineFill();				//中线补线
-	if(g_device_NO==7)           //7号车中线偏移参数       jqy
-	{
-		for(i=RoadEnd;i<RoadStart/2-10;i++)
-			CenterLine[i]=(CenterLine[i]+3);
-		for(i=RoadStart/2-10;i<=RoadStart;i++)
-			CenterLine[i]=(CenterLine[i]+7);
-	}
-	if(g_device_NO==8)           //7号车中线偏移参数       jqy
-	{
-		for(i=RoadEnd;i<RoadStart/2-10;i++)
-			CenterLine[i]=(CenterLine[i]+5);
-		for(i=RoadStart/2-10;i<=RoadStart;i++)
-			CenterLine[i]=(CenterLine[i]+11);
-	}
+#if 0
+	for(i=RoadEnd;i<=RoadStart;++i)
+		CenterLine[i]=(CenterLine[i]+15);
+#endif
 	TargetOffset();					//目标控制量
 }
 
@@ -1994,7 +1980,7 @@ void AnalyzeRoadType()
 ***************************************************/
 byte JudgeBarrier()
 {
-	signed char i,m,n,o,p,gg,cc;
+	signed char i,m,n;
 	byte Flag1=0;//控制语句辅助标志位
 	byte Flag2=0;//控制语句辅助标志位
 	byte Flag3=0;//控制语句辅助标志位
@@ -2182,75 +2168,10 @@ byte JudgeBarrier()
 			D1=0;
 		}
 	}
-	o=0;
-	p=0;
-#if 1           //道路类型66  判断方法      jqy
-	for(i=ROW;i>=0;i--)
-	{
-		for(n=20;n<COLUMN-1;n++)
-		{
-			if(g_pix[i][n-1]!=0 && g_pix[i][n]==0)
-			{
-				break;
-			}			
-		}
-		BlackLine[1][i]=n;
-	}
-#endif
-#if 1
-	while(BlackLine[1][o]==COLUMN-1)
-	{
-		BlackLine[1][o]=0;
-		o++;
-	}
-//	gg=0;
-//	if(o<14)
-//		o=14;
-//	BlackLine[1][o-5]=0;BlackLine[1][o-4]=0;BlackLine[1][o-3]=0;BlackLine[1][o-2]=0;BlackLine[1][o-1]=0;
-	for(i=o;i<ROW;i++)
-	{
-	    if(BlackLine[1][i-3]>BlackLine[1][i])
-	    {
-	    	if(p==0)
-	    		gg=i;
-	    	p++;
-	    }
-	    if(BlackLine[1][i]>BlackLine[1][i-3] && p>2)
-	    	if(i-gg>8)
-	        {
-	    	    p=100;
-	    	    break;
-	        }
-	}
-	if(p==100)
-		RoadType=66;
 
-	cc=0;
-	for(i=ROW;i>=12;i--)          //道路类型88  判断方法      jqy
-	{
-		gg=0;
-		for(n=0;n<COLUMN-1;n++)
-			if(g_pix[i][n]!=0)		
-				gg++;
-		if(g_pix[i][gg-1]!=0 && g_pix[i][gg]==0)
-			gg=0;
-		if(gg<25 && gg>5)
-		{
-			cc++;
-			LCD_Write_Num(105,3,gg,4);
-		}
-	}
-	if(cc>8)
-		RoadType=88;
-#endif
-//	LCD_Write_Num(105,3,p,3);
 	if((RoadType==Barrier1)||(RoadType==Barrier2))
 		return 1;
-	else if(RoadType==66)
-		return 1;
-	else if(RoadType==88)
-		return 1;
-	else	
+	else
 		return 0;	
 }
 
@@ -2820,95 +2741,4 @@ void NearOffset()
 		}
 	}
 	target_offset/=sum_weight;
-}
-
-void Typejudge()
-{
-	if(RoadType==66)      //道路类型66，表示单车道障碍    jqy
-		jishu++;
-	if(jishu>=2 && bz==1)   //bz位为1时，进行超车    jqy
-	{
-		zhangai=0;
-		jishu=0;
-	}
-	if(jishu>=1 && bz==0)   //bz位为0时，进行避障停车   jqy
-	{
-		zhangai=0;
-		jishu=0;
-	}
-	if(RoadType==88 && bz==2 && g_device_NO==1)    //道路类型88，表示双车道障碍，需掉头绕行    jqy
-	{
-	//	delay_ms(300);
-		set_speed_pwm(-800);
-		delay_ms(70);
-		set_speed_pwm(0);
-		jishu=0;
-		Car_Stop=1;
-		while(Car_Stop==1)
-		{
-			if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
-			{
-				g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
-				Wifi_Ctrl();
-			}
-			if(order_received==1)
-			{
-				order_received=0;
-				generate_remote_frame_2(g_device_NO_Hex, 0x33, 0x0000, 2, (const BYTE *)(&response_data));
-			}
-			FindBlackLine();
-			CenterLineWithVideo(); 
-			Video_Show();
-			LCD_Write_Num(105,2,RoadType,2);
-			control_car_action();
-			EMIOS_0.CH[3].CSR.B.FLAG = 1;
-			EMIOS_0.CH[3].CCR.B.FEN=1;
-		}
-		zhangai=1;
-		bz=-1;
-#if 0
-		set_speed_pwm(0);
-		delay_ms(2000);
-		set_steer_helm_basement(data_steer_helm_basement.left_limit);
-		set_speed_pwm(320);
-		delay_ms(1600);/////
-		set_speed_pwm(0);
-		set_steer_helm_basement(data_steer_helm_basement.right_limit);
-		delay_ms(1000);
-		set_speed_pwm(-320);
-		delay_ms(1200);/////
-		set_speed_pwm(0);
-		set_steer_helm_basement(data_steer_helm_basement.left_limit);
-		delay_ms(1000);
-		set_speed_pwm(320);
-		delay_ms(1500);
-		bz=5;/////
-#endif
-	}
-	if(RoadType==88 && bz==2 && g_device_NO==2)    //道路类型88，表示双车道障碍，需掉头绕行    jqy
-	{
-		sending_service_package(0x33,0x0088,0x00);
-		set_speed_pwm(-500);
-		delay_ms(50);
-		set_speed_pwm(0);
-		delay_ms(2000);
-		set_speed_pwm(-320);
-		delay_ms(1000);
-		set_speed_pwm(0);
-		delay_ms(1500);
-		set_steer_helm_basement(data_steer_helm_basement.left_limit);
-		set_speed_pwm(320);
-		delay_ms(1200);/////
-		set_speed_pwm(0);
-		set_steer_helm_basement(data_steer_helm_basement.right_limit);
-		delay_ms(1000);
-		set_speed_pwm(-320);
-		delay_ms(800);/////
-		set_speed_pwm(0);
-		set_steer_helm_basement(data_steer_helm_basement.left_limit);
-		delay_ms(1000);
-		set_speed_pwm(320);
-		delay_ms(1300);/////
-		bz=5;
-	}
 }
