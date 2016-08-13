@@ -74,7 +74,7 @@ void Car_UTurn();
 void set_car_direction(SBYTE act);
 //******************************2016赛季****************************************//
 void zhangai_run();
-
+void Start_one();
 
 extern void WiFi_control_car_1_action(WORD cmd);
 extern void WiFi_control_car_2_action(WORD cmd);

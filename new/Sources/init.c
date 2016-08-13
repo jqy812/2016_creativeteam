@@ -93,7 +93,7 @@ void init_led(void)
 	LeftL = 1;	/* 0=熄灭 */
 	RightL = 1;
 	StopL = 1;
-	RunL = 1;
+	RunL = 1;//能吸起来
 	Mag = 1;//haha
 }
 
@@ -118,7 +118,7 @@ void init_pit(void)
 	PIT.PITMCR.R = 0x00000001;	/* Enable PIT and configure timers to stop in debug modem */
 	PIT.CH[1].LDVAL.R = 800000;	/* 800000==10ms */
 	PIT.CH[1].TCTRL.R = 0x00000003;	/* Enable PIT1 interrupt and make PIT active to count */
-	INTC_InstallINTCInterruptHandler(PitISR,60,1);	/* PIT 1 interrupt vector with priority 1 */
+	INTC_InstallINTCInterruptHandler(PitISR,60,2);	/* PIT 1 interrupt vector with priority 1 */
 }
 
 
@@ -319,8 +319,6 @@ void delay_ms(DWORD ms)
 	for (i = 0; i < ms; i++)
 	{
 		delay_us(1000);
-//		if(RFID_site_data.is_new_site && (RFID_site_data.roadnum>>8)==0x11)//读到红绿灯卡强制停止delay
-//			break;
 	}
 }
 
@@ -518,7 +516,7 @@ void init_pit_1s_L(void)
 	PIT.PITMCR.R = 0x00000001;	/* Enable PIT and configure timers to stop in debug modem */
 	PIT.CH[2].LDVAL.R = 800000;	/* 800000==10ms */
 	PIT.CH[2].TCTRL.R = 0x00000003;	/* Enable PIT1 interrupt and make PIT active to count */
-	INTC_InstallINTCInterruptHandler(Pit_1s_L,61,4);	/* PIT 1 interrupt vector with priority 1 */
+	INTC_InstallINTCInterruptHandler(Pit_1s_L,61,1);	/* PIT 1 interrupt vector with priority 1 */
 }
 void Pit_1s_L(void)//10ms
 {
@@ -553,7 +551,8 @@ void Pit_1s_L(void)//10ms
 	if(WarnC==100)
 	{
 		WarnC=0;
-		StopL=~StopL;
+		if(Car_Waitfororder!=1)
+			StopL=~StopL;
 	}
 	PIT.CH[2].TFLG.B.TIF = 1;	// MPC56xxB/P/S: Clear PIT 1 flag by writing 1
 }

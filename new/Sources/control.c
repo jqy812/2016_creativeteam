@@ -14,7 +14,7 @@ int counter=0;
 int hangdata=0;
 int speed_pwm_tp;
 DWORD tmp_a, tmp_b;
-
+int delay_count=0;
 
 /*-----------------------------------------------------------------------*/
 /* 舵机初始化 	                                                                      */
@@ -50,7 +50,16 @@ void PitISR(void)
 		//SpeedControl();//不同路段PID,尚未调,不可用
 		contorl_speed_encoder_pid();
 	}
-	
+	//光编记步
+	if (data_encoder.is_forward)
+	{
+		data_encoder.speed_real =(SWORD) data_encoder.speed_now;
+	}
+	else
+	{
+		data_encoder.speed_real = 0 - (SWORD) data_encoder.speed_now;
+	}
+	delay_count+=data_encoder.speed_real;
 	
 #if 0
 	/* 发送位置 */
@@ -426,10 +435,7 @@ void Hang_Up()
 {
 	EMIOS_0.CH[10].CBDR.R = 7000;
 	delay_ms(1000);
-	LeftL=~LeftL;
-	RunL=~RunL;
-	RightL=~RightL;
-	for(hangdata=7000;hangdata>=2000;hangdata=hangdata-1000)
+	for(hangdata=7000;hangdata>=3000;hangdata=hangdata-1000)
 	{
 		EMIOS_0.CH[10].CBDR.R = hangdata;
 		delay_ms(500);

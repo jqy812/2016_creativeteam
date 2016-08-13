@@ -151,7 +151,7 @@ extern void main_wifi_sender (void);
 extern void ancillary_wifi_sender (void);
 extern void wifi_sender_checker (void);
 extern void sending_service_package ( BYTE toward, WORD cmd, WORD data);
-
+extern void Wifi_Ctrl(void);
 extern struct
 {
 	BYTE scr;

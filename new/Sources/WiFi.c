@@ -173,57 +173,6 @@ int rev_remote_frame_2(BYTE rev)
 			g_remote_frame_state = REMOTE_FRAME_STATE_OK;	//CheckSum Success
 		}
 	}
-	if(remote_frame_data[2] == 0x33 )//熊老板上位机发出
-	{
-		if (remote_frame_data[3] == g_device_NO_Hex && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)   
-		{	
-			have_responsed=1;	
-		}// 检查是否得到应答 
-		if (remote_frame_data[3] == 0xEE )   
-		{
-			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01)// 红绿灯状态
-			{
-				order_received =1;
-				if(remote_frame_data[8]==0x0A)
-					Light_Status=0;	//红灯
-				if(remote_frame_data[8]==0x0B)
-					Light_Status=1;	//绿灯
-			}
-			if(remote_frame_data[5]==0xBB && remote_frame_data[6]==0x00)
-			{
-				Traffic_Jam=1;//出现拥堵
-			}
-			if(remote_frame_data[5]==0x33)
-			{
-				set_speed_KP(remote_frame_data[6]);
-				set_speed_KI(remote_frame_data[7]);
-				set_speed_KD(remote_frame_data[8]);
-			}
-		}
-	}
-	
-	if(remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex)//天少发过来
-	{
-		if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x66)//约车成功
-		{
-			Car_Waitfororder=0;
-			sending_service_package(0x44,0x0000,0xAAAA);
-		}
-		if ( remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)
-			have_responsed=1;	// 检查天少是否回答 
-		if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x0B)
-			Door_Open=1;	//天少远程开门
-		if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCB)
-			Door_Close=1;
-		if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01) 
-			Car_Stop=0;//天少开车
-		if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCC) 
-			Door_Close_Run=1;//关门并开车
-	}
-	high2=((WORD)(remote_frame_data[5])<<8);
-	low2=(WORD)(remote_frame_data[6]);
-	remote_frame_data[5]=0x00;
-//	remote_frame_data[6]=0x00;//每次读完把cmd位置0，不置0每次都会有冲突）
 	return g_remote_frame_state;
 }
 
@@ -395,7 +344,7 @@ void main_wifi_sender (void)
 	   waiting_for_response=0;
 	}
 //	***********发送函数主体***************	                                    
-	generate_remote_frame_2(g_device_NO_Hex, des, cmd_WIFI, 2, (const BYTE *)(&sending_data));
+	generate_remote_frame_2(g_device_NO, des, cmd_WIFI, 2, (const BYTE *)(&sending_data));
 //  ***********等待回复位置1*************** 
 	waiting_for_response=1;
 	have_responsed=0;  
@@ -431,8 +380,57 @@ void wifi_sender_checker (void)
 //*********************************************************************************
 void ancillary_wifi_sender (void)
 {                                      		    
-	generate_remote_frame_2(g_device_NO_Hex, des, cmd_WIFI, 2, (const BYTE *)(&sending_data));
+	generate_remote_frame_2(g_device_NO, des, cmd_WIFI, 2, (const BYTE *)(&sending_data));
 }
-
+void Wifi_Ctrl()
+{
+	if(remote_frame_data[2] == 0x33 )//熊老板上位机发出
+		{
+			if (remote_frame_data[3] == g_device_NO_Hex && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)   
+			{	
+				have_responsed=1;	
+			}// 检查是否得到应答 
+			if (remote_frame_data[3] == 0xEE )   
+			{
+				if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01)// 红绿灯状态
+				{
+					order_received =1;
+					if(remote_frame_data[8]==0x0A)
+						Light_Status=0;	//红灯
+					if(remote_frame_data[8]==0x0B)
+						Light_Status=1;	//绿灯
+				}
+				if(remote_frame_data[5]==0xBB && remote_frame_data[6]==0x00)
+				{
+					Traffic_Jam=1;//出现拥堵
+				}
+				if(remote_frame_data[5]==0x33)
+				{
+					set_speed_KP(remote_frame_data[6]);
+					set_speed_KI(remote_frame_data[7]);
+					set_speed_KD(remote_frame_data[8]);
+				}
+			}
+			if (remote_frame_data[3] == 0x04 && remote_frame_data[5]==0x44 && remote_frame_data[6]==0x44)
+			{
+				Car_Waitfororder=0;
+			}
+		}
+		
+		if(remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex)//天少发过来
+		{
+			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x66)//约车成功
+			{
+				Car_Waitfororder=0;
+				sending_service_package(0x44,0x0000,0xAAAA);
+			}
+			if ( remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)
+				have_responsed=1;	// 检查天少是否回答 
+			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01) 
+				Car_Stop=0;//天少开车
+		}
+		high2=((WORD)(remote_frame_data[5])<<8);
+		low2=(WORD)(remote_frame_data[6]);
+}
 
 

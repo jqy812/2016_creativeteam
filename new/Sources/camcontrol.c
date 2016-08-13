@@ -26,7 +26,7 @@ byte stop_delay=0;
 
 //********************2016赛季参数******************************************
 extern int velocity;
-
+extern int bz;
 //*****************************************************************************************************************
 //************************************************角度控制************************************************    	  *
 //*****************************************************************************************************************
@@ -45,32 +45,11 @@ void SteerControl()
 //	if(Slope==1)					{Steer_kp=10;Steer_kd=5;}
 //	else if(Slope==2)				{Steer_kp=8;Steer_kd=5;}
 
-	
-if(g_device_NO==3)         //3号车PID参数       jqy
-{
-	if(ABS(target_offset)<6) 	{Steer_kp=5;Steer_kd=5;}
-	else if(ABS(target_offset)<26)  {Steer_kp=7.2+target_offset*target_offset/100;Steer_kd=10;}
-	else {Steer_kp=10.8+target_offset*target_offset/500;Steer_kd=5;}
-}
-
-if(g_device_NO==2)         //2号车PID参数       jqy
-{
-	if(ABS(target_offset)<6) 	{Steer_kp=5;Steer_kd=5;}
-	else if(ABS(target_offset)<26)  {Steer_kp=18.2+target_offset*target_offset/100;Steer_kd=10;}
-	else {Steer_kp=20.8+target_offset*target_offset/500;Steer_kd=5;}
-}
-
 if(g_device_NO==4)                   //4号车PID参数       jqy
 {
 	if(ABS(target_offset)<6) 	{Steer_kp=6;Steer_kd=5;}
 	else if(ABS(target_offset)<26)  {Steer_kp=28.6+target_offset*target_offset/100;Steer_kd=10;}
 	else {Steer_kp=30.2+target_offset*target_offset/500;Steer_kd=5;}
-}
-if(g_device_NO==1)                   //1号车PID参数       jqy
-{
-	if(ABS(target_offset)<6) 	{Steer_kp=6;Steer_kd=5;}
-	else if(ABS(target_offset)<26)  {Steer_kp=15.8+target_offset*target_offset/100;Steer_kd=10;}
-	else {Steer_kp=16.2+target_offset*target_offset/500;Steer_kd=5;}
 }
 #if 0
 	if(ABS(target_offset)<5) 		{Steer_kp=5;Steer_kd=5;}
@@ -81,7 +60,10 @@ if(g_device_NO==1)                   //1号车PID参数       jqy
 			else							{Steer_kp=12;Steer_kd=5;}
 #endif
 //	Steer_PWM[3]=Steer_kp*target_offset+Steer_kd*(target_offset-last_offset);
-	Steer_PWM[3]=data_steer_helm_basement.center+Steer_kp*target_offset+Steer_kd*(target_offset-last_offset);//位置式PD
+//	if(bz==6)
+//		Steer_PWM[3]=data_steer_helm_basement.center-1.1*(Steer_kp*target_offset+Steer_kd*(target_offset-last_offset));//位置式PD
+//	else
+	    Steer_PWM[3]=data_steer_helm_basement.center+Steer_kp*target_offset+Steer_kd*(target_offset-last_offset);//位置式PD
 	//if(ABS(Steer_PWM[3]-Steer_PWM[2])>250) Steer_PWM[3]=(Steer_PWM[2]+Steer_PWM[1])/2;
 	//感觉不太靠谱，调的不好
 	
