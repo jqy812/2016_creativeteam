@@ -31,6 +31,7 @@ void init_serial_port_0(void)
 	DIV_M=LFDIV整数部分
 	DIV_F=LFDIV小数部分*16  */ 	
 //#ifndef PERIPH_SET_1_CLK_16M	//80M
+	
 	LINFLEX_0.LINFBRR.B.DIV_F = 6;		//38400:64M-104+3
 	LINFLEX_0.LINIBRR.B.DIV_M= 17;  //115200	//波特率设置38400:80M-130+3 57600:80M-86+13 115200:80M-43+6  9600:80M-520+13
    
@@ -102,6 +103,7 @@ void init_serial_port_1(void)
 //#else
     LINFLEX_1.LINFBRR.B.DIV_F = 1;
     LINFLEX_1.LINIBRR.B.DIV_M= 26; //38400
+
 //#endif
 
     LINFLEX_1.UARTCR.B.UART=1;
@@ -242,8 +244,9 @@ void init_serial_port_2(void)
 	LINFLEX_2.LINIBRR.B.DIV_M= 520;
     LINFLEX_2.LINFBRR.B.DIV_F = 83;
 #else
-    LINFLEX_2.LINFBRR.B.DIV_F = 1;
+	LINFLEX_2.LINFBRR.B.DIV_F = 1;
 	LINFLEX_2.LINIBRR.B.DIV_M= 52;
+
 #endif
     LINFLEX_2.UARTCR.B.UART=1;
 	LINFLEX_2.UARTCR.R=0x00000033;
@@ -304,6 +307,7 @@ void init_serial_port_3(void)
 #else
     LINFLEX_3.LINFBRR.B.DIV_F = 3;
 	LINFLEX_3.LINIBRR.B.DIV_M= 104;
+	
 #endif
     LINFLEX_3.UARTCR.B.UART=1;
 	LINFLEX_3.UARTCR.R=0x00000033;

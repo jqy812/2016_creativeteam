@@ -408,8 +408,6 @@ void set_door_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 	}
 	else if (speed_pwm<0)	//backward
 	{
-		StopL = 1;
-		RunL = 0;
 		speed_pwm = 0-speed_pwm;
 		if (speed_pwm>SPEED_PWM_MAX)
 		{
@@ -420,8 +418,6 @@ void set_door_pwm(int16_t speed_pwm)	//speed_pwm正为向前，负为向后
 	}
 	else
 	{
-		StopL = 1;
-		RunL = 0;
 		EMIOS_0.CH[18].CBDR.R = 1;
 		EMIOS_0.CH[20].CBDR.R = 1;	
 	}

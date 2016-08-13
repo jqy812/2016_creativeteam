@@ -249,11 +249,13 @@ void RFID_control_car_1_action(WORD site)
 		delay_ms(50);
 		set_speed_pwm(0);
 		set_steer_helm_basement(data_steer_helm_basement.right_limit);
-		delay_ms(1400);
+		delay_ms(1380);
 		sending_service_package(0x44,0xCCDD,0x0001);
-		set_speed_pwm(-320);
+		set_speed_pwm(-400);
 		Game_over=1;
-		delay_ms(1600);
+		delay_ms(1400);
+		set_speed_pwm(500);
+		delay_ms(50);
 		set_speed_pwm(0);
 		sending_service_package(0x44,0xAABB,0x0001);
 		set_steer_helm_basement(data_steer_helm_basement.center);
@@ -261,6 +263,12 @@ void RFID_control_car_1_action(WORD site)
 		set_speed_pwm(0);
 		Car_Waitfororder=1;
 		Car_Stop=1;
+		delay_ms(1000);
+		sending_service_package(0xEE,0x0711,0x0);
+		delay_ms(500);
+		sending_service_package(0xEE,0x0711,0x0);
+		delay_ms(500);
+		sending_service_package(0xEE,0x0711,0x0);	
 #endif
 	}
 #endif
@@ -289,16 +297,16 @@ void RFID_control_car_1_action(WORD site)
 		fieldover=1;
 	}
 #endif
-	if((site>>8)==0x26)//进入停车场
-	{
-		delay_ms(100);
-		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.29+data_steer_helm_basement.center);
-		delay_ms(600);
-	}
+//	if((site>>8)==0x26)//进入停车场
+//	{
+//		delay_ms(100);
+//		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.29+data_steer_helm_basement.center);
+//		delay_ms(600);
+//	}
 	if((site>>8)==0x31)
 	{
 		up=1;
-		velocity=800;
+		velocity=930;
 		set_speed_pwm(velocity);
 		fieldover=1;
 	}
@@ -323,15 +331,15 @@ void RFID_control_car_1_action(WORD site)
 	}
 	if((site>>0)==0x3001)
 	{
-		delay_ms(200);
+		delay_ms(300);
 		velocity=200;
 		set_speed_pwm(velocity);
 		fieldover=1;
 	}
-	if((site>>0)==0x8009)
-	{
-		bz=1;
-	}
+//	if((site>>0)==0x8009)
+//	{
+//		bz=1;
+//	}
 	if((site>>0)==0x1101 || (site>>0)==0x1102)
 	{
 		bz=-1;
@@ -414,7 +422,7 @@ void RFID_control_car_2_action(DWORD site)
 		if(Light_Status==0)
 		{
 			set_steer_helm_basement(data_steer_helm_basement.center);
-			delay_ms(1200);//1350
+			delay_ms(1300);//1350
 			set_steer_helm_basement(data_steer_helm_basement.left_limit);
 			delay_ms(800);//900
 		}
@@ -445,7 +453,6 @@ void RFID_control_car_2_action(DWORD site)
 		delay_ms(100);
 		set_steer_helm_basement(data_steer_helm_basement.left_limit);
 		delay_ms(1000);
-		//bz=-bz;
 		fieldover=1;
 		RFID_site_data.is_new_site = 0;
 	}
@@ -463,13 +470,13 @@ void RFID_control_car_2_action(DWORD site)
 		if(bz==99)
 		{
 			sending_service_package(0x44,0xCCDD,0x0001);
-			set_speed_pwm(250);
-			set_steer_helm_basement(data_steer_helm_basement.center-(data_steer_helm_basement.center-data_steer_helm_basement.left_limit)*0.94);
-			delay_ms(650);
+			set_speed_pwm(225);
+			set_steer_helm_basement(data_steer_helm_basement.center-(data_steer_helm_basement.center-data_steer_helm_basement.left_limit)*1);
+			delay_ms(640);
 			sending_service_package(0x44,0xCCDD,0x0001);
 			set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.96+data_steer_helm_basement.center);
 			Game_over=1;
-			delay_ms(470);
+			delay_ms(570);
 			set_steer_helm_basement(data_steer_helm_basement.center);
 			set_speed_pwm(0);
 			LCD_Fill(0x00);
@@ -483,50 +490,60 @@ void RFID_control_car_2_action(DWORD site)
 
 	if((site>>0)==0x3003)//改变PID算法
 	{
-		delay_ms(200);
+		delay_ms(550);
 		set_steer_helm_basement(data_steer_helm_basement.right_limit);
-		delay_ms(1050);
+		delay_ms(850);
 	}
 	if((site>>8)==0x26)//进入停车场
 	{
-		delay_ms(100);
-		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.4+data_steer_helm_basement.center);
+		set_speed_pwm(250);
+		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.42+data_steer_helm_basement.center);
 		delay_ms(1000);
 		bz=99;
 	}
-	if((site>>0)==0x8007)
-	{
-		while(Emergency==1)
-		{
-			set_speed_pwm(0);
-			if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
-			{
-				g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
-				Wifi_Ctrl();
-			}
-			if(order_received==1)
-			{
-				order_received=0;
-				generate_remote_frame_2(g_device_NO_Hex, 0x33, 0x0000, 2, (const BYTE *)(&response_data));
-			}
-		}
-		set_speed_pwm(velocity);
-	}
-//	if((site>>0)==0x8009)
+//	if((site>>0)==0x8007)
 //	{
-//		bz=1;
+//		while(Emergency==1)
+//		{
+//			set_speed_pwm(0);
+//			if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
+//			{
+//				g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
+//				Wifi_Ctrl();
+//			}
+//			if(order_received==1)
+//			{
+//				order_received=0;
+//				generate_remote_frame_2(g_device_NO_Hex, 0x33, 0x0000, 2, (const BYTE *)(&response_data));
+//			}
+//		}
+//		set_speed_pwm(velocity);
 //	}
-	if((site>>0)==0x1101 || (site>>0)==0x1102)
+	if((site>>0)==0x8009)
 	{
-		bz=-1;
-	}
-//	if((site>>0)==0x8001)
-//	{
-//		bz=2;
-//	}
-	if((site>>0)==0x1105)
-	{
-		bz=-1;
+	//	delay_ms(200);
+		set_speed_pwm(-500);
+		delay_ms(50);
+		set_speed_pwm(0);
+		delay_ms(2000);
+		set_speed_pwm(-320);
+		delay_ms(1000);
+		set_speed_pwm(0);
+		delay_ms(1500);
+		set_steer_helm_basement(data_steer_helm_basement.left_limit);
+		set_speed_pwm(320);
+		delay_ms(1200);/////
+		set_speed_pwm(0);
+		set_steer_helm_basement(data_steer_helm_basement.right_limit);
+		delay_ms(1000);
+		set_speed_pwm(-320);
+		delay_ms(800);/////
+		set_speed_pwm(0);
+		set_steer_helm_basement(data_steer_helm_basement.left_limit);
+		delay_ms(1000);
+		set_speed_pwm(320);
+		delay_ms(1150);/////
+		bz=5;
 	}
 }
 /*-----------------------------------------------------------------------*/
@@ -536,7 +553,7 @@ void RFID_control_car_2_action(DWORD site)
 /*-----------------------------------------------------------------------*/
 void RFID_control_car_3_action(DWORD site)
 {
-	if((site>>8)!=0x25 && (site>>8)!=0x40 && (site>>8)!=0x23)
+	if((site>>8)!=0x25 && (site>>8)!=0x40 && (site>>8)!=0x23 && (site>>8)!=0x11 && (site>>8)!=0x12 && (site>>0)!=0x8014)
 		sending_service_package(0x33,0x00CD,site);
 	current_place=0;
 	if(place[1]==2)
@@ -551,48 +568,83 @@ void RFID_control_car_3_action(DWORD site)
 		current_place=2;
 	if(place[3]==1)
 		current_place=3;
-	if((site>>0)==0x1105 && (current_place==1 || current_place==2))//在红绿灯路口1
+	if((site>>0)==0x1105)//在1号路口
 	{
-		Road_No=1;
-		if(Light_Status==0)
+		if((current_place==1 || current_place==2))
 		{
-			set_speed_pwm(-800);
-			delay_ms(80);
-			Car_Stop=1;
-			LCD_Fill(0x00);
-			set_speed_pwm(0);
-			Leftturn=1;
+			sending_service_package(0x33,0x00DC,0x01BB);
+			Road_No=1;
+			if(Light_Status==0)
+			{
+				set_speed_pwm(-800);
+				delay_ms(80);
+				Car_Stop=1;
+				LCD_Fill(0x00);
+				set_speed_pwm(0);
+			}
+//			if(Light_Status==1)
+//			{
+//				set_steer_helm_basement(data_steer_helm_basement.center);
+//				delay_ms(800);
+//				set_steer_helm_basement(data_steer_helm_basement.left_limit);////////
+//				delay_ms(800);
+//			}
 		}
-		if(Light_Status==1)
+		else
 		{
-			delay_ms(650);
-			set_steer_helm_basement(data_steer_helm_basement.left_limit);////////
-			delay_ms(800);
+			sending_service_package(0x33,0x00DC,0x01AA);
+			Road_No=1;
+			if(Light_Status==0)
+			{
+				set_speed_pwm(-800);
+				delay_ms(80);
+				Car_Stop=1;
+				LCD_Fill(0x00);
+				set_speed_pwm(0);
+			}
 		}
 	}
-	else if((site>>0)==0x1101 && current_place==1)
+	else if((site>>0)==0x1101)//在3号路口
 	{
-		Road_No=1;
-		if(Light_Status==0)
+		if(current_place==1)
 		{
-			set_speed_pwm(-800);
-			delay_ms(80);
-			Car_Stop=1;
-			LCD_Fill(0x00);
-			set_speed_pwm(0);
-			Leftturn=1;
+			sending_service_package(0x33,0x00DC,0x03BB);
+			Road_No=1;
+			if(Light_Status==0)
+			{
+				set_speed_pwm(-800);
+				delay_ms(80);
+				Car_Stop=1;
+				LCD_Fill(0x00);
+				set_speed_pwm(0);
+				Leftturn=1;
+			}
+			if(Light_Status==1)
+			{
+				delay_ms(550);
+				set_steer_helm_basement(data_steer_helm_basement.left_limit);////////
+				delay_ms(1050);
+				set_steer_helm_basement(data_steer_helm_basement.center);
+				delay_ms(500);
+			}
 		}
-		if(Light_Status==1)
+		else
 		{
-			delay_ms(550);
-			set_steer_helm_basement(data_steer_helm_basement.left_limit);////////
-			delay_ms(1050);
-			set_steer_helm_basement(data_steer_helm_basement.center);
-			delay_ms(500);
+			sending_service_package(0x33,0x00DC,0x03AA);
+			Road_No=1;
+			if(Light_Status==0)
+			{
+				set_speed_pwm(-800);
+				delay_ms(80);
+				Car_Stop=1;
+				LCD_Fill(0x00);
+				set_speed_pwm(0);
+			}
 		}
 	}
-	else if((site>>0)==0x1106)
+	else if((site>>0)==0x1106)//在2号路口
 	{
+		sending_service_package(0x33,0x00DC,0x02CC);
 		Road_No=1;
 		if(Light_Status==0)
 		{
@@ -622,6 +674,15 @@ void RFID_control_car_3_action(DWORD site)
 			set_speed_pwm(0);
 		}
 	}
+	if((site>>0)==0x8014)//在1号路口
+	{
+		set_speed_pwm(320);
+		if((current_place==1 || current_place==2))
+		{
+			set_steer_helm_basement(data_steer_helm_basement.left_limit);////////
+			delay_ms(1700);
+		}
+	}
 	if((site>>0)==0x1201)
 	{
 		Road_No=2;
@@ -629,13 +690,15 @@ void RFID_control_car_3_action(DWORD site)
 		{
 			if(current_place==2 || current_place==0 || current_place==1)
 			{
+				sending_service_package(0x33,0x00DC,0x05BB);
 				set_steer_helm_basement(data_steer_helm_basement.center);
-				delay_ms(1280);//1350
+				delay_ms(1420);//1350
 				set_steer_helm_basement(data_steer_helm_basement.left_limit);
-				delay_ms(850);//900
+				delay_ms(950);//900
 			}
 			if(current_place==3)
 			{
+				sending_service_package(0x33,0x00DC,0x05CC);
 				delay_ms(400);
 				set_steer_helm_basement(data_steer_helm_basement.right_limit);
 				delay_ms(1300);
@@ -663,10 +726,11 @@ void RFID_control_car_3_action(DWORD site)
 		}
 		if(Light_Status==0)
 		{
+			sending_service_package(0x33,0x00DC,0x06BB);
 			set_steer_helm_basement(data_steer_helm_basement.center);
 			delay_ms(700);
 			set_steer_helm_basement(data_steer_helm_basement.left_limit);
-			delay_ms(850);
+			delay_ms(900);
 		}
 	}
 	if((site>>8)==0x21 && (site>>0)!=0x2103)//在左打死路口
@@ -675,35 +739,37 @@ void RFID_control_car_3_action(DWORD site)
 	//	bz=5;
 		delay_ms(100);
 		set_steer_helm_basement(data_steer_helm_basement.left_limit);
-		delay_ms(900);
+		delay_ms(1000);
 	}
 	if((site>>8)==0x25)//停车
 	{
 		if(End==1)
 		{
-			sending_service_package(0x44,0xCCDD,0x0001);
-			set_steer_helm_basement(data_steer_helm_basement.center-(data_steer_helm_basement.center-data_steer_helm_basement.left_limit)*0.2);
-			delay_ms(200);
-			set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.2+data_steer_helm_basement.center);
+			set_speed_pwm(300);
+			set_steer_helm_basement(data_steer_helm_basement.center-50);
 			delay_ms(100);
 			sending_service_package(0x44,0xCCDD,0x0001);
-			set_steer_helm_basement(data_steer_helm_basement.center);
 			Game_over=1;
-			delay_ms(600);
+			delay_ms(700);
 			set_speed_pwm(0);
+			Game_over=0;
 			LCD_Fill(0x00);
 			sending_service_package(0x44,0xAABB,0x0001);
-			Car_Waitfororder=1;
-			Car_Stop=1;
+			delay_ms(200);
+			sending_service_package(0x44,0xAABB,0x0001);
+			delay_ms(200);
+			suicide();
 		}
 		else 
 			jishu=1;
 	}
 	if((site>>8)==0x26 && End==1)//回停车场
 	{
-		delay_ms(100);
-		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.36+data_steer_helm_basement.center);
-		delay_ms(600);
+		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.66+data_steer_helm_basement.center);
+		sending_service_package(0x44,0xCCDD,0x0001);
+		delay_ms(300);
+		sending_service_package(0x44,0xCCDD,0x0001);
+		delay_ms(300);
 	}
 	if((site>>8)==0x22)//在右打死路口
 	{
@@ -715,13 +781,14 @@ void RFID_control_car_3_action(DWORD site)
 	}
 	if((site>>0)==0x3003)//改变PID算法
 	{
-		delay_ms(600);
+		delay_ms(450);
 		set_steer_helm_basement(data_steer_helm_basement.right_limit);
 		delay_ms(1320);
 	}
 	
 	if((site>>0)==0x4001 && place[1]==1)//住宅区起点
 	{
+		delay_ms(150);
 		sending_service_package(0x44,0x0011,site);
 		Car_Stop=1;
 		set_speed_pwm(-800);
@@ -731,9 +798,12 @@ void RFID_control_car_3_action(DWORD site)
 		set_speed_pwm(0);
 		place[1]=3;
 		used=1;
+		delay_ms(450);
+		sending_service_package(0x44,0x0011,site);
 	}	
 	if((site>>0)==0x4002 && place[2]==1)//工作区起点
 	{
+		delay_ms(150);
 		sending_service_package(0x44,0x0011,site);
 		Car_Stop=1;
 		set_speed_pwm(-800);
@@ -747,23 +817,33 @@ void RFID_control_car_3_action(DWORD site)
 		    Had_turn=1;
 		if(place[1]==2)
 		    Had_turn=0;
+		delay_ms(450);
+		sending_service_package(0x44,0x0011,site);
 	}
 	if((site>>0)==0x4003 && place[3]==1)//警察局起点
 	{
-		sending_service_package(0x44,0x0011,site);
+		delay_ms(150);
+		sending_service_package(0xEE,0xAAAA,0x0);		
 		Car_Stop=1;
 		set_speed_pwm(-800);
 		delay_ms(50);
 		LCD_Fill(0x00);
 		Car_Psg=1;
 		set_speed_pwm(0);
+		delay_ms(100);
+		sending_service_package(0xEE,0xAAAA,0x0);
+		delay_ms(100);
+		sending_service_package(0x44,0x0011,site);
 		place[3]=3;
 		used=1;
+		delay_ms(450);
+		sending_service_package(0x44,0x0011,site);
 	}
 	if(used==1)
 	{
 		if((site>>0)==0x4001 && place[1]==2)//住宅区终点
 		{
+			delay_ms(150);
 			sending_service_package(0x44,0x0022,site);
 			Car_Stop=1;
 			set_speed_pwm(-800);
@@ -772,9 +852,12 @@ void RFID_control_car_3_action(DWORD site)
 			Car_Psg=1;
 			set_speed_pwm(0);
 			place[1]=3;
+			delay_ms(450);
+			sending_service_package(0x44,0x0022,site);
 		}	
 		if((site>>0)==0x4002 && place[2]==2)//工作区终点
 		{
+			delay_ms(150);
 			sending_service_package(0x44,0x0022,site);
 			Car_Stop=1;
 			set_speed_pwm(-800);
@@ -783,17 +866,26 @@ void RFID_control_car_3_action(DWORD site)
 			Car_Psg=1;
 			set_speed_pwm(0);
 			place[2]=3;
+			delay_ms(450);
+			sending_service_package(0x44,0x0022,site);
 		}
 		if((site>>0)==0x4003 && place[3]==2)//警察局终点
 		{
-			sending_service_package(0x44,0x0022,site);
+			delay_ms(150);
+			sending_service_package(0xEE,0xAAAA,0x0);
 			Car_Stop=1;
 			set_speed_pwm(-800);
 			delay_ms(50);
 			LCD_Fill(0x00);
 			Car_Psg=1;
 			set_speed_pwm(0);
+			delay_ms(100);
+			sending_service_package(0xEE,0xAAAA,0x0);
+			delay_ms(100);
+			sending_service_package(0x44,0x0022,site);
 			place[3]=3;
+			delay_ms(450);
+			sending_service_package(0x44,0x0022,site);
 		}
 	}
 }
@@ -951,9 +1043,9 @@ void control_car_action(void)
 				set_speed_pwm(velocity);
 				if(Rightturn==1)
 				{
-					delay_ms(700);
+					delay_ms(870);
 					set_steer_helm_basement(data_steer_helm_basement.right_limit);
-					delay_ms(900);
+					delay_ms(930);
 					Rightturn=0;
 				}
 			}
@@ -966,9 +1058,9 @@ void control_car_action(void)
 				if(Leftturn==1)
 				{
 					set_steer_helm_basement(data_steer_helm_basement.center);
-					delay_ms(1750);//1350
+					delay_ms(2120);//1350
 					set_steer_helm_basement(data_steer_helm_basement.left_limit);
-					delay_ms(850);//900
+					delay_ms(970);//900
 					Leftturn=0;
 				}	
 			}
@@ -1001,13 +1093,13 @@ void control_car_action(void)
 						set_steer_helm_basement(data_steer_helm_basement.center);
 						delay_ms(250);
 					}
-					else
-					{
-						set_steer_helm_basement(data_steer_helm_basement.center);
-						delay_ms(750);//850
-						set_steer_helm_basement(data_steer_helm_basement.left_limit);////////
-						delay_ms(1050);////////////900
-					}
+//					else
+//					{
+//						set_steer_helm_basement(data_steer_helm_basement.center-100);
+//						delay_ms(800);//850
+//						set_steer_helm_basement(data_steer_helm_basement.left_limit);////////
+//						delay_ms(1000);////////////900
+//					}
 					Leftturn=0;
 				}
 				if(Rightturn==1)
@@ -1021,19 +1113,21 @@ void control_car_action(void)
 			if(Light_Status==0 && Road_No==2)
 			{
 				delay_ms(1000);
-				set_speed_pwm(450);
+				set_speed_pwm(420);
 				Car_Stop=0;
 				if(RFID_site_data.roadnum==0x1201)
 				{
 					if(current_place==2 || current_place==0 || current_place==1)
 					{
+						sending_service_package(0x33,0x00DC,0x05BB);
 						set_steer_helm_basement(data_steer_helm_basement.center);
-						delay_ms(1350);//1350
+						delay_ms(1650);//1350
 						set_steer_helm_basement(data_steer_helm_basement.left_limit);
-						delay_ms(850);//900
+						delay_ms(900);//900
 					}	
 					if(current_place==3)
 					{//////////////////
+						sending_service_package(0x33,0x00DC,0x05CC);
 						delay_ms(550);
 						set_steer_helm_basement(data_steer_helm_basement.right_limit);
 						delay_ms(1350);
@@ -1041,10 +1135,11 @@ void control_car_action(void)
 				}
 				if(RFID_site_data.roadnum==0x1202)
 				{
+					sending_service_package(0x33,0x00DC,0x06BB);
 					set_steer_helm_basement(data_steer_helm_basement.center);
 					delay_ms(1150);
 					set_steer_helm_basement(data_steer_helm_basement.left_limit);
-					delay_ms(900);
+					delay_ms(1100);
 				}
 			}
 		}
@@ -1175,6 +1270,9 @@ void BMW_Taxi()//宝马开关门开车控制
 			sending_service_package(0x44,0x1111,0x0000);
 			Car_Stop=0;
 			Door_Delay=0;
+			sending_service_package(0xEE,0xBBBB,0x0);
+			delay_ms(100);
+			sending_service_package(0xEE,0xBBBB,0x0);
 		}
 	}
 	if(Door_Close_Run)
@@ -1183,6 +1281,7 @@ void BMW_Taxi()//宝马开关门开车控制
 		set_door_pwm(-600);
 		Door_Close_Run=0;
 		Door_Delay=1;
+		sending_service_package(0x44,0x1111,0x0000);
 	}
 }
 
@@ -1295,37 +1394,21 @@ void Start_one()
 				g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
 				Wifi_Ctrl();
 			}
-			if(order_received==1)
-			{
-				order_received=0;
-				generate_remote_frame_2(g_device_NO_Hex, 0x33, 0x0000, 2, (const BYTE *)(&response_data));
-			}
 		}
-		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.5+data_steer_helm_basement.center);
-		set_speed_pwm(-300); 
-		jishu=0;
-		while(jishu==0)
-		{
-			control_car_action();
-			if(jishu==1)
-			{
-			//	set_speed_pwm(1000);
-			//	delay_ms(80);
-				sending_service_package(0x44,0xDDCC,0x0002);
-				set_speed_pwm(0);
-				delay_ms(1500);
-				sending_service_package(0x44,0xDDCC,0x0002);
-				set_steer_helm_basement(data_steer_helm_basement.center);
-				set_speed_pwm(310);
-				delay_ms(800);
-				sending_service_package(0x44,0xDDCC,0x0002);
-				delay_ms(1000);
-				sending_service_package(0x44,0xAABB,0x0001);		
-				fieldover=1;	
-			}
-		}
-		bz=-2;
-		velocity=300;
+		set_speed_pwm(270);
+		set_steer_helm_basement((data_steer_helm_basement.right_limit-data_steer_helm_basement.center)*0.72+data_steer_helm_basement.center);
+		sending_service_package(0x44,0xDDCC,0x0002);
+		delay_ms(500);
+		sending_service_package(0x44,0xDDCC,0x0002);
+		delay_ms(500);
+		sending_service_package(0x44,0xDDCC,0x0002);
+		delay_ms(800);
+		sending_service_package(0x44,0xDDCC,0x0002);
+		delay_ms(500);
+		sending_service_package(0x44,0xAABB,0x0001);
+		delay_ms(500);
+		sending_service_package(0x44,0xAABB,0x0001);
+		velocity=280;
 		jishu=0;
 	}
 	if(g_device_NO==3 && Car_Waitfororder==1) 
@@ -1355,16 +1438,25 @@ void Start_one()
 				set_speed_pwm(1000);
 				delay_ms(80);
 				set_speed_pwm(0);
-				delay_ms(1500);
+				delay_ms(500);
+				sending_service_package(0x44,0xDDCC,0x0002);
+				delay_ms(500);
+				sending_service_package(0x44,0xDDCC,0x0002);
+				delay_ms(500);
 				sending_service_package(0x44,0xDDCC,0x0002);
 				set_steer_helm_basement(data_steer_helm_basement.left_limit);
-				set_speed_pwm(450);
-				delay_ms(1000);
+				set_speed_pwm(420);
+				delay_ms(150);
+				sending_service_package(0x44,0xAABB,0x0001);
+				delay_ms(150);
+				sending_service_package(0x44,0xAABB,0x0001);
+				delay_ms(150);
+				sending_service_package(0x44,0xAABB,0x0001);
+				delay_ms(150);
 				sending_service_package(0x44,0xAABB,0x0001);
 				out=1;
-				delay_ms(5000);
+				delay_ms(4000);
 				set_steer_helm_basement(data_steer_helm_basement.right_limit);
-				sending_service_package(0x44,0xAABB,0x0001);
 				delay_ms(400);
 				fieldover=1;
 				velocity=360;

@@ -391,7 +391,6 @@ void Wifi_Ctrl()
 	{
 		if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x66)
 		{
-			order_received =1;
 			Car_Waitfororder=0;
 		}
 		if (remote_frame_data[3] == g_device_NO_Hex && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)   
@@ -404,7 +403,6 @@ void Wifi_Ctrl()
 		}// 第一幕终止 
 		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01)   
 		{
-			order_received =1;
 			if(remote_frame_data[8]==0x0A)
 				Light_Status=0;	
 			if(remote_frame_data[8]==0x0B)
@@ -425,6 +423,9 @@ void Wifi_Ctrl()
 			order_received =1;
 			Emergency=0;
 		}// 紧急状态	解除
+	}
+	if(remote_frame_data[2] == 0x03 && g_device_NO!=2)
+	{
 		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xAA && remote_frame_data[6]==0xAA)   
 		{
 			order_received =1;
@@ -435,14 +436,15 @@ void Wifi_Ctrl()
 			order_received =1;
 			Hold_a=0;
 			Car_Waitfororder=0;
-		}// 接客状态	解除		
-	}	
+		}// 接客状态	解除
+	}
 	if(remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex)//天少发过来
 	{
 		if ( remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)
 				have_responsed=1;	// 检查天少是否回答 
 		if(g_device_NO == 3)
 		{
+
 			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x66)
 			{
 				used=0;
@@ -460,7 +462,7 @@ void Wifi_Ctrl()
 					place[3]=2;
 				Car_Waitfororder=0;
 				sending_service_package(0x44,0x0000,0xAAAA);
-				delay_ms(500);
+				delay_ms(200);
 				sending_service_package(0x44,0x0000,0xAAAA);
 			}
 			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x0B)
@@ -468,7 +470,13 @@ void Wifi_Ctrl()
 			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCB)
 				Door_Close=1;
 			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01) 
+			{
+				while(Door_Status==1);
 				Car_Stop=0;//天少开车
+				sending_service_package(0xEE,0xBBBB,0x0);
+				delay_ms(100);
+				sending_service_package(0xEE,0xBBBB,0x0);
+			}
 			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCC) 
 				Door_Close_Run=1;//关门并开车
 			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0x3B) 

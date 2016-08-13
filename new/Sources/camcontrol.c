@@ -72,9 +72,9 @@ if(g_device_NO==2 && right==1)         //2号车PID参数   转弯    jqy
 
 if(g_device_NO==2 && right==0)         //2号车PID参数       jqy
 {
-	if(ABS(target_offset)<6) 	{Steer_kp=20;Steer_kd=5;}//25
-	else if(ABS(target_offset)<26)  {Steer_kp=24+target_offset*target_offset/100;Steer_kd=10;}//30
-	else {Steer_kp=30+target_offset*target_offset/500;Steer_kd=5;}//34
+	if(ABS(target_offset)<6) 	{Steer_kp=17;Steer_kd=5;}//25
+	else if(ABS(target_offset)<26)  {Steer_kp=21+target_offset*target_offset/100;Steer_kd=10;}//30
+	else {Steer_kp=26+target_offset*target_offset/500;Steer_kd=5;}//34
 }
 #endif
 
