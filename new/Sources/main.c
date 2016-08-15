@@ -56,7 +56,7 @@ void Lightcontrol(void)
 			Wifi_Ctrl();
 			//rfid_ask_road(0x05, 0x33, 0x04, 0x00000000);//device_05
 		}
-		if(Emergency_Mode==0 || mode==3)
+		if(1)//Emergency_Mode==0 || mode==3
 		{
 			if(Light_Status==0)//红灯
 			{
@@ -82,8 +82,8 @@ void Lightcontrol(void)
 			if(LightCC2==1)
 			{
 				LightCC2=0;
-				GreenL_main2=0;
-				YellowL_main2=1;
+				GreenL_main2=1;
+				//YellowL_main2=1;
 				RedL_main2=0;
 			}
 			if(Light_Status==1)//绿灯
@@ -96,15 +96,15 @@ void Lightcontrol(void)
 				RedL_main2=1;
 			}
 		}
-		if(Emergency_Mode==1 && mode==1)
-		{
-			RedL_main=1;
-			RedL_main2=1;
-			GreenL_main=0;
-			GreenL_main2=0;
-			YellowL_main=0;
-			YellowL_main2=0;
-		}
+//		if(Emergency_Mode==1 && mode==1)
+//		{
+//			RedL_main=1;
+//			RedL_main2=1;
+//			GreenL_main=0;
+//			GreenL_main2=0;
+//			YellowL_main=0;
+//			YellowL_main2=0;
+//		}
 	}
 }
 
