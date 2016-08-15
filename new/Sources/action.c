@@ -97,28 +97,11 @@ void RFID_control_car_4_action(DWORD site)
 /*-----------------------------------------------------------------------*/
 void RFID_control_car_7_action(WORD site)
 {
-	if((site>>8)!=0x25 && (site>>8)!=0x23)
+	if((site>>8)!=0x25 && (site>>8)!=0x23 && (site>>0)!=0x1105 && (site>>0)!=0x8014)
 		sending_service_package(0x33,0x00CD,site);
-//	if((site>>0)==0x1105 && Polizei==1)//在红绿灯路口1
-//	{
-//		Light_Mode=0;
-//		set_steer_helm_basement(data_steer_helm_basement.center+70);
-//		delay_count=0;
-//		while(delay_count<7000)
-//		{
-//			LCD_Write_Num(105,3,delay_count,4);
-//		}
-//		set_steer_helm_basement(data_steer_helm_basement.left_limit);
-//		delay_count=0;
-//		while(delay_count<6000)
-//		{
-//			LCD_Write_Num(105,3,delay_count,4);
-//		}
-//		Polizei=0;
-//		velocity=100;
-//	}
 	if((site>>0)==0x8014 && Polizei==1)//在红绿灯路口1
 	{
+		sending_service_package(0x33,0x00DC,0x01BB);
 		Light_Mode=0;
 		delay_count=0;
 		set_steer_helm_basement(data_steer_helm_basement.left_limit);
@@ -126,8 +109,11 @@ void RFID_control_car_7_action(WORD site)
 		{
 			LCD_Write_Num(105,3,delay_count,4);
 		}
-		Polizei=0;
 		velocity=90;
+	}
+	if((site>>0)==0x8014 && Polizei==0)//在红绿灯路口1
+	{
+		sending_service_package(0x33,0x00DC,0x01AA);
 	}
 	if((site>>0)==0x1102)
 	{
@@ -169,6 +155,7 @@ void RFID_control_car_7_action(WORD site)
 		{
 			LCD_Write_Num(105,3,delay_count,4);
 		}
+		Polizei=0;
 	}
 	if((site>>8)==0x21 && (site>>0)!=0x2103)//在左打死路口         并起道路动作切换功能，日后需更改               jqy
 	{
@@ -190,19 +177,19 @@ void RFID_control_car_7_action(WORD site)
 		bz=1;
 		delay_count=0;
 		set_steer_helm_basement(data_steer_helm_basement.left_limit);
-		while(delay_count<4000)
+		while(delay_count<3600)
 		{
 			LCD_Write_Num(105,3,delay_count,4);
 		}
 		set_steer_helm_basement(data_steer_helm_basement.right_limit);
 		delay_count=0;
-		while(delay_count<4100)
+		while(delay_count<3700)
 		{
 			LCD_Write_Num(105,3,delay_count,4);
 		}
 		set_steer_helm_basement(data_steer_helm_basement.center);
 		delay_count=0;
-		while(delay_count<3000)
+		while(delay_count<2600)
 		{
 			LCD_Write_Num(105,3,delay_count,4);
 		}
@@ -269,10 +256,10 @@ void RFID_control_car_8_action(WORD site)
 	if(((site>>0)==0x1101) && (Polizei==1))//在红绿灯路口1
 	{
 		g_f_enable_speed_control=0;
-		delay_ms(100);
 		set_speed_pwm(-300);
 		delay_ms(50);
 		set_speed_pwm(0);
+		sending_service_package(0x33,0x00FD,0x00FD);
 		suicide();
 	}
 	if((site>>8)==0x12)//在红绿灯路口2
@@ -400,14 +387,10 @@ void control_car_action(void)
 				RFID_control_car_8_action(RFID_site_data.roadnum);
 				RFID_site_data.is_new_site = 0;
 			}
-			if(Car_Stop==1 &&  RoadType!=88 && RoadType!=2)
+			if(Car_Stop==1)
 			{
 				if(Light_Status==1 && Road_No==1)
 				{
-//					if(bz==2 || (RFID_site_data.roadnum==0x1102))
-//					{
-//						LCD_Write_Num(105,6,'he',2);
-//					}
 					g_f_enable_speed_control=1;
 					fieldover=1;
 					Car_Stop=0;
@@ -477,11 +460,6 @@ void Start_one()
 				g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
 				Wifi_Ctrl();
 			}
-//			if(order_received==1)
-//			{
-//				order_received=0;
-//				generate_remote_frame_2(g_device_NO_Hex, 0x33, 0x0000, 2, (const BYTE *)(&response_data));
-//			}
 		}
 		RightL=0;
 		velocity=60;
@@ -499,5 +477,17 @@ void Start_one()
 			LCD_Write_Num(105,3,delay_count,4);
 		}
 	}
-	
+	if(g_device_NO==8 && Car_Waitfororder==1)    //电压8.7V
+	{
+		while(Car_Waitfororder==1)
+		{
+			if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
+			{
+				g_remote_frame_state = REMOTE_FRAME_STATE_NOK;
+				Wifi_Ctrl();
+			}
+		}
+		velocity=16;
+		set_speed_target(velocity);
+	}
 }

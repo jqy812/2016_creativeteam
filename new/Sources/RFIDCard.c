@@ -173,6 +173,8 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x1106;
 	if(site== ROAD_NUM_1201)
 		return 0x1201;
+	if(site== ROAD_NUM_1201_1)
+		return 0x1201;
 	if(site== ROAD_NUM_1202)
 		return 0x1202;
 	if(site== ROAD_NUM_4001)
@@ -180,6 +182,10 @@ WORD RFID_Num_Exp(DWORD site)
 	if(site== ROAD_NUM_4001_1)
 		return 0x4001;
 	if(site== ROAD_NUM_4002)
+		return 0x4002;
+	if(site== ROAD_NUM_4002_1)
+		return 0x4002;
+	if(site== ROAD_NUM_4002_2)
 		return 0x4002;
 	if(site== ROAD_NUM_4003)
 		return 0x4003;
@@ -189,9 +195,13 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x2101;
 	if(site== ROAD_NUM_2101_1)
 		return 0x2101;
+	if(site== ROAD_NUM_2101_2)
+		return 0x2101;
 	if(site== ROAD_NUM_2102)
 		return 0x2102;
 	if(site== ROAD_NUM_2102_1)
+		return 0x2102;
+	if(site== ROAD_NUM_2102_2)
 		return 0x2102;
 	if(site== ROAD_NUM_2103)
 		return 0x2103;
@@ -225,19 +235,25 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x2601;
 	if(site== ROAD_NUM_3001)
 		return 0x3001;
+	if(site== ROAD_NUM_3001_1)
+		return 0x3001;
+	if(site== ROAD_NUM_3001_2)
+		return 0x3001;
 	if(site== ROAD_NUM_3002)
+		return 0x3002;
+	if(site== ROAD_NUM_3002_1)
+		return 0x3002;
+	if(site== ROAD_NUM_3002_2)
 		return 0x3002;
 	if(site== ROAD_NUM_3003)
 		return 0x3003;
-	if(site== ROAD_NUM_3004)
-		return 0x3001;
-	if(site== ROAD_NUM_3005)
-		return 0x3002;
 	if(site== ROAD_NUM_3101)
 		return 0x3101;
 	if(site== ROAD_NUM_3201)
 		return 0x3201;
-	if(site== ROAD_NUM_3202)
+	if(site== ROAD_NUM_3201_1)
+		return 0x3201;
+	if(site== ROAD_NUM_3201_2)
 		return 0x3201;
 	if(site== ROAD_NUM_0A01)
 		return 0x0A01;
@@ -252,6 +268,8 @@ WORD RFID_Num_Exp(DWORD site)
 	if(site== ROAD_NUM_8004)
 		return 0x8004;
 	if(site== ROAD_NUM_8005)
+		return 0x8005;
+	if(site== ROAD_NUM_8005_1)
 		return 0x8005;
 	if(site== ROAD_NUM_8006)
 		return 0x8006;
@@ -268,6 +286,8 @@ WORD RFID_Num_Exp(DWORD site)
 	if(site== ROAD_NUM_8011)
 		return 0x8011;
 	if(site== ROAD_NUM_8012)
+		return 0x8012;
+	if(site== ROAD_NUM_8012_1)
 		return 0x8012;
 	if(site== ROAD_NUM_8013)
 		return 0x8013;

@@ -427,12 +427,21 @@ void Wifi_Ctrl()
 		{
 			order_received =1;
 			Emergency=0;
-		}// 紧急状态	解除		
+		}// 紧急状态	解除	
+		if(g_device_NO==8)
+		{
+			if (remote_frame_data[3] == 0x08 && remote_frame_data[5]==0x88 && remote_frame_data[6]==0x88)   
+			{
+				order_received =1;
+				Car_Waitfororder=0;
+			}// 匪车出门	
+		}
 		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0x07 && remote_frame_data[6]==0x08)   
 		{
 			order_received =1;
 			Polizei=1;
-			Car_Waitfororder=0;
+			if(g_device_NO==7)
+				Car_Waitfororder=0;
 		}// 警匪追逐开始	
 	}	
 	if(remote_frame_data[2] == 0x01 && g_device_NO==7)
@@ -443,20 +452,20 @@ void Wifi_Ctrl()
 			bz=711;
 		}// 接客状态	
 	}
-	if(remote_frame_data[2] == 0x03 && g_device_NO!=7)
-	{
-		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xAA && remote_frame_data[6]==0xAA)   
-		{
-			order_received =1;
-			Hold_a=1;
-		}// 接客状态	
-		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xBB && remote_frame_data[6]==0xBB)   
-		{
-			order_received =1;
-			Hold_a=0;
-			Car_Waitfororder=0;
-		}// 接客状态	解除
-	}
+//	if(remote_frame_data[2] == 0x03 && g_device_NO!=7)
+//	{
+//		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xAA && remote_frame_data[6]==0xAA)   
+//		{
+//			order_received =1;
+//			Hold_a=1;
+//		}// 接客状态	
+//		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xBB && remote_frame_data[6]==0xBB)   
+//		{
+//			order_received =1;
+//			Hold_a=0;
+//			Car_Waitfororder=0;
+//		}// 接客状态	解除
+//	}
 }
 
 

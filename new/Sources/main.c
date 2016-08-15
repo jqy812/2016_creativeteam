@@ -45,16 +45,8 @@ void Mode0_DebugCamera(void)
 	
 	EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
 	g_f_enable_speed_control=1;
-	if(g_device_NO==7)
-	{   
-		Car_Waitfororder=1; /////////////////////////
-		velocity=60;
-		Start_one();
-	}
-	if(g_device_NO==8)
-	{
-		velocity=16;
-	}
+	Car_Waitfororder=1;
+	Start_one();
 	for (;;)
 	{
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
