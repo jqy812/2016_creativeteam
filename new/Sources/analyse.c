@@ -327,7 +327,7 @@ void FindBlackLine(void)
 		    for(i=RoadEnd;i<RoadStart/2-10;i++)
 				CenterLine[i]=(CenterLine[i]+7);
 			for(i=RoadStart/2-10;i<=RoadStart;i++)
-				CenterLine[i]=(CenterLine[i]+16);
+				CenterLine[i]=(CenterLine[i]+14);
 		}
 	}
 	if(g_device_NO==2)           //2号车中线偏移参数       jqy

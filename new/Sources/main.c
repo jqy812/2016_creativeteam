@@ -30,7 +30,7 @@ void Mode2_GO(void);
 void Mode3_Andriod(void);
 
 void main(void)
-{
+	{
 	init_all_and_POST();
 	if(mode==0)
 		Mode0_DebugCamera();//图像显示屏显示，车速20，显示offset RoadType，舵机打角，wifi_car_action不激活
@@ -52,11 +52,10 @@ void Mode0_DebugCamera(void)
 	else
 	{
 		EMIOS_0.CH[3].CCR.B.FEN=1;//开场中断
-		velocity=290;///////////////////////////////////////////
+		velocity=310;///////////////////////////////////////////
 	}
 	for (;;)
 	{
-	//	Start_one();
 		if (REMOTE_FRAME_STATE_OK == g_remote_frame_state)
 		{
 			g_remote_frame_state = REMOTE_FRAME_STATE_NOK;

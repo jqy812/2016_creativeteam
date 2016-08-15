@@ -276,7 +276,9 @@ void set_steer_helm_basement(WORD helmData)
 //	{
 //		helmData = 5000;
 //	}
-	if(helmData <= data_steer_helm_basement.left_limit)
+	if(g_device_NO!=3)
+	{
+		if(helmData <= data_steer_helm_basement.left_limit)
 		{
 			helmData = data_steer_helm_basement.left_limit;
 		}
@@ -284,6 +286,18 @@ void set_steer_helm_basement(WORD helmData)
 		{
 			helmData = data_steer_helm_basement.right_limit;
 		}
+	}
+	else
+	{
+		if(helmData <= data_steer_helm_basement.left_limit+100)
+		{
+			helmData = data_steer_helm_basement.left_limit+100;
+		}
+		else if(helmData >= data_steer_helm_basement.right_limit-100)
+		{
+			helmData = data_steer_helm_basement.right_limit-100;
+		}
+	}
 	if(helmData <=3700)
 	{
 		LeftL = 1;

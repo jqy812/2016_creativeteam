@@ -424,20 +424,6 @@ void Wifi_Ctrl()
 			Emergency=0;
 		}// 紧急状态	解除
 	}
-	if(remote_frame_data[2] == 0x03 && g_device_NO!=2)
-	{
-		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xAA && remote_frame_data[6]==0xAA)   
-		{
-			order_received =1;
-			Hold_a=1;
-		}// 接客状态	
-		if (remote_frame_data[3] == 0xEE && remote_frame_data[5]==0xBB && remote_frame_data[6]==0xBB)   
-		{
-			order_received =1;
-			Hold_a=0;
-			Car_Waitfororder=0;
-		}// 接客状态	解除
-	}
 	if(remote_frame_data[2] == 0x44 && remote_frame_data[3] == g_device_NO_Hex)//天少发过来
 	{
 		if ( remote_frame_data[5]==0x00 && remote_frame_data[6]==0x00)
@@ -468,11 +454,14 @@ void Wifi_Ctrl()
 			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0x0B)
 				Door_Open=1;	//天少远程开门
 			if(remote_frame_data[5]==0x00 && remote_frame_data[6]==0xCB)
-				Door_Close=1;
+			{
+				if(!Door_Status)
+					Door_Close=1;
+			}
 			if (remote_frame_data[5]==0x00 && remote_frame_data[6]==0x01) 
 			{
-				while(Door_Status==1);
-				Car_Stop=0;//天少开车
+				if(!Door_Status)
+					Car_Stop=0;//天少开车
 				sending_service_package(0xEE,0xBBBB,0x0);
 				delay_ms(100);
 				sending_service_package(0xEE,0xBBBB,0x0);

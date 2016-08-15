@@ -45,7 +45,7 @@ int rev_RFID_frame(BYTE rev)
 		}
 		else
 		{
-			g_rfid_frame_cnt = 0;
+			g_rfid_frame_cnt = Rfid_frame_rebuild(rfid_frame_data,g_rfid_frame_cnt);
 		}
 	}
 	else if (g_rfid_frame_cnt == 2)	//Receive length
@@ -53,7 +53,7 @@ int rev_RFID_frame(BYTE rev)
 		rfid_frame_data[g_rfid_frame_cnt++] = rev;
 		if (rev+3>RFID_FRAME_LENGTH_MAX)	//Overflow or not
 		{
-			g_rfid_frame_cnt = 0;
+			g_rfid_frame_cnt = Rfid_frame_rebuild(rfid_frame_data,g_rfid_frame_cnt);
 		}
 	}
 	else if (g_rfid_frame_cnt>2 && g_rfid_frame_cnt<=rfid_frame_data[2]+1)	//Receive data area
@@ -68,7 +68,7 @@ int rev_RFID_frame(BYTE rev)
 		sum = check_sum((const BYTE *)(rfid_frame_data+2), (WORD)(rfid_frame_data[2]));
 		if (sum != rfid_frame_data[rfid_frame_data[2]+2])
 		{
-			g_rfid_frame_cnt = 0;	//CheckSum Fail
+			g_rfid_frame_cnt = Rfid_frame_rebuild(rfid_frame_data,g_rfid_frame_cnt);	//CheckSum Fail
 		}
 		else
 		{
@@ -80,6 +80,25 @@ int rev_RFID_frame(BYTE rev)
 	return g_rfid_frame_state;
 }
 
+int Rfid_frame_rebuild(BYTE r_f_data[],int g_r_f_cnt)
+{
+	int i,j;
+	for(i=1;i<g_r_f_cnt;i++)
+	{
+		if((r_f_data[i] == 0xAA) && (r_f_data[i+1] == 0xBB))
+		{
+			for(j=0;j++;i+j<=g_r_f_cnt)
+				r_f_data[j]=r_f_data[i+j];
+			return (g_r_f_cnt-i+1);
+		}
+	}
+	if(r_f_data[g_r_f_cnt] == 0xAA)
+	{
+		r_f_data[0]=0xAA;
+		return 1;
+	}
+	return 0;
+}
 
 /*-----------------------------------------------------------------------*/
 /* Explane RFID return data aera                                         */
@@ -173,6 +192,8 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x1106;
 	if(site== ROAD_NUM_1201)
 		return 0x1201;
+	if(site== ROAD_NUM_1201_1)
+		return 0x1201;
 	if(site== ROAD_NUM_1202)
 		return 0x1202;
 	if(site== ROAD_NUM_4001)
@@ -183,6 +204,8 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x4002;
 	if(site== ROAD_NUM_4002_1)
 		return 0x4002;
+	if(site== ROAD_NUM_4002_2)
+		return 0x4002;
 	if(site== ROAD_NUM_4003)
 		return 0x4003;
 	if(site== ROAD_NUM_4003_1)
@@ -191,9 +214,13 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x2101;
 	if(site== ROAD_NUM_2101_1)
 		return 0x2101;
+	if(site== ROAD_NUM_2101_2)
+		return 0x2101;
 	if(site== ROAD_NUM_2102)
 		return 0x2102;
 	if(site== ROAD_NUM_2102_1)
+		return 0x2102;
+	if(site== ROAD_NUM_2102_2)
 		return 0x2102;
 	if(site== ROAD_NUM_2103)
 		return 0x2103;
@@ -227,19 +254,25 @@ WORD RFID_Num_Exp(DWORD site)
 		return 0x2601;
 	if(site== ROAD_NUM_3001)
 		return 0x3001;
+	if(site== ROAD_NUM_3001_1)
+		return 0x3001;
+	if(site== ROAD_NUM_3001_2)
+		return 0x3001;
 	if(site== ROAD_NUM_3002)
+		return 0x3002;
+	if(site== ROAD_NUM_3002_1)
+		return 0x3002;
+	if(site== ROAD_NUM_3002_2)
 		return 0x3002;
 	if(site== ROAD_NUM_3003)
 		return 0x3003;
-	if(site== ROAD_NUM_3004)
-		return 0x3001;
-	if(site== ROAD_NUM_3005)
-		return 0x3002;
 	if(site== ROAD_NUM_3101)
 		return 0x3101;
 	if(site== ROAD_NUM_3201)
 		return 0x3201;
-	if(site== ROAD_NUM_3202)
+	if(site== ROAD_NUM_3201_1)
+		return 0x3201;
+	if(site== ROAD_NUM_3201_2)
 		return 0x3201;
 	if(site== ROAD_NUM_0A01)
 		return 0x0A01;
@@ -254,6 +287,8 @@ WORD RFID_Num_Exp(DWORD site)
 	if(site== ROAD_NUM_8004)
 		return 0x8004;
 	if(site== ROAD_NUM_8005)
+		return 0x8005;
+	if(site== ROAD_NUM_8005_1)
 		return 0x8005;
 	if(site== ROAD_NUM_8006)
 		return 0x8006;
@@ -270,6 +305,8 @@ WORD RFID_Num_Exp(DWORD site)
 	if(site== ROAD_NUM_8011)
 		return 0x8011;
 	if(site== ROAD_NUM_8012)
+		return 0x8012;
+	if(site== ROAD_NUM_8012_1)
 		return 0x8012;
 	if(site== ROAD_NUM_8013)
 		return 0x8013;
