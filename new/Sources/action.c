@@ -189,7 +189,7 @@ void RFID_control_car_7_action(WORD site)
 		}
 		set_steer_helm_basement(data_steer_helm_basement.center);
 		delay_count=0;
-		while(delay_count<2600)
+		while(delay_count<3000)
 		{
 			LCD_Write_Num(105,3,delay_count,4);
 		}
@@ -200,7 +200,7 @@ void RFID_control_car_7_action(WORD site)
 		Light_Mode=1;
 		bz=-1;
 	}
-	if(site==0x4003)
+	if(site==0x4003)// && Polizei==0
 	{
 		delay_count=0;
 		set_steer_helm_basement(data_steer_helm_basement.left_limit);

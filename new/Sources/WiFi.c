@@ -450,7 +450,7 @@ void Wifi_Ctrl()
 		{
 			order_received =1;
 			bz=711;
-		}// 接客状态	
+		}// 警车开车	
 	}
 //	if(remote_frame_data[2] == 0x03 && g_device_NO!=7)
 //	{

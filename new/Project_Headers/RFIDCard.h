@@ -166,8 +166,9 @@ struct
 	DWORD site;
 	DWORD time;
 	DWORD old_site;
+	WORD roadnum;
 	int is_new_site;
-} RFID_site_data = { 0x00000000, 0x00000000, 0x00000000, 0 };
+} RFID_site_data = { 0x00000000, 0x00000000, 0x00000000, 0 ,0};
 #else
 extern struct
 {
