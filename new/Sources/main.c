@@ -82,7 +82,7 @@ void Mode0_DebugCamera(void)
 			else
 			    set_speed_pwm(velocity);
 			CenterLineWithVideo();        //摄像头数据处理              jqy     
-	     	Video_Show();                 //显示屏显示                     jqy
+	     	//Video_Show();                 //显示屏显示                     jqy
 	     	Typejudge();                  //赛道避障类型判断         jqy
 			if(target_offset<0)           //显示偏差值及赛道类型      jqy
 				LCD_write_english_string(96,1,"-");
